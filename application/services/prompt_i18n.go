@@ -305,6 +305,7 @@ Each frame **must** follow these specific rules:
 - **Frame 8:** Deceleration/Follow-through
 - **Frame 9:** Complete conclusion/Return to stillness
 
+**Style Requirement:** %s
 **Aspect Ratio:** * %s
 
 **Output Specification:**
@@ -346,8 +347,8 @@ You must return a **JSON object** with the following structure:
 - **第8格**：动作缓冲/逐渐收势
 - **第9格**：完全收尾/回归静止
 
-**Aspect Ratio:** 
-* %s
+**风格要求:** %s
+**图片比例:** * %s
 
 **Output Specification:**
 必须返回一个 **JSON 对象**,其结构如下:
@@ -358,7 +359,7 @@ You must return a **JSON object** with the following structure:
 {
   "prompt": "动作序列布局，3x3方格布局\n [第1格]: [角色参考图2] 在 [场景参考图1] 中自然站立，双脚分开...\n---\n [第2格]: [角色参考图2] 眼神锁定，身体前倾...\n---\n [第3格]: [角色参考图2的腿部] 双腿微屈，重心下沉...\n---\n [第4格]: [角色参考图2] 后腿蹬地，身体前移，[场景参考图1的地面] 扬起尘土...\n---\n [第5格]: [角色参考图2的服装] 身体前倾，拳头蓄力...\n---\n [第6格]: [角色参考图2] 全速冲刺，拳头击出...\n---\n [第7格]: [角色参考图2] 拳头击中，身体前冲...\n---\n [第8格]: [角色参考图2] 减速收拳...\n---\n [第9格]: [角色参考图2的完整外观] 在 [场景参考图1] 中站稳，恢复姿态。\n",
   "description": "黑衣剑客从拔剑到攻击的完整动作序列"
-}`, imageRatio)
+}`, style, imageRatio)
 }
 
 // GetLastFramePrompt 获取尾帧提示词

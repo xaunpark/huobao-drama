@@ -129,7 +129,7 @@ func (s *ScriptGenerationService) processCharacterGeneration(taskID string, req 
 
 	if err := utils.SafeParseAIJSON(text, &result); err != nil {
 		s.log.Errorw("Failed to parse characters JSON", "error", err, "raw_response", text[:minInt(500, len(text))], "task_id", taskID)
-		s.taskService.UpdateTaskStatus(taskID, "failed", 0, "解析AI返回结果失败")
+		s.taskService.UpdateTaskStatus(taskID, "failed", 0, "解析AI返回结果失败: " + err.Error())
 		return
 	}
 

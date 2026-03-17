@@ -628,8 +628,14 @@
             <div class="tab-content" v-if="currentStoryboard">
               <div class="video-generation-section">
                 <!-- 生成提示词展示 -->
-                <div class="video-prompt-box">
-                  {{ currentStoryboard.video_prompt || "暂无提示词" }}
+                <div class="video-prompt-container" style="margin-bottom: 20px;">
+                  <el-input
+                    v-model="currentVideoPrompt"
+                    type="textarea"
+                    :rows="8"
+                    placeholder="编辑将要发送的视频提示词..."
+                    resize="vertical"
+                  />
                 </div>
 
                 <!-- 视频参数设置 -->
@@ -911,9 +917,13 @@
                               i.frame_type === 'first',
                           ) && previousStoryboardLastFrames.length === 0
                         "
-                        description="暂无首帧图片"
+                        :description="$t('editor.noFirstFrameImage')"
                         size="small"
-                      />
+                      >
+                        <el-button type="primary" size="small" @click="activeTab = 'image'; selectedFrameType = 'first'">
+                          {{ $t('editor.goToGenerateImage') }}
+                        </el-button>
+                      </el-empty>
                     </div>
 
                     <!-- 关键帧 -->
@@ -993,9 +1003,13 @@
                               i.frame_type === 'key',
                           )
                         "
-                        description="暂无关键帧图片"
+                        :description="$t('editor.noKeyFrameImage')"
                         size="small"
-                      />
+                      >
+                        <el-button type="primary" size="small" @click="activeTab = 'image'; selectedFrameType = 'key'">
+                          {{ $t('editor.goToGenerateImage') }}
+                        </el-button>
+                      </el-empty>
                     </div>
 
                     <!-- 尾帧 -->
@@ -1075,9 +1089,13 @@
                               i.frame_type === 'last',
                           )
                         "
-                        description="暂无尾帧图片"
+                        :description="$t('editor.noLastFrameImage')"
                         size="small"
-                      />
+                      >
+                        <el-button type="primary" size="small" @click="activeTab = 'image'; selectedFrameType = 'last'">
+                          {{ $t('editor.goToGenerateImage') }}
+                        </el-button>
+                      </el-empty>
                     </div>
 
                     <!-- 分镜板 -->
@@ -2149,6 +2167,7 @@ const timelineEditorRef = ref<InstanceType<typeof VideoTimelineEditor> | null>(
 const videoReferenceImages = ref<ImageGeneration[]>([]);
 const selectedVideoModel = ref<string>("");
 const selectedReferenceMode = ref<string>(""); // 参考图模式：single, first_last, multiple, none
+const currentVideoPrompt = ref<string>("");
 const previewImageUrl = ref<string>(""); // 预览大图的URL
 const videoModelCapabilities = ref<VideoModelCapability[]>([]);
 let videoPollingTimer: any = null;
@@ -2654,6 +2673,44 @@ watch(selectedReferenceMode, () => {
   selectedImagesForVideo.value = [];
   selectedLastImageForVideo.value = null;
 });
+
+// 监听视频帧类型切换（首帧/尾帧/关键帧等），自动切换对应的参考图模式
+watch(selectedVideoFrameType, (newType) => {
+  if (newType === "first") {
+    selectedReferenceMode.value = "single";
+  } else if (newType === "last" || newType === "action" || newType === "key") {
+    selectedReferenceMode.value = "multiple";
+  }
+});
+
+// 监听分镜切换，自动填充视频提示词
+watch(
+  currentStoryboard,
+  () => {
+    if (!currentStoryboard.value) {
+      currentVideoPrompt.value = "";
+      return;
+    }
+    
+    // 获取基础提示词
+    let basePrompt =
+      currentStoryboard.value.video_prompt ||
+      currentStoryboard.value.action ||
+      currentStoryboard.value.description ||
+      "";
+      
+    // 自动将剧本的预设风格（Style）添加到最前面，确保风格权重最高
+    if (drama.value?.style) {
+      const stylePrefix = "Style: " + drama.value.style + ". ";
+      if (!basePrompt.includes("Style: " + drama.value.style)) {
+        basePrompt = stylePrefix + basePrompt;
+      }
+    }
+    
+    currentVideoPrompt.value = basePrompt;
+  },
+  { immediate: true },
+);
 
 // 当前分镜的角色列表
 const currentStoryboardCharacters = computed(() => {
@@ -3359,15 +3416,12 @@ const generateVideo = async () => {
     const requestParams: any = {
       drama_id: dramaId.toString(),
       storyboard_id: currentStoryboard.value.id,
-      prompt:
-        currentStoryboard.value.video_prompt ||
-        currentStoryboard.value.action ||
-        currentStoryboard.value.description ||
-        "",
+      prompt: currentVideoPrompt.value || "Anime style video scene",
       duration: videoDuration.value,
       provider: provider,
       model: selectedVideoModel.value,
       reference_mode: selectedReferenceMode.value,
+      style: drama.value?.style || undefined,
     };
 
     // 根据参考图模式设置参数

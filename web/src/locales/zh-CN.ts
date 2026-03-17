@@ -638,6 +638,10 @@ export default {
     createFailed: '制作失败',
     allCellsRequired: '请填充所有宫格',
     replaceImage: '替换图片',
+    noFirstFrameImage: '暂无首帧图片',
+    noKeyFrameImage: '暂无关键帧图片',
+    noLastFrameImage: '暂无尾帧图片',
+    goToGenerateImage: '前往生成',
     noImagesAvailable: '暂无图片'
   },
   video: {

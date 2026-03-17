@@ -521,6 +521,8 @@ func (s *ImageGenerationService) getImageClient(provider string) (image.ImageCli
 	case "gemini", "google":
 		endpoint = "/v1beta/models/{model}:generateContent"
 		return image.NewGeminiImageClient(config.BaseURL, config.APIKey, model, endpoint), nil
+	case "flowtool", "flow_tool":
+		return image.NewFlowToolImageClient(config.BaseURL), nil
 	default:
 		endpoint = "/images/generations"
 		return image.NewOpenAIImageClient(config.BaseURL, config.APIKey, model, endpoint), nil
@@ -579,6 +581,8 @@ func (s *ImageGenerationService) getImageClientWithModel(provider string, modelN
 	case "gemini", "google":
 		endpoint = "/v1beta/models/{model}:generateContent"
 		return image.NewGeminiImageClient(config.BaseURL, config.APIKey, model, endpoint), nil
+	case "flowtool", "flow_tool":
+		return image.NewFlowToolImageClient(config.BaseURL), nil
 	default:
 		endpoint = "/images/generations"
 		return image.NewOpenAIImageClient(config.BaseURL, config.APIKey, model, endpoint), nil

@@ -353,6 +353,11 @@ const providerConfigs: Record<AIServiceType, ProviderConfig[]> = {
       models: ["gemini-3-pro-image-preview"],
     },
     { id: "openai", name: "OpenAI", models: ["dall-e-3", "dall-e-2"] },
+    {
+      id: "flowtool",
+      name: "Flow-Tool (Localhost)",
+      models: ["veo-t2i", "veo-i2i"],
+    },
   ],
   video: [
     {
@@ -389,6 +394,11 @@ const providerConfigs: Record<AIServiceType, ProviderConfig[]> = {
       ],
     },
     { id: "openai", name: "OpenAI", models: ["sora-2", "sora-2-pro"] },
+    {
+      id: "flowtool",
+      name: "Flow-Tool (Localhost)",
+      models: ["veo-t2v", "veo-i2v-s", "veo-i2v-se", "veo-r2v"],
+    },
   ],
 };
 
@@ -426,6 +436,8 @@ const fullEndpointExample = computed(() => {
   } else if (serviceType === "image") {
     if (provider === "gemini" || provider === "google") {
       endpoint = "/v1beta/models/{model}:generateContent";
+    } else if (provider === "flowtool" || provider === "flow_tool") {
+      endpoint = "/v1/jobs";
     } else {
       endpoint = "/images/generations";
     }
@@ -442,6 +454,8 @@ const fullEndpointExample = computed(() => {
       endpoint = "/video_generation";
     } else if (provider === "openai") {
       endpoint = "/videos";
+    } else if (provider === "flowtool" || provider === "flow_tool") {
+      endpoint = "/v1/jobs";
     } else {
       endpoint = "/video/generations";
     }
@@ -496,6 +510,8 @@ const generateConfigName = (
     openai: "OpenAI",
     gemini: "Gemini",
     google: "Google",
+    flowtool: "FlowTool",
+    flow_tool: "FlowTool",
   };
 
   const serviceNames: Record<AIServiceType, string> = {
@@ -666,6 +682,8 @@ const handleProviderChange = () => {
     form.base_url = "https://ark.cn-beijing.volces.com/api/v3";
   } else if (form.provider === "openai") {
     form.base_url = "https://api.openai.com/v1";
+  } else if (form.provider === "flowtool" || form.provider === "flow_tool") {
+    form.base_url = "http://localhost:8000";
   } else {
     // chatfire 和其他厂商
     form.base_url = "https://api.chatfire.site/v1";

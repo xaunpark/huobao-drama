@@ -19,8 +19,12 @@ func SafeParseAIJSON(aiResponse string, v interface{}) error {
 		return fmt.Errorf("AI返回内容为空")
 	}
 
-	// 1. 移除可能的Markdown代码块标记
+	// 1. 移除可能的Markdown代码块标记和思考过程 (<think>...</think>)
 	cleaned := strings.TrimSpace(aiResponse)
+	
+	// 移除 <think>...</think>，包括多行内容
+	cleaned = regexp.MustCompile("(?s)<think>.*?</think>").ReplaceAllString(cleaned, "")
+	
 	// 移除开头的 ```json 或 ```
 	cleaned = regexp.MustCompile("(?m)^```json\\s*").ReplaceAllString(cleaned, "")
 	cleaned = regexp.MustCompile("(?m)^```\\s*").ReplaceAllString(cleaned, "")
@@ -60,6 +64,9 @@ func SafeParseAIJSON(aiResponse string, v interface{}) error {
 	if jsonMatch == "" {
 		return fmt.Errorf("响应中未找到有效的JSON对象或数组，原始响应: %s", truncateString(aiResponse, 200))
 	}
+
+	// 尝试自动修复AI不小心加入的未转义双引号问题
+	jsonMatch = fixUnescapedQuotes(jsonMatch)
 
 	// 3. 尝试解析JSON
 	err := json.Unmarshal([]byte(jsonMatch), v)
@@ -104,6 +111,66 @@ func SafeParseAIJSON(aiResponse string, v interface{}) error {
 
 	return fmt.Errorf("JSON解析失败: %w\n原始响应: %s", err, truncateString(jsonMatch, 300))
 }
+
+// fixUnescapedQuotes 修复由于AI生成的文本中包含未转义双引号导致的JSON无法解析问题
+// 这是一个基于状态机的简单修复程序，能识别并转义存在于JSON字符串内部的独立双引号。
+func fixUnescapedQuotes(jsonStr string) string {
+	var sb strings.Builder
+	sb.Grow(len(jsonStr))
+
+	inString := false
+	var lastNonSpace rune
+
+	runes := []rune(jsonStr)
+	for i := 0; i < len(runes); i++ {
+		r := runes[i]
+
+		if r == '"' && (i == 0 || runes[i-1] != '\\') {
+			isValidStart := false
+			if lastNonSpace == ':' || lastNonSpace == '{' || lastNonSpace == '[' || lastNonSpace == ',' {
+				isValidStart = true
+			}
+
+			isValidEnd := false
+			nextNonSpace := rune(0)
+			for j := i + 1; j < len(runes); j++ {
+				if runes[j] != ' ' && runes[j] != '\t' && runes[j] != '\n' && runes[j] != '\r' {
+					nextNonSpace = runes[j]
+					break
+				}
+			}
+			if nextNonSpace == ':' || nextNonSpace == ',' || nextNonSpace == '}' || nextNonSpace == ']' || nextNonSpace == 0 {
+				isValidEnd = true
+			}
+
+			if inString {
+				if isValidEnd {
+					inString = false
+				} else {
+					// 字符串内部的未转义双引号，转义它
+					sb.WriteString(`\"`)
+					continue
+				}
+			} else {
+				if isValidStart {
+					inString = true
+				} else {
+					// 这个双引号不在合法的JSON标点后开始，大概率也是非法的，转义它
+					sb.WriteString(`\"`)
+					continue
+				}
+			}
+		}
+
+		if r != ' ' && r != '\t' && r != '\n' && r != '\r' {
+			lastNonSpace = r
+		}
+		sb.WriteRune(r)
+	}
+
+	return sb.String()
+}
+
 
 // attemptJSONRepair 尝试修复常见的JSON问题
 func attemptJSONRepair(jsonStr string) string {

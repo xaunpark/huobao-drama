@@ -623,6 +623,8 @@ func (s *VideoGenerationService) getVideoClient(provider string, modelName strin
 		return video.NewPikaClient(baseURL, apiKey, model), nil
 	case "minimax":
 		return video.NewMinimaxClient(baseURL, apiKey, model), nil
+	case "flowtool", "flow_tool":
+		return video.NewFlowToolVideoClient(baseURL), nil
 	default:
 		return nil, fmt.Errorf("unsupported video provider: %s", provider)
 	}

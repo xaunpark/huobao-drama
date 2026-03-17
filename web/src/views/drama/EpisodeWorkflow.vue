@@ -1735,28 +1735,27 @@ const extractCharactersAndBackgrounds = async () => {
   try {
     const episodeId = currentEpisode.value.id;
 
-    // 并行创建异步任务
-    const [characterTask, backgroundTask] = await Promise.all([
-      generationAPI.generateCharacters({
-        drama_id: dramaId.toString(),
-        episode_id: episodeId,
-        outline: currentEpisode.value.script_content || "",
-        count: 0,
-        model: selectedTextModel.value, // 传递用户选择的文本模型
-      }),
-      dramaAPI.extractBackgrounds(
-        episodeId.toString(),
-        selectedTextModel.value,
-      ), // 传递用户选择的文本模型
-    ]);
+    // 改为串行执行，避免本地AI(如Locally AI)并发请求时报"no workers online"错误
+    ElMessage.success("正在创建角色提取任务...");
+    const characterTask = await generationAPI.generateCharacters({
+      drama_id: dramaId.toString(),
+      episode_id: episodeId,
+      outline: currentEpisode.value.script_content || "",
+      count: 0,
+      model: selectedTextModel.value, // 传递用户选择的文本模型
+    });
 
-    ElMessage.success("任务已创建，正在后台处理...");
+    ElMessage.success("角色提取任务正在处理...");
+    await pollExtractTask(characterTask.task_id, "character");
 
-    // 并行轮询两个任务
-    await Promise.all([
-      pollExtractTask(characterTask.task_id, "character"),
-      pollExtractTask(backgroundTask.task_id, "background"),
-    ]);
+    ElMessage.success("角色提取完成，正在创建场景提取任务...");
+    const backgroundTask = await dramaAPI.extractBackgrounds(
+      episodeId.toString(),
+      selectedTextModel.value,
+    ); // 传递用户选择的文本模型
+
+    ElMessage.success("场景提取任务正在处理...");
+    await pollExtractTask(backgroundTask.task_id, "background");
 
     ElMessage.success($t("workflow.charactersAndScenesExtractSuccess"));
     await loadDramaData();
@@ -1819,7 +1818,7 @@ const pollExtractTask = async (
       } else if (task.status === "failed") {
         // 任务失败
         throw new Error(
-          task.error ||
+          task.error || task.message ||
             (type === "character"
               ? $t("workflow.characterGenerationFailed")
               : $t("workflow.sceneExtractionFailed")),

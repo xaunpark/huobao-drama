@@ -263,6 +263,11 @@ const providerConfigs: Record<AIServiceType, ProviderConfig[]> = {
       models: ["gemini-3-pro-image-preview"],
     },
     { id: "openai", name: "OpenAI", models: ["dall-e-3", "dall-e-2"] },
+    {
+      id: "flowtool",
+      name: "Flow-Tool (Localhost)",
+      models: ["veo-t2i", "veo-i2i"],
+    },
   ],
   video: [
     {
@@ -290,22 +295,30 @@ const providerConfigs: Record<AIServiceType, ProviderConfig[]> = {
       ],
     },
     { id: "openai", name: "OpenAI", models: ["sora-2", "sora-2-pro"] },
+    {
+      id: "flowtool",
+      name: "Flow-Tool (Localhost)",
+      models: ["veo-t2v", "veo-i2v-s", "veo-i2v-se", "veo-r2v"],
+    },
     //    { id: 'minimax', name: 'MiniMax', models: ['MiniMax-Hailuo-2.3', 'MiniMax-Hailuo-2.3-Fast', 'MiniMax-Hailuo-02'] }
   ],
 };
 
-// 当前可用的厂商列表（只显示有激活配置的）
+// 当前可用的厂商列表
+// 新建配置时显示所有厂商，编辑时只显示有激活配置的厂商
 const availableProviders = computed(() => {
-  // 获取当前service_type下所有激活的配置
+  const allProviders = providerConfigs[form.service_type] || [];
+
+  // 新建模式：显示所有厂商，方便添加新provider
+  if (!isEdit.value) {
+    return allProviders;
+  }
+
+  // 编辑模式：只显示有激活配置的厂商
   const activeConfigs = configs.value.filter(
     (c) => c.service_type === form.service_type && c.is_active,
   );
-
-  // 提取所有激活配置的provider，去重
   const activeProviderIds = new Set(activeConfigs.map((c) => c.provider));
-
-  // 从providerConfigs中筛选出有激活配置的provider
-  const allProviders = providerConfigs[form.service_type] || [];
   return allProviders.filter((p) => activeProviderIds.has(p.id));
 });
 
@@ -347,6 +360,8 @@ const fullEndpointExample = computed(() => {
   } else if (serviceType === "image") {
     if (provider === "gemini" || provider === "google") {
       endpoint = "/v1beta/models/{model}:generateContent";
+    } else if (provider === "flowtool" || provider === "flow_tool") {
+      endpoint = "/v1/jobs";
     } else {
       endpoint = "/images/generations";
     }
@@ -361,6 +376,8 @@ const fullEndpointExample = computed(() => {
       endpoint = "/contents/generations/tasks";
     } else if (provider === "openai") {
       endpoint = "/videos";
+    } else if (provider === "flowtool" || provider === "flow_tool") {
+      endpoint = "/v1/jobs";
     } else {
       endpoint = "/video/generations";
     }
@@ -416,6 +433,8 @@ const generateConfigName = (
     openai: "OpenAI",
     gemini: "Gemini",
     google: "Google",
+    flowtool: "FlowTool",
+    flow_tool: "FlowTool",
   };
 
   const serviceNames: Record<AIServiceType, string> = {
@@ -580,6 +599,8 @@ const handleProviderChange = () => {
   // 根据厂商自动设置默认 base_url
   if (form.provider === "gemini" || form.provider === "google") {
     form.base_url = "https://api.chatfire.site";
+  } else if (form.provider === "flowtool" || form.provider === "flow_tool") {
+    form.base_url = "http://localhost:8000";
   } else {
     // openai, chatfire 等其他厂商
     form.base_url = "https://api.chatfire.site/v1";

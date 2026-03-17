@@ -1,0 +1,50 @@
+[
+  {
+    "id": "800b9a9f-1a27-4d2c-886d-082bcc9d73d2",
+    "type": "background_extraction",
+    "status": "failed",
+    "message": "AI提取场景失败: AI提取场景失败: API error: no workers online",
+    "error": "",
+    "created_at": "2026-03-17 01:09:54.2894104 +0700 +07"
+  },
+  {
+    "id": "94fb2b63-253a-45d5-b42f-ecedf62f5af9",
+    "type": "character_generation",
+    "status": "processing",
+    "message": "正在生成角色...",
+    "error": "",
+    "created_at": "2026-03-17 01:09:54.1991418 +0700 +07"
+  },
+  {
+    "id": "7044acfc-c2ac-4e06-b703-2986bebc646d",
+    "type": "background_extraction",
+    "status": "failed",
+    "message": "AI提取场景失败: AI提取场景失败: API error: no workers online",
+    "error": "",
+    "created_at": "2026-03-17 00:56:17.1692892 +0700 +07"
+  },
+  {
+    "id": "7dbe3994-aa78-4824-b8d9-b5df427a7d69",
+    "type": "character_generation",
+    "status": "failed",
+    "message": "解析AI返回结果失败",
+    "error": "",
+    "created_at": "2026-03-17 00:56:17.0847412 +0700 +07"
+  },
+  {
+    "id": "46540c89-ba0c-4603-b19b-3f07e4d572e6",
+    "type": "background_extraction",
+    "status": "failed",
+    "message": "AI提取场景失败: AI提取场景失败: API error: no workers online",
+    "error": "",
+    "created_at": "2026-03-17 00:53:13.7209402 +0700 +07"
+  },
+  {
+    "id": "96b5917f-4e74-4b02-b3a2-748390d667cf",
+    "type": "character_generation",
+    "status": "failed",
+    "message": "解析AI返回结果失败",
+    "error": "",
+    "created_at": "2026-03-17 00:53:13.4065663 +0700 +07"
+  }
+]
