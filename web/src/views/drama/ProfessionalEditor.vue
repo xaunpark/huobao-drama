@@ -26,9 +26,14 @@
       <div class="storyboard-panel">
         <div class="panel-header">
           <h3>{{ $t("storyboard.scriptStructure") }}</h3>
-          <el-button text :icon="Plus" @click="handleAddStoryboard">{{
-            $t("storyboard.add")
-          }}</el-button>
+          <div class="header-actions">
+            <el-button text :icon="MagicStick" @click="showBatchDialog = true" :title="$t('professionalEditor.batch.title')">
+              {{ $t("common.batch") }}
+            </el-button>
+            <el-button text :icon="Plus" @click="handleAddStoryboard">{{
+              $t("storyboard.add")
+            }}</el-button>
+          </div>
         </div>
 
         <div class="storyboard-list">
@@ -2021,6 +2026,17 @@
       :image-url="cropImageUrl"
       @save="handleCropSave"
     />
+
+    <!-- 批量生成对话框 -->
+    <BatchGenerationDialog
+      v-model="showBatchDialog"
+      :storyboards="storyboards"
+      :drama-id="dramaId"
+      :style="drama?.style || ''"
+      :video-models="videoModelCapabilities"
+      :default-video-model="selectedVideoModel"
+      @completed="loadData"
+    />
   </div>
 </template>
 
@@ -2081,6 +2097,7 @@ import type { Asset } from "@/types/asset";
 import type { VideoMerge } from "@/api/videoMerge";
 import VideoTimelineEditor from "@/components/editor/VideoTimelineEditor.vue";
 import GridImageEditor from "@/components/editor/GridImageEditor.vue";
+import BatchGenerationDialog from "@/components/editor/BatchGenerationDialog.vue";
 import type { Drama, Episode, Storyboard } from "@/types/drama";
 import { AppHeader, ImageCropDialog } from "@/components/common";
 import { getImageUrl, hasImage, getVideoUrl } from "@/utils/image";
@@ -2109,6 +2126,7 @@ const showCharacterImagePreview = ref(false);
 const previewCharacter = ref<any>(null);
 const showSceneImagePreview = ref(false);
 const showSettings = ref(false);
+const showBatchDialog = ref(false);
 const showVideoPreview = ref(false);
 const previewVideo = ref<VideoGeneration | null>(null);
 const addingToAssets = ref<Set<number>>(new Set());
@@ -2437,7 +2455,7 @@ const availableReferenceModes = computed(() => {
 
 // 帧提示词存储key生成函数
 const getPromptStorageKey = (
-  storyboardId: number | undefined,
+  storyboardId: string | number | undefined,
   frameType: FrameType,
 ) => {
   if (!storyboardId) return null;
@@ -2487,7 +2505,7 @@ const loadPreviousStoryboardLastFrame = async () => {
   }
   try {
     const result = await imageAPI.listImages({
-      storyboard_id: previousStoryboard.value.id,
+      storyboard_id: Number(previousStoryboard.value.id),
       frame_type: "last",
       page: 1,
       page_size: 10,
@@ -2601,10 +2619,17 @@ watch(currentStoryboard, async (newStoryboard) => {
   );
   if (storageKey) {
     const stored = sessionStorage.getItem(storageKey);
-    currentFramePrompt.value = stored || "";
+    let prompt = stored || "";
+    
+    // Fallback to database image_prompt for action type
+    if (!prompt && selectedFrameType.value === 'action' && newStoryboard.image_prompt) {
+      prompt = newStoryboard.image_prompt;
+    }
+    
+    currentFramePrompt.value = prompt;
     // 同时更新 framePrompts 对象
-    if (stored) {
-      framePrompts.value[selectedFrameType.value] = stored;
+    if (prompt) {
+      framePrompts.value[selectedFrameType.value] = prompt;
     }
   } else {
     currentFramePrompt.value = "";
@@ -2860,7 +2885,7 @@ const extractFramePrompt = async () => {
       params.panel_count = panelCount.value;
     }
 
-    const { task_id } = await generateFramePrompt(storyboardId, params);
+    const { task_id } = await generateFramePrompt(Number(storyboardId), params);
 
     // 轮询任务状态（独立函数，不依赖组件当前状态）
     const pollTask = async () => {
@@ -2913,6 +2938,16 @@ const extractFramePrompt = async () => {
     ) {
       currentFramePrompt.value = extractedPrompt;
       framePrompts.value[targetFrameType] = extractedPrompt;
+      
+      // 如果是动作序列，同步更新到数据库的 image_prompt
+      if (targetFrameType === 'action') {
+        dramaAPI.updateStoryboard(storyboardId.toString(), { image_prompt: extractedPrompt })
+          .catch(err => console.error("Failed to sync prompt to DB", err));
+      }
+    } else if (targetFrameType === 'action') {
+       // 即使不在当前页，如果是 action type 也同步到 DB
+       dramaAPI.updateStoryboard(storyboardId.toString(), { image_prompt: extractedPrompt })
+          .catch(err => console.error("Failed to sync prompt to DB", err));
     }
 
     // 更新内存缓存（稍微复杂点，framePrompts 是响应式的且绑定当前镜头，这里只做sessionStorage持久化即可，
@@ -2967,8 +3002,8 @@ const loadStoryboardImages = async (
     if (frameType) {
       params.frame_type = frameType;
     }
-    const result = await imageAPI.listImages(params);
-    generatedImages.value = result.items || [];
+    const result = await imageAPI.listImages(params as any);
+    generatedImages.value = (result.items || []) as ImageGeneration[];
 
     // 如果有进行中的任务，启动轮询
     const hasPendingOrProcessing = generatedImages.value.some(
@@ -3498,7 +3533,7 @@ const generateVideo = async () => {
 const loadVideoReferenceImages = async (storyboardId: number) => {
   try {
     const result = await imageAPI.listImages({
-      storyboard_id: storyboardId,
+      storyboard_id: Number(storyboardId),
       page: 1,
       page_size: 100,
     });
@@ -6182,6 +6217,24 @@ onBeforeUnmount(() => {
   border-radius: 8px;
   border: 1px solid var(--border-primary);
   background: var(--bg-secondary);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  
+  .header-actions {
+    display: flex;
+    gap: 0;
+    align-items: center;
+    
+    :deep(.el-button) {
+      margin-left: 0;
+      padding: 4px 8px;
+    }
+  }
 }
 </style>
 <style>

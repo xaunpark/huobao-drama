@@ -27,6 +27,7 @@ export default {
     }
   },
   common: {
+    batch: 'Batch',
     create: 'Create',
     edit: 'Edit',
     delete: 'Delete',
@@ -601,7 +602,38 @@ export default {
     duration: 'Duration',
     seconds: 's',
     videoDuration: 'Video Duration',
-    downloadVideo: 'Download Video'
+    downloadVideo: 'Download Video',
+    batch: {
+      title: 'Batch Action Studio',
+      instructions: 'The system will process all shots in the sequence: [Extract Prompts] -> [Generate Grid Images] -> [Generate Video]. You can choose to run all phases or specific ones.',
+      imageModel: 'Image Model:',
+      videoModel: 'Video Model:',
+      generationMode: 'Generation Mode:',
+      defaultModel: 'Default Model',
+      r2vMode: 'Action Sequence (R2V)',
+      runAll: 'Run All Phases',
+      onlyPrompt: 'Extract Prompts Only',
+      onlyImage: 'Generate Images Only',
+      onlyVideo: 'Generate Videos Only',
+      stop: 'Stop',
+      shot: 'Shot',
+      description: 'Description',
+      prompt: 'Prompt',
+      image: 'Image (Grid)',
+      video: 'Video',
+      progress: 'Progress',
+      noDescription: 'No description',
+      status: {
+        pending: 'Pending',
+        loading: 'Processing',
+        done: 'Ready',
+        failed: 'Failed'
+      },
+      stopping: 'Stopping tasks...',
+      completed: 'Batch task completed',
+      selectVideoModelFirst: 'Please select a video model first',
+      lackActionImage: 'Shot {number} lacks a valid Action image'
+    }
   },
   storyboard: {
     title: 'Storyboard',

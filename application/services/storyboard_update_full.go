@@ -65,6 +65,12 @@ func (s *StoryboardService) UpdateStoryboard(storyboardID string, updates map[st
 	if val, ok := updates["description"].(string); ok && val != "" {
 		updateData["description"] = val
 	}
+	if val, ok := updates["image_prompt"].(string); ok && val != "" {
+		updateData["image_prompt"] = val
+	}
+	if val, ok := updates["video_prompt"].(string); ok && val != "" {
+		updateData["video_prompt"] = val
+	}
 	if val, ok := updates["bgm_prompt"].(string); ok && val != "" {
 		updateData["bgm_prompt"] = val
 		sb.BgmPrompt = val

@@ -1,0 +1,443 @@
+<template>
+  <el-dialog
+    v-model="visible"
+    :title="$t('professionalEditor.batch.title')"
+    width="900px"
+    :close-on-click-modal="false"
+    class="batch-dialog"
+  >
+    <div class="batch-container">
+      <!-- 顶部配置栏 -->
+      <div class="batch-config-bar">
+        <el-alert
+          :title="$t('professionalEditor.batch.title')"
+          type="info"
+          :description="$t('professionalEditor.batch.instructions')"
+          show-icon
+          :closable="false"
+          style="margin-bottom: 20px"
+        />
+
+        <div class="config-row">
+          <div class="config-item">
+            <span class="label">{{ $t('professionalEditor.batch.imageModel') }}</span>
+            <el-tag size="small" type="info">{{ $t('professionalEditor.batch.defaultModel') }}</el-tag>
+          </div>
+          <div class="config-item">
+            <span class="label">{{ $t('professionalEditor.batch.videoModel') }}</span>
+            <el-select v-model="selectedVideoModel" :placeholder="$t('video.selectVideoModel')" size="small" style="width: 200px">
+              <el-option
+                v-for="model in videoModels"
+                :key="model.id"
+                :label="model.name"
+                :value="model.id"
+              />
+            </el-select>
+          </div>
+          <div class="config-item">
+            <span class="label">{{ $t('professionalEditor.batch.generationMode') }}</span>
+            <el-tag size="small" type="success">{{ $t('professionalEditor.batch.r2vMode') }}</el-tag>
+          </div>
+        </div>
+
+        <div class="action-row" style="margin-top: 15px">
+          <el-button type="primary" :loading="isBatching" @click="startFullBatch">
+            <el-icon><MagicStick /></el-icon> {{ $t('professionalEditor.batch.runAll') }}
+          </el-button>
+          <el-button-group style="margin-left: 10px">
+            <el-button :disabled="isBatching" @click="startStep('prompt')">{{ $t('professionalEditor.batch.onlyPrompt') }}</el-button>
+            <el-button :disabled="isBatching" @click="startStep('image')">{{ $t('professionalEditor.batch.onlyImage') }}</el-button>
+            <el-button :disabled="isBatching" @click="startStep('video')">{{ $t('professionalEditor.batch.onlyVideo') }}</el-button>
+          </el-button-group>
+          <el-button type="danger" plain v-if="isBatching" @click="stopBatch" style="margin-left: 10px">
+            {{ $t('professionalEditor.batch.stop') }}
+          </el-button>
+        </div>
+      </div>
+
+      <!-- 分镜列表状态 -->
+      <div class="shot-progress-list">
+        <el-table :data="storyboards" style="width: 100%" height="400px">
+          <el-table-column :label="$t('professionalEditor.batch.shot')" width="80" property="storyboard_number">
+            <template #default="scope">
+              {{ $t('professionalEditor.batch.shot') }} {{ scope.row.storyboard_number }}
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('professionalEditor.batch.description')" show-overflow-tooltip>
+            <template #default="scope">
+              {{ scope.row.action || scope.row.description || $t('professionalEditor.batch.noDescription') }}
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('professionalEditor.batch.prompt')" width="100">
+            <template #default="scope">
+              <el-tag :type="getStatusTag(scope.row.id, 'prompt')" size="small">
+                {{ getStatusText(scope.row.id, 'prompt') }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('professionalEditor.batch.image')" width="100">
+            <template #default="scope">
+              <el-tag :type="getStatusTag(scope.row.id, 'image')" size="small">
+                {{ getStatusText(scope.row.id, 'image') }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('professionalEditor.batch.video')" width="100">
+            <template #default="scope">
+              <el-tag :type="getStatusTag(scope.row.id, 'video')" size="small">
+                {{ getStatusText(scope.row.id, 'video') }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('professionalEditor.batch.progress')" width="150">
+            <template #default="scope">
+              <el-progress 
+                :percentage="getProgress(scope.row.id)" 
+                :status="getProgressStatus(scope.row.id)"
+                :stroke-width="10"
+              />
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+    </div>
+    
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="visible = false">{{ $t('common.close') || 'Close' }}</el-button>
+      </span>
+    </template>
+  </el-dialog>
+</template>
+
+<script setup lang="ts">
+import { ref, reactive, computed, watch } from 'vue'
+import { MagicStick } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import { useI18n } from 'vue-i18n'
+import { dramaAPI } from '@/api/drama'
+import { generateFramePrompt } from '@/api/frame'
+import { imageAPI } from '@/api/image'
+import { videoAPI } from '@/api/video'
+import { taskAPI } from '@/api/task'
+import type { Storyboard } from '@/types/drama'
+
+const props = defineProps<{
+  modelValue: boolean
+  storyboards: Storyboard[]
+  dramaId: number
+  style?: string
+  videoModels: any[]
+  defaultVideoModel?: string
+}>()
+
+const emit = defineEmits(['update:modelValue', 'completed'])
+const { t } = useI18n()
+
+const visible = computed({
+  get: () => props.modelValue,
+  set: (val) => emit('update:modelValue', val)
+})
+
+const selectedVideoModel = ref(props.defaultVideoModel || '')
+const isBatching = ref(false)
+const shouldStop = ref(false)
+
+// 任务状态追踪 map: shotId -> { step: 'prompt'|'image'|'video', status: 'pending'|'loading'|'done'|'error', progress: number }
+const taskStates = reactive<Record<string, any>>({})
+
+const initTaskStates = () => {
+  props.storyboards.forEach(sb => {
+    // Check if prompt exists in DB or session storage
+    const hasPrompt = !!sb.image_prompt || !!sessionStorage.getItem(`frame_prompt_${sb.id}_action`)
+    
+    taskStates[sb.id] = {
+      prompt: hasPrompt ? 'done' : 'pending',
+      image: 'pending',
+      video: 'pending',
+      progress: hasPrompt ? 30 : 0
+    }
+  })
+}
+
+const getStatusTag = (id: string, type: string) => {
+  const state = taskStates[id]?.[type]
+  if (state === 'loading') return ''
+  if (state === 'done') return 'success'
+  if (state === 'error') return 'danger'
+  return 'info'
+}
+
+const getStatusText = (id: string, type: string) => {
+  const state = taskStates[id]?.[type]
+  if (state === 'loading') return t('professionalEditor.batch.status.loading')
+  if (state === 'done') return t('professionalEditor.batch.status.done')
+  if (state === 'error') return t('professionalEditor.batch.status.failed')
+  return t('professionalEditor.batch.status.pending')
+}
+
+const getProgress = (id: string) => taskStates[id]?.progress || 0
+const getProgressStatus = (id: string) => {
+  const s = taskStates[id]
+  if (s?.prompt === 'error' || s?.image === 'error' || s?.video === 'error') return 'exception'
+  if (s?.video === 'done') return 'success'
+  return undefined
+}
+
+const stopBatch = () => {
+  shouldStop.value = true
+  isBatching.value = false
+  ElMessage.warning(t('professionalEditor.batch.stopping'))
+}
+
+// 核心逻辑：提取提示词并保存
+const processPrompt = async (sb: Storyboard) => {
+  taskStates[sb.id].prompt = 'loading'
+  taskStates[sb.id].progress = 10
+  try {
+    const { task_id } = await generateFramePrompt(Number(sb.id), { frame_type: 'action' })
+    
+    // 轮询
+    let result = null
+    while (true) {
+      if (shouldStop.value) throw new Error('Stopped')
+      const task = await taskAPI.getStatus(task_id)
+      if (task.status === 'completed') {
+        let res = task.result
+        if (typeof res === 'string') res = JSON.parse(res)
+        result = res.response
+        break
+      } else if (task.status === 'failed') {
+        throw new Error(task.message || 'Prompt failed')
+      }
+      await new Promise(r => setTimeout(r, 2000))
+    }
+
+    let finalPrompt = ""
+    if (result.single_frame) finalPrompt = result.single_frame.prompt
+    else if (result.multi_frame?.frames) {
+      finalPrompt = result.multi_frame.frames.map((f: any) => f.prompt).join('\n\n')
+    }
+
+    // 如果项目有风格设定，则作为前缀加入提示词 (Style always at top)
+    if (props.style && !finalPrompt.startsWith(props.style)) {
+      finalPrompt = `${props.style}, ${finalPrompt}`
+    }
+
+    // 保存到DB
+    await dramaAPI.updateStoryboard(sb.id.toString(), { image_prompt: finalPrompt })
+    
+    // ALSO save to sessionStorage to keep it in sync with ProfessionalEditor UI (Action sequence)
+    sessionStorage.setItem(`frame_prompt_${sb.id}_action`, finalPrompt)
+    
+    taskStates[sb.id].prompt = 'done'
+    taskStates[sb.id].progress = 30
+    return finalPrompt
+  } catch (e) {
+    taskStates[sb.id].prompt = 'error'
+    throw e
+  }
+}
+
+// 核心逻辑：生成格点图
+const processImage = async (sb: Storyboard, prompt: string) => {
+  taskStates[sb.id].image = 'loading'
+  try {
+    const result = await imageAPI.generateImage({
+      drama_id: props.dramaId.toString(),
+      prompt: prompt,
+      storyboard_id: Number(sb.id),
+      image_type: 'storyboard',
+      frame_type: 'action'
+    })
+
+    // 轮询图片直到完成
+    while (true) {
+      if (shouldStop.value) throw new Error('Stopped')
+      const res = await imageAPI.listImages({ storyboard_id: Number(sb.id), frame_type: 'action' })
+      const img = res.items?.find((i: any) => i.id === result.id)
+      if (img?.status === 'completed') {
+        taskStates[sb.id].image = 'done'
+        taskStates[sb.id].progress = 60
+        return img
+      } else if (img?.status === 'failed') {
+        throw new Error('Image generation failed')
+      }
+      await new Promise(r => setTimeout(r, 3000))
+    }
+  } catch (e) {
+    taskStates[sb.id].image = 'error'
+    throw e
+  }
+}
+
+// 从模型名称提取provider (copied from ProfessionalEditor for consistency)
+const extractProviderFromModel = (modelName: string): string => {
+  if (modelName.startsWith("doubao-") || modelName.startsWith("seedance")) {
+    return "doubao";
+  }
+  if (modelName.startsWith("runway")) {
+    return "runway";
+  }
+  if (modelName.startsWith("pika")) {
+    return "pika";
+  }
+  if (
+    modelName.startsWith("MiniMax-") ||
+    modelName.toLowerCase().startsWith("minimax") ||
+    modelName.startsWith("hailuo")
+  ) {
+    return "minimax";
+  }
+  if (modelName.startsWith("sora")) {
+    return "openai";
+  }
+  if (modelName.startsWith("kling")) {
+    return "kling";
+  }
+  return "doubao";
+};
+
+// 核心逻辑：生成视频
+const processVideo = async (sb: Storyboard, image: any) => {
+  if (!selectedVideoModel.value) throw new Error('No video model')
+  taskStates[sb.id].video = 'loading'
+  try {
+    const provider = extractProviderFromModel(selectedVideoModel.value)
+    
+    // 构建 R2V 请求
+    await videoAPI.generateVideo({
+      drama_id: props.dramaId.toString(),
+      storyboard_id: Number(sb.id),
+      prompt: sb.video_prompt || sb.action || "Cinematic video",
+      duration: 5,
+      provider: provider,
+      model: selectedVideoModel.value,
+      reference_mode: 'multiple',
+      reference_image_urls: [image.local_path || image.image_url]
+    })
+    
+    taskStates[sb.id].video = 'done'
+    taskStates[sb.id].progress = 100
+  } catch (e) {
+    taskStates[sb.id].video = 'error'
+    throw e
+  }
+}
+
+const startFullBatch = async () => {
+  if (!selectedVideoModel.value) {
+    ElMessage.warning(t('professionalEditor.batch.selectVideoModelFirst'))
+    return
+  }
+  isBatching.value = true
+  shouldStop.value = false
+  initTaskStates()
+
+  for (const sb of props.storyboards) {
+    if (shouldStop.value) break
+    try {
+      const prompt = await processPrompt(sb)
+      const img = await processImage(sb, prompt)
+      await processVideo(sb, img)
+    } catch (e: any) {
+      console.error(`Shot ${sb.storyboard_number} failed:`, e)
+      ElMessage.error(`${t('professionalEditor.batch.shot')} ${sb.storyboard_number} ${t('professionalEditor.batch.status.failed')}: ${e.message || 'Unknown'}`)
+    }
+  }
+
+  isBatching.value = false
+  if (!shouldStop.value) {
+    ElMessage.success(t('professionalEditor.batch.completed'))
+    emit('completed')
+  }
+}
+
+const startStep = async (step: string) => {
+  if (step === 'video' && !selectedVideoModel.value) {
+    ElMessage.warning(t('professionalEditor.batch.selectVideoModelFirst'))
+    return
+  }
+  isBatching.value = true
+  shouldStop.value = false
+  initTaskStates()
+
+  for (const sb of props.storyboards) {
+    if (shouldStop.value) break
+    try {
+      if (step === 'prompt') await processPrompt(sb)
+      else if (step === 'image') {
+         const p = sb.image_prompt || await processPrompt(sb)
+         await processImage(sb, p)
+      }
+      else if (step === 'video') {
+         // 寻找已有的 action 帧图片
+         const res = await imageAPI.listImages({ storyboard_id: Number(sb.id), frame_type: 'action' })
+         const img = res.items?.find((i: any) => i.status === 'completed')
+         if (img) await processVideo(sb, img)
+         else ElMessage.warning(t('professionalEditor.batch.lackActionImage', { number: sb.storyboard_number }))
+      }
+    } catch (e: any) {
+      console.error(`Shot ${sb.storyboard_number} step ${step} failed:`, e)
+      const stepName = step === 'prompt' ? t('professionalEditor.batch.prompt') : (step === 'image' ? t('professionalEditor.batch.image') : t('professionalEditor.batch.video'))
+      ElMessage.error(`${t('professionalEditor.batch.shot')} ${sb.storyboard_number} ${stepName} ${t('professionalEditor.batch.status.failed')}: ${e.message || 'Unknown'}`)
+    }
+  }
+
+  isBatching.value = false
+  if (!shouldStop.value) {
+    ElMessage.success(t('professionalEditor.batch.completed'))
+    emit('completed')
+  }
+}
+
+
+watch(() => props.modelValue, (newVal) => {
+  if (newVal) initTaskStates()
+})
+</script>
+
+<style scoped>
+.batch-dialog :deep(.el-dialog__body) {
+  padding-top: 10px;
+}
+.batch-container {
+  padding: 0 10px;
+}
+.batch-config-bar {
+  background: var(--el-fill-color-light);
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+.config-row {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.config-item .label {
+  font-weight: bold;
+  margin-right: 12px;
+  color: var(--el-text-color-regular);
+}
+.action-row {
+  display: flex;
+  align-items: center;
+}
+.shot-progress-list {
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 10px;
+}
+
+/* 动画和过渡 */
+.el-progress--line {
+  margin-bottom: 0;
+}
+</style>

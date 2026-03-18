@@ -27,6 +27,7 @@ export default {
     }
   },
   common: {
+    batch: '批量',
     create: '创建',
     edit: '编辑',
     delete: '删除',
@@ -517,7 +518,38 @@ export default {
     duration: '时长',
     seconds: '秒',
     videoDuration: '视频时长',
-    downloadVideo: '下载视频'
+    downloadVideo: '下载视频',
+    batch: {
+      title: '批量任务工作站 (Batch Action Studio)',
+      instructions: '系统将按照 [提取提示词] -> [生成格点图] -> [生成视频] 的顺序处理所有分镜。您可以选择执行全部，或只执行特定阶段。',
+      imageModel: '图片模型:',
+      videoModel: '视频模型:',
+      generationMode: '生成模式:',
+      defaultModel: '默认模型',
+      r2vMode: 'Action Sequence (R2V)',
+      runAll: '执行全流程 (Run All)',
+      onlyPrompt: '仅提取提示词',
+      onlyImage: '仅生成图片',
+      onlyVideo: '仅生成视频',
+      stop: '停止',
+      shot: '场次',
+      description: '内容描述',
+      prompt: '提示词',
+      image: '图片(Grid)',
+      video: '视频',
+      progress: '进度',
+      noDescription: '无描述',
+      status: {
+        pending: '待处理',
+        loading: '处理中',
+        done: '就绪',
+        failed: '失败'
+      },
+      stopping: '正在停止任务...',
+      completed: '批量任务处理完成',
+      selectVideoModelFirst: '请先选择视频模型',
+      lackActionImage: 'Shot {number} 缺乏有效的 Action 图片'
+    }
   },
   storyboard: {
     title: '分镜制作',
