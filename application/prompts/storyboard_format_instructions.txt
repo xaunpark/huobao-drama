@@ -1,0 +1,67 @@
+[Storyboard Elements] Each shot must focus on a single action and be described in exhaustive detail:
+1. **Shot Title**: Summarize the core action or emotion in 3-5 words
+   - Example: "Nightmare awakening", "Silent standoff", "Fleeing the scene"
+2. **Time**: [Morning/Afternoon/Late Night/Specific Time + detailed lighting]
+   - Example: "Late night 22:30, moonlight shines through the broken window, forming a bright and dark boundary"
+3. **Location**: [Complete scene description + spatial layout + environmental details]
+   - Example: "Abandoned dock warehouse, rusty shelves, water on the ground reflecting dim light"
+4. **Shot Design**:
+   - **shot_type**: [Extreme Long Shot/Long Shot/Medium Shot/Close-up/Extreme Close-up]
+   - **angle**: [Eye-level/High-angle/Low-angle/Side/Back]
+   - **movement**: [Fixed/Push in/Pull out/Pan/Follow/Tracking]
+5. **Character Action (action)**: **Detailed action description**, including [Who + Exactly how they do it + Body details + Facial expression]
+   - Example: "Chen Zheng bends down, gripping a crowbar to pry the safe door. Veins bulge on his arms, his brows are tightly furrowed, sweat drips down his cheeks."
+6. **Dialogue/Monologue**: The complete dialogue or monologue in this shot (if none, empty string)
+7. **Visual Result (result)**: The immediate consequence of the action + visual details + atmosphere change
+   - Example: "The safe door springs open with a sharp metallic clatter, dust swirls in the flashlight beam, inside is completely empty except for yellowed newspaper. Chen Zheng's expression shifts from anticipation to shock."
+8. **Atmosphere**: Light texture + color tone + sound environment + overall mood
+   - Example: "Dim cool tones, only a flashlight beam swaying, muffled sound of waves in the distance, oppressive mood."
+9. **BGM Prompt**: Describe the background music atmosphere, rhythm, and emotion
+   - Example: "Low tense strings, slow rhythm, creating a suspenseful atmosphere."
+10. **Sound Effect**: Key audio effects in the shot
+    - Example: "Metallic clatter, footsteps, waves crashing."
+11. **Audience Emotion (emotion)**: [Emotion Type] ([Intensity] + [Resolution])
+
+[Output Format] You must output in JSON format, each shot containing the fields (all descriptive fields must be highly detailed):
+{
+  "storyboards": [
+    {
+      "shot_number": 1,
+      "title": "Nightmare Awakening",
+      "shot_type": "Long Shot",
+      "angle": "High-angle 45 degrees",
+      "time": "Late night 22:30, moonlight shines through the broken window, forming silver reflections on the water, corners are dim",
+      "location": "Abandoned dock warehouse, rusty shelves, water on the ground reflecting dim light, moldy air",
+      "scene_id": 1,
+      "movement": "Fixed",
+      "action": "Chen Zheng bends down, gripping a crowbar to pry the safe door. Veins bulge on his arms, his brows are tightly furrowed, sweat drips down his cheeks.",
+      "dialogue": "(Monologue) After all these years, what secret is hidden inside?",
+      "result": "The safe door springs open with a sharp metallic clatter, dust swirls in the flashlight beam, inside is completely empty except for yellowed newspaper. Chen Zheng's expression shifts from anticipation to shock.",
+      "atmosphere": "Dim cool tones, only a flashlight beam swaying, muffled sound of waves in the distance, oppressive mood",
+      "emotion": "Curiosity↑↑ to Disappointment↓ (Reversal)",
+      "duration": 9,
+      "bgm_prompt": "Low tense strings, slow rhythm",
+      "sound_effect": "Metallic clatter, dust swirling, waves crashing",
+      "characters": [159],
+      "is_primary": true
+    }
+  ]
+}
+
+**dialogue Field Instructions**:
+- If dialog exists: "CharacterName: Dialogue Content" (no quotes wrapping the text). Or "(Monologue) Content"
+- Empty string if no dialogue
+
+**Character and Background Requirements**:
+- characters array must contain only valid IDs (integers) from the Available Character List
+- scene_id must correspond strictly to the Valid Scene ID from the Extracted Scene Backgrounds list (use null if none fits)
+
+**Duration Estimation Rules**:
+- Every shot must be 4-12 seconds based on action complexity and dialogue length.
+
+**CRITICAL RULES**:
+- **You MUST break down the ENTIRE script.**
+- NO skipping any plot points!
+- Do not combine scenes. Always create more shots if needed to reflect the script accurately.
+
+***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response, including all JSON values, descriptions, character dialogue, and action sequences STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language. Do NOT use Chinese anywhere in the output JSON.

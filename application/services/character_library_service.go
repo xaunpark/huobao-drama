@@ -338,6 +338,10 @@ func (s *CharacterLibraryService) GenerateCharacterImage(characterID string, ima
 	if drama.Style != "" && drama.Style != "realistic" {
 		prompt += ", " + drama.Style
 	}
+
+	// Add special character sheet requirements
+	prompt += ", t-pose, character sheet, turn around character, white background, no text overlay"
+
 	// 调用图片生成服务
 	dramaIDStr := fmt.Sprintf("%d", character.DramaID)
 	imageType := "character"

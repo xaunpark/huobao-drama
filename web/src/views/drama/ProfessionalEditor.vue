@@ -2459,7 +2459,7 @@ const getPromptStorageKey = (
   frameType: FrameType,
 ) => {
   if (!storyboardId) return null;
-  return `frame_prompt_${storyboardId}_${frameType}`;
+  return `frame_prompt_e${episodeId.value}_s${storyboardId}_${frameType}`;
 };
 
 const isCharacterSelected = (charId: number) => {
@@ -2725,9 +2725,29 @@ watch(
       "";
       
     // 自动将剧本的预设风格（Style）添加到最前面，确保风格权重最高
+    const getVideoStylePrefix = (styleCode: string): string => {
+      const stylesMap: Record<string, string> = {
+        'ghibli': 'Studio Ghibli animation film style, breathtaking masterpiece scenery, highly detailed anime art, vivid colors, beautifully graded lighting',
+        'guoman': 'High quality Chinese 2D animation style, vivid wuxia/xianxia aesthetic, delicate linework, epic cinematic atmosphere',
+        'wasteland': 'Post-apocalyptic wasteland style, gritty and rusty textures, desolate environments, cinematic lighting, highly detailed survival aesthetic',
+        'nostalgia': 'Retro nostalgic aesthetic, vintage film look, muted warm colors, 90s classic anime feelings, cinematic lighting',
+        'pixel': 'High-quality 16-bit retro pixel art, detailed sprite animations, vibrant arcade game aesthetics, nostalgic masterpiece',
+        'voxel': 'Voxel art style, 3D blocky world aesthetic, high quality render, bright and pleasant lighting, minecraft style masterpiece',
+        'urban': 'Modern urban realistic photography, high-resolution 8k cinematic shot, city street lights, highly detailed life-like textures',
+        'guoman3d': 'High quality Chinese 3D animation style, unreal engine 5 render, highly detailed 3D models, smooth lighting, realistic shading, wuxia/xianxia aesthetic',
+        'chibi3d': 'Cute chibi 3D style, blind box toy aesthetic, smooth glossy textures, bright pastel lighting, octane render, disney quality'
+      };
+      const detailedStyle = stylesMap[styleCode] || `${styleCode} style, highly detailed cinematic masterpiece`;
+      return `(Art Style: ${detailedStyle}) - `;
+    };
+
     if (drama.value?.style) {
-      const stylePrefix = "Style: " + drama.value.style + ". ";
-      if (!basePrompt.includes("Style: " + drama.value.style)) {
+      const stylePrefix = getVideoStylePrefix(drama.value.style);
+      if (!basePrompt.includes("(Art Style:")) {
+        // Handle migration from old 'Style: ghibli. ' prefix if present
+        if (basePrompt.startsWith("Style: " + drama.value.style + ". ")) {
+          basePrompt = basePrompt.substring(("Style: " + drama.value.style + ". ").length);
+        }
         basePrompt = stylePrefix + basePrompt;
       }
     }

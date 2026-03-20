@@ -148,14 +148,28 @@ const taskStates = reactive<Record<string, any>>({})
 
 const initTaskStates = () => {
   props.storyboards.forEach(sb => {
-    // Check if prompt exists in DB or session storage
-    const hasPrompt = !!sb.image_prompt || !!sessionStorage.getItem(`frame_prompt_${sb.id}_action`)
+    // Check if prompt exists in DB ONLY. 
+    // AND it must NOT be the backend-generated default fallback ("first frame" or "continuous movement progression")
+    const isFallback = typeof sb.image_prompt === 'string' && (
+      sb.image_prompt.trim().endsWith('first frame') || 
+      sb.image_prompt.trim().endsWith('continuous movement progression')
+    )
+    const hasPrompt = sb.image_prompt && String(sb.image_prompt) !== 'null' && String(sb.image_prompt) !== 'undefined' && String(sb.image_prompt).trim().length > 0 && !isFallback;
+    
+    // Check if image or video exists in DB
+    const hasImage = !!sb.composed_image || !!sb.image_url
+    const hasVideo = !!sb.video_url
+    
+    let progress = 0
+    if (hasVideo) progress = 100
+    else if (hasImage) progress = 60
+    else if (hasPrompt) progress = 30
     
     taskStates[sb.id] = {
       prompt: hasPrompt ? 'done' : 'pending',
-      image: 'pending',
-      video: 'pending',
-      progress: hasPrompt ? 30 : 0
+      image: hasImage ? 'done' : 'pending',
+      video: hasVideo ? 'done' : 'pending',
+      progress: progress
     }
   })
 }
@@ -170,6 +184,7 @@ const getStatusTag = (id: string, type: string) => {
 
 const getStatusText = (id: string, type: string) => {
   const state = taskStates[id]?.[type]
+
   if (state === 'loading') return t('professionalEditor.batch.status.loading')
   if (state === 'done') return t('professionalEditor.batch.status.done')
   if (state === 'error') return t('professionalEditor.batch.status.failed')
@@ -220,8 +235,28 @@ const processPrompt = async (sb: Storyboard) => {
     }
 
     // 如果项目有风格设定，则作为前缀加入提示词 (Style always at top)
-    if (props.style && !finalPrompt.startsWith(props.style)) {
-      finalPrompt = `${props.style}, ${finalPrompt}`
+    const getStylePrefix = (styleCode: string): string => {
+      const stylesMap: Record<string, string> = {
+        'ghibli': 'Studio Ghibli animation film style, breathtaking masterpiece scenery, highly detailed anime art, vivid colors, beautifully graded lighting',
+        'guoman': 'High quality Chinese 2D animation style, vivid wuxia/xianxia aesthetic, delicate linework, epic cinematic atmosphere',
+        'wasteland': 'Post-apocalyptic wasteland style, gritty and rusty textures, desolate environments, cinematic lighting, highly detailed survival aesthetic',
+        'nostalgia': 'Retro nostalgic aesthetic, vintage film look, muted warm colors, 90s classic anime feelings, cinematic lighting',
+        'pixel': 'High-quality 16-bit retro pixel art, detailed sprite animations, vibrant arcade game aesthetics, nostalgic masterpiece',
+        'voxel': 'Voxel art style, 3D blocky world aesthetic, high quality render, bright and pleasant lighting, minecraft style masterpiece',
+        'urban': 'Modern urban realistic photography, high-resolution 8k cinematic shot, city street lights, highly detailed life-like textures',
+        'guoman3d': 'High quality Chinese 3D animation style, unreal engine 5 render, highly detailed 3D models, smooth lighting, realistic shading, wuxia/xianxia aesthetic',
+        'chibi3d': 'Cute chibi 3D style, blind box toy aesthetic, smooth glossy textures, bright pastel lighting, octane render, disney quality'
+      }
+      const detailedStyle = stylesMap[styleCode] || `${styleCode} style, highly detailed cinematic masterpiece`
+      return `(Art Style: ${detailedStyle}) - `
+    }
+
+    if (props.style && !finalPrompt.includes('(Art Style:')) {
+      // Remove the old simple prefix if it was prepended by mistake
+      if (finalPrompt.startsWith(`${props.style}, `)) {
+        finalPrompt = finalPrompt.substring(props.style.length + 2)
+      }
+      finalPrompt = `${getStylePrefix(props.style)}${finalPrompt}`
     }
 
     // 保存到DB
@@ -306,7 +341,7 @@ const processVideo = async (sb: Storyboard, image: any) => {
     const provider = extractProviderFromModel(selectedVideoModel.value)
     
     // 构建 R2V 请求
-    await videoAPI.generateVideo({
+    const result = await videoAPI.generateVideo({
       drama_id: props.dramaId.toString(),
       storyboard_id: Number(sb.id),
       prompt: sb.video_prompt || sb.action || "Cinematic video",
@@ -317,12 +352,38 @@ const processVideo = async (sb: Storyboard, image: any) => {
       reference_image_urls: [image.local_path || image.image_url]
     })
     
-    taskStates[sb.id].video = 'done'
-    taskStates[sb.id].progress = 100
+    // 轮询视频直到完成 (视频生成通常耗时较长)
+    while (true) {
+      if (shouldStop.value) throw new Error('Stopped')
+      const videoTask = await videoAPI.getVideo(result.id)
+      if (videoTask.status === 'completed') {
+        taskStates[sb.id].video = 'done'
+        taskStates[sb.id].progress = 100
+        return videoTask
+      } else if (videoTask.status === 'failed') {
+        throw new Error(videoTask.error_msg || 'Video generation failed')
+      }
+      await new Promise(r => setTimeout(r, 5000))
+    }
   } catch (e) {
     taskStates[sb.id].video = 'error'
     throw e
   }
+}
+
+const runConcurrently = async <T>(items: T[], limit: number, worker: (item: T) => Promise<void>) => {
+  const executing: Promise<void>[] = []
+  for (const item of items) {
+    if (shouldStop.value) break
+    const p = worker(item).finally(() => {
+      executing.splice(executing.indexOf(p), 1)
+    })
+    executing.push(p)
+    if (executing.length >= limit) {
+      await Promise.race(executing)
+    }
+  }
+  await Promise.all(executing)
 }
 
 const startFullBatch = async () => {
@@ -334,16 +395,48 @@ const startFullBatch = async () => {
   shouldStop.value = false
   initTaskStates()
 
-  for (const sb of props.storyboards) {
-    if (shouldStop.value) break
+  const promptCache = new Map<string, string>()
+
+  // Phase 1: All Prompts
+  await runConcurrently(props.storyboards, 4, async (sb) => {
+    if (taskStates[sb.id]?.prompt === 'done') return
     try {
-      const prompt = await processPrompt(sb)
-      const img = await processImage(sb, prompt)
-      await processVideo(sb, img)
+      const p = await processPrompt(sb)
+      promptCache.set(sb.id, p)
     } catch (e: any) {
-      console.error(`Shot ${sb.storyboard_number} failed:`, e)
+      console.error(`Shot ${sb.storyboard_number} prompt failed:`, e)
       ElMessage.error(`${t('professionalEditor.batch.shot')} ${sb.storyboard_number} ${t('professionalEditor.batch.status.failed')}: ${e.message || 'Unknown'}`)
     }
+  })
+
+  // Phase 2: All Images
+  if (!shouldStop.value) {
+    await runConcurrently(props.storyboards, 4, async (sb) => {
+      if (taskStates[sb.id]?.prompt !== 'done' || taskStates[sb.id]?.image === 'done') return
+      try {
+        const p = promptCache.get(sb.id) || sb.image_prompt || ""
+        await processImage(sb, p)
+      } catch (e: any) {
+        console.error(`Shot ${sb.storyboard_number} image failed:`, e)
+        ElMessage.error(`${t('professionalEditor.batch.shot')} ${sb.storyboard_number} ${t('professionalEditor.batch.status.failed')}: ${e.message || 'Unknown'}`)
+      }
+    })
+  }
+
+  // Phase 3: All Videos
+  if (!shouldStop.value) {
+    await runConcurrently(props.storyboards, 4, async (sb) => {
+      if (taskStates[sb.id]?.image !== 'done' || taskStates[sb.id]?.video === 'done') return
+      try {
+         const res = await imageAPI.listImages({ storyboard_id: Number(sb.id), frame_type: 'action' })
+         const img = res.items?.find((i: any) => i.status === 'completed')
+         if (img) await processVideo(sb, img)
+         else ElMessage.warning(t('professionalEditor.batch.lackActionImage', { number: sb.storyboard_number }))
+      } catch (e: any) {
+        console.error(`Shot ${sb.storyboard_number} video failed:`, e)
+        ElMessage.error(`${t('professionalEditor.batch.shot')} ${sb.storyboard_number} ${t('professionalEditor.batch.status.failed')}: ${e.message || 'Unknown'}`)
+      }
+    })
   }
 
   isBatching.value = false
@@ -362,27 +455,31 @@ const startStep = async (step: string) => {
   shouldStop.value = false
   initTaskStates()
 
-  for (const sb of props.storyboards) {
-    if (shouldStop.value) break
+  await runConcurrently(props.storyboards, 4, async (sb) => {
     try {
-      if (step === 'prompt') await processPrompt(sb)
+      if (step === 'prompt') {
+        if (taskStates[sb.id]?.prompt !== 'done') await processPrompt(sb)
+      }
       else if (step === 'image') {
-         const p = sb.image_prompt || await processPrompt(sb)
-         await processImage(sb, p)
+        if (taskStates[sb.id]?.image !== 'done') {
+           const p = sb.image_prompt || await processPrompt(sb)
+           await processImage(sb, p)
+        }
       }
       else if (step === 'video') {
-         // 寻找已有的 action 帧图片
-         const res = await imageAPI.listImages({ storyboard_id: Number(sb.id), frame_type: 'action' })
-         const img = res.items?.find((i: any) => i.status === 'completed')
-         if (img) await processVideo(sb, img)
-         else ElMessage.warning(t('professionalEditor.batch.lackActionImage', { number: sb.storyboard_number }))
+         if (taskStates[sb.id]?.video !== 'done') {
+           const res = await imageAPI.listImages({ storyboard_id: Number(sb.id), frame_type: 'action' })
+           const img = res.items?.find((i: any) => i.status === 'completed')
+           if (img) await processVideo(sb, img)
+           else ElMessage.warning(t('professionalEditor.batch.lackActionImage', { number: sb.storyboard_number }))
+         }
       }
     } catch (e: any) {
       console.error(`Shot ${sb.storyboard_number} step ${step} failed:`, e)
       const stepName = step === 'prompt' ? t('professionalEditor.batch.prompt') : (step === 'image' ? t('professionalEditor.batch.image') : t('professionalEditor.batch.video'))
       ElMessage.error(`${t('professionalEditor.batch.shot')} ${sb.storyboard_number} ${stepName} ${t('professionalEditor.batch.status.failed')}: ${e.message || 'Unknown'}`)
     }
-  }
+  })
 
   isBatching.value = false
   if (!shouldStop.value) {

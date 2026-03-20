@@ -534,7 +534,7 @@ export default {
       stop: '停止',
       shot: '场次',
       description: '内容描述',
-      prompt: '提示词',
+      prompt: '图片提示词',
       image: '图片(Grid)',
       video: '视频',
       progress: '进度',

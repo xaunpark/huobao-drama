@@ -1,0 +1,2 @@
+PS G:\VS-Project\huobao-drama> go run main.go
+PS G:\VS-Project\huobao-drama\web> npm run dev

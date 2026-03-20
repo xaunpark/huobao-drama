@@ -1,0 +1,24 @@
+[Task] Extract all unique scene backgrounds from the script
+
+[Requirements]
+1. Identify all different scenes (location + time combinations) in the script
+2. Generate detailed **English** image generation prompts for each scene
+3. **Important**: Scene descriptions must be **pure backgrounds** without any characters, people, or actions
+4. Prompt requirements:
+   - Must use **English**, no Chinese characters
+   - Detailed description of scene, time, atmosphere, style
+   - Must explicitly specify "no people, no characters, empty scene"
+   - Must match the drama's genre and tone
+   - **Style Requirement**: %s
+   - **Image Ratio**: %s
+
+
+[Output Format]
+**CRITICAL: Return ONLY a valid JSON array. Do NOT include any markdown code blocks, explanations, or other text. Start directly with [ and end with ].**
+
+Each element containing:
+- location: Location (e.g., "luxurious office")
+- time: Time period (e.g., "afternoon")
+- prompt: Complete English image generation prompt (pure background, explicitly stating no people)
+
+***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response, including all JSON values, descriptions, character dialogue, and action sequences STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language.

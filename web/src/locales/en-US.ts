@@ -618,7 +618,7 @@ export default {
       stop: 'Stop',
       shot: 'Shot',
       description: 'Description',
-      prompt: 'Prompt',
+      prompt: 'Image Prompt',
       image: 'Image (Grid)',
       video: 'Video',
       progress: 'Progress',

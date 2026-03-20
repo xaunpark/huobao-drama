@@ -1,0 +1,23 @@
+Please extract key props from the following script.
+    
+[Script Content]
+%%s
+
+[Requirements]
+1. Extract ONLY key props that are important to the plot or have special visual characteristics.
+2. Do NOT extract common daily items (e.g., normal cups, pens) unless they have special plot significance.
+3. If a prop has a clear owner, please note it in the description.
+4. "image_prompt" field is for AI image generation, must describe the prop's appearance, material, color, and style in detail.
+- **Style Requirement**: %s
+- **Image Ratio**: %s
+
+[Output Format]
+JSON array, each object containing:
+- name: Prop Name
+- type: Type (e.g., Weapon/Key Item/Daily Item/Special Device)
+- description: Role in the drama and visual description
+- image_prompt: English image generation prompt (Focus on the object, isolated, detailed, cinematic lighting, high quality)
+
+Please return JSON array directly.
+
+***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response, including all JSON values, descriptions, character dialogue, and action sequences STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language.
