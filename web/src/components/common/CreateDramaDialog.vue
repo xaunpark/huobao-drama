@@ -71,6 +71,34 @@
           resize="none"
         />
       </el-form-item>
+
+      <el-form-item label="Prompt Template">
+        <el-select
+          v-model="form.prompt_template_id"
+          placeholder="Mặc định hệ thống"
+          clearable
+          size="large"
+          style="width: 100%"
+          @change="onTemplateChange"
+        >
+          <el-option
+            v-for="tpl in promptTemplates"
+            :key="tpl.id"
+            :label="tpl.name"
+            :value="tpl.id"
+          >
+            <span>{{ tpl.name }}</span>
+            <span v-if="tpl.description" style="color: #999; font-size: 12px; margin-left: 8px;">{{ tpl.description }}</span>
+          </el-option>
+        </el-select>
+        <div class="form-tip">
+          <router-link to="/settings/prompt-templates">Quản lý Templates →</router-link>
+        </div>
+        <div v-if="templateHasStyle" class="template-style-hint">
+          <el-icon><WarningFilled /></el-icon>
+          <span>Template này có <strong>style_prompt</strong> riêng — sẽ override phong cách "{{ $t('drama.styles.' + form.style) }}" ở trên khi sinh ảnh.</span>
+        </div>
+      </el-form-item>
     </el-form>
 
     <template #footer>
@@ -93,11 +121,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from "vue";
+import { ref, reactive, watch, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage, type FormInstance, type FormRules } from "element-plus";
-import { Plus } from "@element-plus/icons-vue";
+import { Plus, WarningFilled } from "@element-plus/icons-vue";
 import { dramaAPI } from "@/api/drama";
+import { promptTemplateAPI } from "@/api/prompt-template";
+import type { PromptTemplate } from "@/types/prompt-template";
 import type { CreateDramaRequest } from "@/types/drama";
 
 /**
@@ -116,6 +146,7 @@ const emit = defineEmits<{
 const router = useRouter();
 const formRef = ref<FormInstance>();
 const loading = ref(false);
+const promptTemplates = ref<PromptTemplate[]>([]);
 
 // v-model binding / 双向绑定
 const visible = ref(props.modelValue);
@@ -162,13 +193,48 @@ const rules: FormRules = {
   ]
 };
 
+// Template conflict detection
+const selectedTemplate = computed(() => {
+  if (!form.prompt_template_id) return null;
+  return promptTemplates.value.find(t => t.id === form.prompt_template_id) || null;
+});
+
+const templateHasStyle = computed(() => {
+  const tpl = selectedTemplate.value;
+  return tpl?.prompts?.style_prompt && tpl.prompts.style_prompt.trim().length > 0;
+});
+
+const onTemplateChange = (templateId: number | undefined) => {
+  if (!templateId) return;
+  const tpl = promptTemplates.value.find(t => t.id === templateId);
+  if (tpl?.prompts?.style_prompt && tpl.prompts.style_prompt.trim()) {
+    // If template has its own style, suggest switching to custom
+    if (form.style !== 'custom') {
+      ElMessage.info('Template có style riêng, sẽ override phong cách đã chọn khi sinh ảnh.');
+    }
+  }
+};
+
+// Load prompt templates
+const loadPromptTemplates = async () => {
+  try {
+    const res = await promptTemplateAPI.list();
+    promptTemplates.value = Array.isArray(res) ? res : [];
+  } catch {
+    // silent - dropdown will just be empty
+  }
+};
+
 // Reset form when dialog closes / 关闭时重置表单
 const handleClosed = () => {
   form.title = "";
   form.description = "";
   form.custom_style = "";
+  form.prompt_template_id = undefined;
   formRef.value?.resetFields();
 };
+
+onMounted(loadPromptTemplates);
 
 // Close dialog / 关闭弹窗
 const handleClose = () => {
@@ -211,6 +277,33 @@ const handleSubmit = async () => {
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid var(--border-primary);
   margin-right: 0;
+}
+
+.form-tip {
+  margin-top: 4px;
+  font-size: 12px;
+}
+.form-tip a {
+  color: var(--el-color-primary);
+  text-decoration: none;
+}
+
+.template-style-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--el-color-warning-light-9);
+  border: 1px solid var(--el-color-warning-light-5);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--el-color-warning-dark-2);
+  line-height: 1.5;
+}
+.template-style-hint .el-icon {
+  margin-top: 2px;
+  flex-shrink: 0;
 }
 
 .create-dialog :deep(.el-dialog__title) {

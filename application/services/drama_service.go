@@ -28,22 +28,24 @@ func NewDramaService(db *gorm.DB, cfg *config.Config, log *logger.Logger) *Drama
 }
 
 type CreateDramaRequest struct {
-	Title       string `json:"title" binding:"required,min=1,max=100"`
-	Description string `json:"description"`
-	Genre       string `json:"genre"`
-	Style       string `json:"style"`
-	CustomStyle string `json:"custom_style"`
-	Tags        string `json:"tags"`
+	Title            string `json:"title" binding:"required,min=1,max=100"`
+	Description      string `json:"description"`
+	Genre            string `json:"genre"`
+	Style            string `json:"style"`
+	CustomStyle      string `json:"custom_style"`
+	Tags             string `json:"tags"`
+	PromptTemplateID *uint  `json:"prompt_template_id"`
 }
 
 type UpdateDramaRequest struct {
-	Title       string `json:"title" binding:"omitempty,min=1,max=100"`
-	Description string `json:"description"`
-	Genre       string `json:"genre"`
-	Style       string `json:"style"`
-	CustomStyle string `json:"custom_style"`
-	Tags        string `json:"tags"`
-	Status      string `json:"status" binding:"omitempty,oneof=draft planning production completed archived"`
+	Title            string `json:"title" binding:"omitempty,min=1,max=100"`
+	Description      string `json:"description"`
+	Genre            string `json:"genre"`
+	Style            string `json:"style"`
+	CustomStyle      string `json:"custom_style"`
+	Tags             string `json:"tags"`
+	Status           string `json:"status" binding:"omitempty,oneof=draft planning production completed archived"`
+	PromptTemplateID *uint  `json:"prompt_template_id"`
 }
 
 type DramaListQuery struct {
@@ -72,6 +74,9 @@ func (s *DramaService) CreateDrama(req *CreateDramaRequest) (*models.Drama, erro
 	}
 	if req.CustomStyle != "" {
 		drama.CustomStyle = req.CustomStyle
+	}
+	if req.PromptTemplateID != nil {
+		drama.PromptTemplateID = req.PromptTemplateID
 	}
 
 	if err := s.db.Create(drama).Error; err != nil {
@@ -292,6 +297,9 @@ func (s *DramaService) UpdateDrama(dramaID string, req *UpdateDramaRequest) (*mo
 	}
 	if req.Status != "" {
 		updates["status"] = req.Status
+	}
+	if req.PromptTemplateID != nil {
+		updates["prompt_template_id"] = req.PromptTemplateID
 	}
 
 	updates["updated_at"] = time.Now()

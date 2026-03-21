@@ -30,6 +30,11 @@
             <el-icon><Setting /></el-icon>
             <span class="btn-text">{{ $t('drama.aiConfig') }}</span>
           </el-button>
+          <!-- Prompt Templates | Prompt 模板管理 -->
+          <el-button v-if="showAIConfig" @click="$router.push('/settings/prompt-templates')" class="header-btn">
+            <el-icon><Document /></el-icon>
+            <span class="btn-text">Templates</span>
+          </el-button>
           <!-- Right slot for business content (before actions) | 右侧插槽（在操作按钮前） -->
           <slot name="right" />
         </div>
@@ -43,7 +48,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Setting } from '@element-plus/icons-vue'
+import { Setting, Document } from '@element-plus/icons-vue'
 import ThemeToggle from './ThemeToggle.vue'
 import AIConfigDialog from './AIConfigDialog.vue'
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue'

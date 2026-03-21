@@ -2,19 +2,86 @@ package services
 
 import (
 	"fmt"
+	"strings"
 
-	"github.com/drama-generator/backend/pkg/config"
 	"github.com/drama-generator/backend/application/prompts"
+	"github.com/drama-generator/backend/domain/models"
+	"github.com/drama-generator/backend/pkg/config"
 )
 
 // PromptI18n 提示词国际化工具
 type PromptI18n struct {
-	config *config.Config
+	config          *config.Config
+	templateService *PromptTemplateService // optional, nil = always use defaults
 }
+
+var globalTemplateService *PromptTemplateService
 
 // NewPromptI18n 创建提示词国际化工具
 func NewPromptI18n(cfg *config.Config) *PromptI18n {
-	return &PromptI18n{config: cfg}
+	return &PromptI18n{
+		config:          cfg,
+		templateService: globalTemplateService,
+	}
+}
+
+// SetTemplateService 设置模板服务（可选注入）
+func (p *PromptI18n) SetTemplateService(svc *PromptTemplateService) {
+	p.templateService = svc
+	if globalTemplateService == nil {
+		globalTemplateService = svc
+	}
+}
+
+// resolvePrompt 使用模板服务解析 prompt，如果没有模板服务则返回默认
+func (p *PromptI18n) resolvePrompt(dramaID uint, promptType string) string {
+	if p.templateService != nil && dramaID > 0 {
+		return p.templateService.ResolvePrompt(dramaID, promptType)
+	}
+	// Fallback to default
+	defaultFile, ok := models.PromptTypeToDefaultFile[promptType]
+	if !ok {
+		return ""
+	}
+	return prompts.Get(defaultFile)
+}
+
+// formatPromptWithVars 安全地替换 %s 变量 - 用于自定义模板可能没有 %s 占位符
+func formatPromptWithVars(template string, vars map[string]string) string {
+	result := template
+	for placeholder, value := range vars {
+		result = strings.Replace(result, placeholder, value, 1)
+	}
+	return result
+}
+
+// resolveEffectiveStyle determines the actual style description to use.
+// Priority: template's style_prompt > custom style text > dropdown style key.
+// This ensures that when a template has its own style_prompt, the %s placeholders
+// in extraction/image prompts receive the template's style description instead of
+// the short dropdown value like "ghibli".
+func (p *PromptI18n) resolveEffectiveStyle(dramaID uint, style string, customStyle string) string {
+	// 1. Custom style always wins (user explicitly typed it)
+	if style == "custom" && customStyle != "" {
+		return customStyle
+	}
+
+	// 2. Check if drama has a template with style_prompt
+	if p.templateService != nil && dramaID > 0 {
+		templateStylePrompt := p.templateService.ResolvePromptIfCustom(dramaID, "style_prompt")
+		if templateStylePrompt != "" {
+			return templateStylePrompt
+		}
+	}
+
+	// 3. Fallback to dropdown style key
+	return p.GetStylePrompt(style, customStyle)
+}
+
+// ResolveEffectiveStylePublic is the exported version. Other services can call
+// this to get the resolved style description (template override > custom > key).
+func (p *PromptI18n) ResolveEffectiveStylePublic(dramaID uint, style string, customStyle string) string {
+	return p.resolveEffectiveStyle(dramaID, style, customStyle)
 }
 
 // GetLanguage 获取当前语言设置
@@ -326,4 +393,147 @@ func (p *PromptI18n) GetVideoConstraintPrompt(referenceMode string) string {
 	}
 
 	return ""
+}
+
+// ==========================================
+// WithDrama* Methods - Template-aware versions
+// These methods resolve prompts via PromptTemplateService fallback.
+// If dramaID is 0 or templateService is nil, they behave identically to originals.
+// ==========================================
+
+// WithDramaStoryboardSystemPrompt resolves storyboard system prompt for a specific drama
+func (p *PromptI18n) WithDramaStoryboardSystemPrompt(dramaID uint) string {
+	return p.resolvePrompt(dramaID, "storyboard_breakdown")
+}
+
+// WithDramaSceneExtractionPrompt resolves scene extraction prompt for a specific drama
+func (p *PromptI18n) WithDramaSceneExtractionPrompt(dramaID uint, style string, customStyle string) string {
+	imageRatio := "16:9"
+	effectiveStyle := p.resolveEffectiveStyle(dramaID, style, customStyle)
+	template := p.resolvePrompt(dramaID, "scene_extraction")
+	// Use safe replacement for custom templates that may not have %s
+	if strings.Contains(template, "%s") {
+		return fmt.Sprintf(template, effectiveStyle, imageRatio)
+	}
+	return formatPromptWithVars(template, map[string]string{
+		"{{STYLE}}": effectiveStyle,
+		"{{RATIO}}": imageRatio,
+	})
+}
+
+// WithDramaCharacterExtractionPrompt resolves character extraction prompt for a specific drama
+func (p *PromptI18n) WithDramaCharacterExtractionPrompt(dramaID uint, style string, customStyle string) string {
+	imageRatio := "16:9"
+	effectiveStyle := p.resolveEffectiveStyle(dramaID, style, customStyle)
+	template := p.resolvePrompt(dramaID, "character_extraction")
+	if strings.Contains(template, "%s") {
+		return fmt.Sprintf(template, effectiveStyle, imageRatio)
+	}
+	return formatPromptWithVars(template, map[string]string{
+		"{{STYLE}}": effectiveStyle,
+		"{{RATIO}}": imageRatio,
+	})
+}
+
+// WithDramaPropExtractionPrompt resolves prop extraction prompt for a specific drama
+func (p *PromptI18n) WithDramaPropExtractionPrompt(dramaID uint, style string, customStyle string) string {
+	imageRatio := "1:1"
+	effectiveStyle := p.resolveEffectiveStyle(dramaID, style, customStyle)
+	template := p.resolvePrompt(dramaID, "prop_extraction")
+	if strings.Contains(template, "%s") {
+		return fmt.Sprintf(template, effectiveStyle, imageRatio)
+	}
+	return formatPromptWithVars(template, map[string]string{
+		"{{STYLE}}": effectiveStyle,
+		"{{RATIO}}": imageRatio,
+	})
+}
+
+// WithDramaOutlineGenerationPrompt resolves outline generation prompt for a specific drama
+func (p *PromptI18n) WithDramaOutlineGenerationPrompt(dramaID uint) string {
+	return p.resolvePrompt(dramaID, "script_outline")
+}
+
+// WithDramaEpisodeScriptPrompt resolves episode script generation prompt for a specific drama
+func (p *PromptI18n) WithDramaEpisodeScriptPrompt(dramaID uint) string {
+	return p.resolvePrompt(dramaID, "script_episode")
+}
+
+// WithDramaFirstFramePrompt resolves first frame prompt for a specific drama
+func (p *PromptI18n) WithDramaFirstFramePrompt(dramaID uint, style string) string {
+	imageRatio := "16:9"
+	effectiveStyle := p.resolveEffectiveStyle(dramaID, style, "")
+	template := p.resolvePrompt(dramaID, "image_first_frame")
+	if strings.Contains(template, "%s") {
+		return fmt.Sprintf(template, effectiveStyle, imageRatio)
+	}
+	return formatPromptWithVars(template, map[string]string{
+		"{{STYLE}}": effectiveStyle,
+		"{{RATIO}}": imageRatio,
+	})
+}
+
+// WithDramaKeyFramePrompt resolves key frame prompt for a specific drama
+func (p *PromptI18n) WithDramaKeyFramePrompt(dramaID uint, style string) string {
+	imageRatio := "16:9"
+	effectiveStyle := p.resolveEffectiveStyle(dramaID, style, "")
+	template := p.resolvePrompt(dramaID, "image_key_frame")
+	if strings.Contains(template, "%s") {
+		return fmt.Sprintf(template, effectiveStyle, imageRatio)
+	}
+	return formatPromptWithVars(template, map[string]string{
+		"{{STYLE}}": effectiveStyle,
+		"{{RATIO}}": imageRatio,
+	})
+}
+
+// WithDramaLastFramePrompt resolves last frame prompt for a specific drama
+func (p *PromptI18n) WithDramaLastFramePrompt(dramaID uint, style string) string {
+	imageRatio := "16:9"
+	effectiveStyle := p.resolveEffectiveStyle(dramaID, style, "")
+	template := p.resolvePrompt(dramaID, "image_last_frame")
+	if strings.Contains(template, "%s") {
+		return fmt.Sprintf(template, effectiveStyle, imageRatio)
+	}
+	return formatPromptWithVars(template, map[string]string{
+		"{{STYLE}}": effectiveStyle,
+		"{{RATIO}}": imageRatio,
+	})
+}
+
+// WithDramaActionSequenceFramePrompt resolves action sequence frame prompt for a specific drama
+func (p *PromptI18n) WithDramaActionSequenceFramePrompt(dramaID uint, style string) string {
+	imageRatio := "16:9"
+	effectiveStyle := p.resolveEffectiveStyle(dramaID, style, "")
+	template := p.resolvePrompt(dramaID, "image_action_sequence")
+	if strings.Contains(template, "%s") {
+		return fmt.Sprintf(template, effectiveStyle, imageRatio)
+	}
+	return formatPromptWithVars(template, map[string]string{
+		"{{STYLE}}": effectiveStyle,
+		"{{RATIO}}": imageRatio,
+	})
+}
+
+// WithDramaVideoConstraintPrompt resolves video constraint prompt for a specific drama
+func (p *PromptI18n) WithDramaVideoConstraintPrompt(dramaID uint, referenceMode string) string {
+	template := p.resolvePrompt(dramaID, "video_constraint")
+	if template == "" {
+		// Fallback to original logic
+		return p.GetVideoConstraintPrompt(referenceMode)
+	}
+	return template
+}
+
+// WithDramaStylePrompt resolves style prompt for a specific drama
+func (p *PromptI18n) WithDramaStylePrompt(dramaID uint, style string, customStyle string) string {
+	if style == "custom" {
+		return fmt.Sprintf("You are an expert Art Director. The exact style you must consistently follow for all visual designs and prompts is: %s", customStyle)
+	}
+	template := p.resolvePrompt(dramaID, "style_prompt")
+	if template != "" {
+		return template
+	}
+	// Fallback to original per-style logic
+	return p.GetStylePrompt(style, customStyle)
 }

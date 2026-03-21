@@ -1,0 +1,14 @@
+**Output Specification:**
+
+You must return a **JSON object** with the following structure:
+
+- **prompt**: A **complete English image generation prompt** (string, describing the visual scene for AI image generation).
+- **description**: A **simplified English description** (string, summarizing the core content).
+
+**Example Format:**
+{
+  "prompt": "A detailed scene description for image generation...",
+  "description": "Brief summary of the visual content."
+}
+
+***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language.

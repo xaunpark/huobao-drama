@@ -1,0 +1,10 @@
+Output Format:
+**CRITICAL: Return ONLY a valid JSON array. Do NOT include any markdown code blocks, explanations, or other text. Start directly with [ and end with ].**
+Each element is a character object containing the following fields:
+- name: Character/Entity name (string)
+- role: Role classification (string: "main", "supporting", or "minor")
+- appearance: Detailed visual description for AI image generation (string, 150-300 words)
+- personality: Personality traits description (string, 100-200 words)
+- description: Background story and relationships (string, 100-200 words)
+
+***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response, including all JSON values STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language.

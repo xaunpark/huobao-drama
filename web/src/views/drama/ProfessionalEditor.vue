@@ -2712,7 +2712,7 @@ watch(selectedVideoFrameType, (newType) => {
 // 监听分镜切换，自动填充视频提示词
 watch(
   currentStoryboard,
-  () => {
+  async () => {
     if (!currentStoryboard.value) {
       currentVideoPrompt.value = "";
       return;
@@ -2726,11 +2726,29 @@ watch(
       "";
       
     // 自动将剧本的预设风格（Style）添加到最前面，确保风格权重最高
-    const getVideoStylePrefix = (styleCode: string): string => {
+    const getVideoStylePrefix = async (styleCode: string): Promise<string> => {
+      // Priority 1: If drama has a template, try to use template's style_prompt
+      if (drama.value?.prompt_template_id) {
+        try {
+          const { promptTemplateAPI } = await import('@/api/prompt-template');
+          const tpl = await promptTemplateAPI.get(drama.value.prompt_template_id);
+          const tplData = tpl as any;
+          const prompts = tplData?.prompts || tplData?.data?.prompts;
+          if (prompts?.style_prompt && prompts.style_prompt.trim()) {
+            return `(Art Style: ${prompts.style_prompt.trim()}) - `;
+          }
+        } catch {
+          // Template load failed, fall through to default
+        }
+      }
+
+      // Priority 2: Custom style text
       if (styleCode === 'custom') {
         const customStyleDesc = drama.value?.custom_style || '';
         return `(Art Style: ${customStyleDesc}) - `;
       }
+
+      // Priority 3: Hardcoded style descriptions
       const stylesMap: Record<string, string> = {
         'ghibli': 'Studio Ghibli animation film style, breathtaking masterpiece scenery, highly detailed anime art, vivid colors, beautifully graded lighting',
         'guoman': 'High quality Chinese 2D animation style, vivid wuxia/xianxia aesthetic, delicate linework, epic cinematic atmosphere',
@@ -2747,7 +2765,7 @@ watch(
     };
 
     if (drama.value?.style) {
-      const stylePrefix = getVideoStylePrefix(drama.value.style);
+      const stylePrefix = await getVideoStylePrefix(drama.value.style);
       if (!basePrompt.includes("(Art Style:")) {
         // Handle migration from old 'Style: ghibli. ' prefix if present
         if (basePrompt.startsWith("Style: " + drama.value.style + ". ")) {

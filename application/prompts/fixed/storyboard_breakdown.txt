@@ -1,0 +1,41 @@
+[Output Format] You must output in JSON array format directly, starting with [ and ending with ], each shot containing the fields (all descriptive fields must be highly detailed):
+[
+  {
+    "shot_number": 1,
+    "title": "Nightmare Awakening",
+    "shot_type": "Long Shot",
+    "angle": "High-angle 45 degrees",
+    "time": "Late night 22:30, moonlight shines through the broken window",
+    "location": "Abandoned dock warehouse, rusty shelves, water on the ground",
+    "scene_id": 1,
+    "movement": "Fixed",
+    "action": "Detailed action description here.",
+    "dialogue": "(Monologue) After all these years, what secret is hidden inside?",
+    "result": "The visual result of the action here.",
+    "atmosphere": "Dim cool tones, oppressive mood",
+    "emotion": "Curiosity↑↑ to Disappointment↓ (Reversal)",
+    "duration": 9,
+    "bgm_prompt": "Low tense strings, slow rhythm",
+    "sound_effect": "Metallic clatter, dust swirling",
+    "characters": [1],
+    "is_primary": true
+  }
+]
+
+**dialogue Field Instructions**:
+- If dialog exists: "CharacterName: Dialogue Content" or "(Monologue) Content" or "(VO) Voiceover text"
+- Empty string if no dialogue
+
+**Character and Background Requirements**:
+- characters array must contain only valid IDs (integers) from the Available Character List. Use empty array [] if no characters.
+- scene_id must correspond strictly to the Valid Scene ID from the Extracted Scene Backgrounds list (use null if none fits)
+
+**Duration Estimation Rules**:
+- Every shot must be 3-12 seconds based on action complexity and dialogue length.
+
+**CRITICAL RULES**:
+- **You MUST break down the ENTIRE script.**
+- NO skipping any plot points!
+- Do not combine scenes. Always create more shots if needed to reflect the script accurately.
+
+***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response, including all JSON values, descriptions, character dialogue, and action sequences STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language. Do NOT use Chinese anywhere in the output JSON.

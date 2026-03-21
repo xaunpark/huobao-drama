@@ -319,7 +319,7 @@ func (s *VideoGenerationService) ProcessVideoGeneration(videoGenID uint) {
 		}
 	}
 
-	constraintPrompt := s.promptI18n.GetVideoConstraintPrompt(referenceMode)
+	constraintPrompt := s.promptI18n.WithDramaVideoConstraintPrompt(videoGen.DramaID, referenceMode)
 	if constraintPrompt != "" {
 		prompt = constraintPrompt + "\n\n" + prompt
 		s.log.Infow("Added constraint prompt to video generation",

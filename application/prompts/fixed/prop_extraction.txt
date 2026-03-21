@@ -1,0 +1,10 @@
+[Output Format]
+**CRITICAL: Return ONLY a valid JSON array. Do NOT include any markdown code blocks, explanations, or other text. Start directly with [ and end with ].**
+
+Each object containing:
+- name: Prop Name (string)
+- type: Type (string, e.g., "Weapon", "Key Item", "Daily Item", "Special Device")
+- description: Role in the drama and visual description (string)
+- image_prompt: English image generation prompt (string, focus on the object, isolated, detailed)
+
+***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language.

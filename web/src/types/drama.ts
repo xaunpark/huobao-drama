@@ -8,6 +8,7 @@ export interface Drama {
   genre?: string
   style?: string
   custom_style?: string
+  prompt_template_id?: number
   total_episodes: number
   total_duration: number
   total_scenes?: number
@@ -124,6 +125,7 @@ export interface CreateDramaRequest {
   style?: string
   custom_style?: string
   tags?: string
+  prompt_template_id?: number
 }
 
 export interface UpdateDramaRequest {
@@ -134,6 +136,7 @@ export interface UpdateDramaRequest {
   custom_style?: string
   tags?: string
   status?: DramaStatus
+  prompt_template_id?: number
 }
 
 export interface DramaListQuery {

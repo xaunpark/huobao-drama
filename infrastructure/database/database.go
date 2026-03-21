@@ -9,9 +9,8 @@ import (
 	"github.com/drama-generator/backend/domain/models"
 	"github.com/drama-generator/backend/pkg/config"
 	"gorm.io/driver/mysql"
-	"gorm.io/driver/sqlite"
+	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
-	_ "modernc.org/sqlite"
 )
 
 func NewDatabase(cfg config.DatabaseConfig) (*gorm.DB, error) {
@@ -32,13 +31,10 @@ func NewDatabase(cfg config.DatabaseConfig) (*gorm.DB, error) {
 	var err error
 
 	if cfg.Type == "sqlite" {
-		// 使用 modernc.org/sqlite 纯 Go 驱动（无需 CGO）
+		// 使用 glebarez/sqlite 纯 Go 驱动（无需 CGO）
 		// 添加并发优化参数：WAL 模式、busy_timeout、cache
-		dsnWithParams := dsn + "?_journal_mode=WAL&_busy_timeout=5000&_synchronous=NORMAL&cache=shared"
-		db, err = gorm.Open(sqlite.Dialector{
-			DriverName: "sqlite",
-			DSN:        dsnWithParams,
-		}, gormConfig)
+		dsnWithParams := dsn + "?_pragma=journal_mode(WAL)&_pragma=busy_timeout(5000)&_pragma=synchronous(NORMAL)&_pragma=cache_size(-2000)"
+		db, err = gorm.Open(sqlite.Open(dsnWithParams), gormConfig)
 	} else {
 		db, err = gorm.Open(mysql.Open(dsn), gormConfig)
 	}
@@ -95,5 +91,8 @@ func AutoMigrate(db *gorm.DB) error {
 
 		// 任务管理
 		&models.AsyncTask{},
+
+		// 提示词模板
+		&models.PromptTemplate{},
 	)
 }

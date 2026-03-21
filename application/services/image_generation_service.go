@@ -267,7 +267,7 @@ func (s *ImageGenerationService) ProcessImageGeneration(imageGenID uint) {
 
 	// 如果drama有风格设置，添加风格提示词
 	if drama.Style != "" && drama.Style != "realistic" {
-		stylePrompt := s.promptI18n.GetStylePrompt(drama.Style, drama.CustomStyle)
+		stylePrompt := s.promptI18n.WithDramaStylePrompt(drama.ID, drama.Style, drama.CustomStyle)
 		if stylePrompt != "" {
 			// 将风格提示词作为系统级约束添加到提示词前面
 			prompt = stylePrompt + "\n\n" + prompt
@@ -960,7 +960,7 @@ func (s *ImageGenerationService) extractBackgroundsFromScript(scriptContent stri
 	}
 
 	// 使用国际化提示词
-	systemPrompt := s.promptI18n.GetSceneExtractionPrompt(style, drama.CustomStyle)
+	systemPrompt := s.promptI18n.WithDramaSceneExtractionPrompt(drama.ID, style, drama.CustomStyle)
 	contentLabel := s.promptI18n.FormatUserPrompt("script_content_label")
 
 	// 根据语言构建不同的格式说明
@@ -973,7 +973,7 @@ func (s *ImageGenerationService) extractBackgroundsFromScript(scriptContent stri
       "location": "Location name (English)",
       "time": "Time description (English)",
       "atmosphere": "Atmosphere description (English)",
-      "prompt": "A cinematic anime-style pure background scene depicting [location description] at [time]. The scene shows [environment details, architecture, objects, lighting, no characters]. Style: rich details, high quality, atmospheric lighting. Mood: [environment mood description]."
+      "prompt": "A cinematic pure background scene depicting [location description] at [time]. The scene shows [environment details, architecture, objects, lighting, no characters]. Style: rich details, high quality, consistent with requested art style. Mood: [environment mood description]."
     }
   ]
 }
@@ -986,13 +986,13 @@ Correct example (note: no characters):
       "location": "Repair Shop Interior",
       "time": "Late Night",
       "atmosphere": "Dim, lonely, industrial",
-      "prompt": "A cinematic anime-style pure background scene depicting a messy repair shop interior at late night. Under dim fluorescent lights, the workbench is scattered with various wrenches, screwdrivers and mechanical parts, oil-stained tool boards and faded posters hang on walls, oil stains on the floor, used tires piled in corners. Style: rich details, high quality, dim atmosphere. Mood: lonely, industrial."
+      "prompt": "A cinematic pure background scene depicting a messy repair shop interior at late night. Under dim fluorescent lights, the workbench is scattered with various wrenches, screwdrivers and mechanical parts, oil-stained tool boards and faded posters hang on walls, oil stains on the floor, used tires piled in corners. Style: rich details, high quality, consistent with requested art style. Mood: lonely, industrial."
     },
     {
       "location": "City Street",
       "time": "Dusk",
       "atmosphere": "Warm, busy, lively",
-      "prompt": "A cinematic anime-style pure background scene depicting a bustling city street at dusk. Sunset afterglow shines on the asphalt road, neon lights of shops on both sides begin to light up, bicycle racks and bus stops on the street, high-rise buildings in the distance, sky showing orange-red gradient. Style: rich details, high quality, warm atmosphere. Mood: lively, busy."
+      "prompt": "A cinematic pure background scene depicting a bustling city street at dusk. Sunset afterglow shines on the asphalt road, neon lights of shops on both sides begin to light up, bicycle racks and bus stops on the street, high-rise buildings in the distance, sky showing orange-red gradient. Style: rich details, high quality, warm atmosphere. Mood: lively, busy."
     }
   ]
 }
@@ -1129,7 +1129,7 @@ func (s *ImageGenerationService) extractBackgroundsWithAI(storyboards []models.S
 	}
 
 	// 使用国际化提示词
-	systemPrompt := s.promptI18n.GetSceneExtractionPrompt(style, drama.CustomStyle)
+	systemPrompt := s.promptI18n.WithDramaSceneExtractionPrompt(drama.ID, style, drama.CustomStyle)
 	storyboardLabel := s.promptI18n.FormatUserPrompt("storyboard_list_label")
 
 	// 根据语言构建不同的提示词
@@ -1141,7 +1141,7 @@ func (s *ImageGenerationService) extractBackgroundsWithAI(storyboards []models.S
     {
       "location": "Location name (English)",
       "time": "Time description (English)",
-      "prompt": "A cinematic anime-style background depicting [location description] at [time]. The scene shows [detail description]. Style: rich details, high quality, atmospheric lighting. Mood: [mood description].",
+      "prompt": "A cinematic background depicting [location description] at [time]. The scene shows [detail description]. Style: rich details, high quality, consistent with requested art style. Mood: [mood description].",
       "scene_numbers": [1, 2, 3]
     }
   ]
@@ -1154,13 +1154,13 @@ Correct example:
     {
       "location": "Repair Shop",
       "time": "Late Night",
-      "prompt": "A cinematic anime-style background depicting a messy repair shop interior at late night. Under dim lighting, the workbench is scattered with various tools and parts, with greasy posters hanging on the walls. Style: rich details, high quality, dim atmosphere. Mood: lonely, industrial.",
+      "prompt": "A cinematic background depicting a messy repair shop interior at late night. Under dim lighting, the workbench is scattered with various tools and parts, with greasy posters hanging on the walls. Style: rich details, high quality, consistent with requested art style. Mood: lonely, industrial.",
       "scene_numbers": [1, 5, 6, 10, 15]
     },
     {
       "location": "City Panorama",
       "time": "Late Night with Acid Rain",
-      "prompt": "A cinematic anime-style background depicting a coastal city panorama in late night acid rain. Neon lights blur in the rain, skyscrapers shrouded in gray-green rain curtain, streets reflecting colorful lights. Style: rich details, high quality, cyberpunk atmosphere. Mood: oppressive, sci-fi, apocalyptic.",
+      "prompt": "A cinematic background depicting a coastal city panorama in late night acid rain. Neon lights blur in the rain, skyscrapers shrouded in gray-green rain curtain, streets reflecting colorful lights. Style: rich details, high quality, consistent with requested art style. Mood: oppressive, sci-fi, apocalyptic.",
       "scene_numbers": [2, 7]
     }
   ]

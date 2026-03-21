@@ -1,0 +1,9 @@
+[Output Format]
+**CRITICAL: Return ONLY a valid JSON array. Do NOT include any markdown code blocks, explanations, or other text. Start directly with [ and end with ].**
+
+Each element containing:
+- location: Location description (string, e.g., "luxurious office")
+- time: Time period (string, e.g., "afternoon")
+- prompt: Complete English image generation prompt (string, pure background, explicitly stating no people)
+
+***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response, including all JSON values STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language.

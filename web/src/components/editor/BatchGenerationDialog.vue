@@ -236,11 +236,35 @@ const processPrompt = async (sb: Storyboard) => {
     }
 
     // 如果项目有风格设定，则作为前缀加入提示词 (Style always at top)
-    const getStylePrefix = (styleCode: string): string => {
+    const getStylePrefix = async (styleCode: string): Promise<string> => {
+      // Priority 1: If drama has a template, try to use template's style_prompt
+      if (props.dramaId) {
+        try {
+          const { promptTemplateAPI } = await import('@/api/prompt-template');
+          // Load drama to check for template
+          const dramaRes = await dramaAPI.get(props.dramaId.toString());
+          const dramaData = dramaRes as any;
+          const templateId = dramaData?.prompt_template_id;
+          if (templateId) {
+            const tpl = await promptTemplateAPI.get(templateId);
+            const tplData = tpl as any;
+            const prompts = tplData?.prompts || tplData?.data?.prompts;
+            if (prompts?.style_prompt && prompts.style_prompt.trim()) {
+              return `(Art Style: ${prompts.style_prompt.trim()}) - `;
+            }
+          }
+        } catch {
+          // Template load failed, fall through to default
+        }
+      }
+
+      // Priority 2: Custom style text
       if (styleCode === 'custom') {
         const customStyleDesc = props.customStyle || '';
         return `(Art Style: ${customStyleDesc}) - `;
       }
+
+      // Priority 3: Hardcoded style descriptions
       const stylesMap: Record<string, string> = {
         'ghibli': 'Studio Ghibli animation film style, breathtaking masterpiece scenery, highly detailed anime art, vivid colors, beautifully graded lighting',
         'guoman': 'High quality Chinese 2D animation style, vivid wuxia/xianxia aesthetic, delicate linework, epic cinematic atmosphere',
@@ -261,7 +285,7 @@ const processPrompt = async (sb: Storyboard) => {
       if (finalPrompt.startsWith(`${props.style}, `)) {
         finalPrompt = finalPrompt.substring(props.style.length + 2)
       }
-      finalPrompt = `${getStylePrefix(props.style)}${finalPrompt}`
+      finalPrompt = `${await getStylePrefix(props.style)}${finalPrompt}`
     }
 
     // 保存到DB

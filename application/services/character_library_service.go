@@ -22,14 +22,14 @@ type CharacterLibraryService struct {
 	promptI18n  *PromptI18n
 }
 
-func NewCharacterLibraryService(db *gorm.DB, log *logger.Logger, cfg *config.Config) *CharacterLibraryService {
+func NewCharacterLibraryService(db *gorm.DB, log *logger.Logger, cfg *config.Config, promptI18n *PromptI18n) *CharacterLibraryService {
 	return &CharacterLibraryService{
 		db:          db,
 		log:         log,
 		config:      cfg,
 		aiService:   NewAIService(db, log),
 		taskService: NewTaskService(db, log),
-		promptI18n:  NewPromptI18n(cfg),
+		promptI18n:  promptI18n,
 	}
 }
 
@@ -334,9 +334,10 @@ func (s *CharacterLibraryService) GenerateCharacterImage(characterID string, ima
 		prompt = character.Name
 	}
 
-	// 使用已经加载的 drama 的 style 信息
-	if drama.Style != "" && drama.Style != "realistic" {
-		prompt += ", " + drama.Style
+	// Resolve effective style — respects template's style_prompt if available
+	effectiveStyle := s.promptI18n.ResolveEffectiveStylePublic(drama.ID, drama.Style, drama.CustomStyle)
+	if effectiveStyle != "" && effectiveStyle != "realistic" {
+		prompt += ", " + effectiveStyle
 	}
 
 	// Add special character sheet requirements
@@ -538,7 +539,7 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 		s.log.Warnw("Failed to load drama", "error", err, "drama_id", episode.DramaID)
 	}
 
-	prompt := s.promptI18n.GetCharacterExtractionPrompt(drama.Style, drama.CustomStyle)
+	prompt := s.promptI18n.WithDramaCharacterExtractionPrompt(drama.ID, drama.Style, drama.CustomStyle)
 	userPrompt := fmt.Sprintf("【剧本内容】\n%s", script)
 
 	response, err := s.aiService.GenerateText(userPrompt, prompt, ai.WithMaxTokens(3000))

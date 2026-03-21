@@ -130,7 +130,7 @@ func (s *FramePromptService) processFramePromptGeneration(taskID string, req Gen
 	var err error
 	switch req.FrameType {
 	case FrameTypeFirst:
-		response.SingleFrame, err = s.generateFirstFrame(storyboard, scene, dramaStyle, model)
+		response.SingleFrame, err = s.generateFirstFrame(episode.Drama.ID, storyboard, scene, dramaStyle, model)
 		if err != nil {
 			s.taskService.UpdateTaskStatus(taskID, "failed", 0, "AI生成提示词失败: "+err.Error())
 			return
@@ -138,14 +138,14 @@ func (s *FramePromptService) processFramePromptGeneration(taskID string, req Gen
 		// 保存单帧提示词
 		s.saveFramePrompt(req.StoryboardID, string(req.FrameType), response.SingleFrame.Prompt, response.SingleFrame.Description, "")
 	case FrameTypeKey:
-		response.SingleFrame, err = s.generateKeyFrame(storyboard, scene, dramaStyle, model)
+		response.SingleFrame, err = s.generateKeyFrame(episode.Drama.ID, storyboard, scene, dramaStyle, model)
 		if err != nil {
 			s.taskService.UpdateTaskStatus(taskID, "failed", 0, "AI生成提示词失败: "+err.Error())
 			return
 		}
 		s.saveFramePrompt(req.StoryboardID, string(req.FrameType), response.SingleFrame.Prompt, response.SingleFrame.Description, "")
 	case FrameTypeLast:
-		response.SingleFrame, err = s.generateLastFrame(storyboard, scene, dramaStyle, model)
+		response.SingleFrame, err = s.generateLastFrame(episode.Drama.ID, storyboard, scene, dramaStyle, model)
 		if err != nil {
 			s.taskService.UpdateTaskStatus(taskID, "failed", 0, "AI生成提示词失败: "+err.Error())
 			return
@@ -156,7 +156,7 @@ func (s *FramePromptService) processFramePromptGeneration(taskID string, req Gen
 		if count == 0 {
 			count = 3
 		}
-		response.MultiFrame, err = s.generatePanelFrames(storyboard, scene, count, dramaStyle, model)
+		response.MultiFrame, err = s.generatePanelFrames(episode.Drama.ID, storyboard, scene, count, dramaStyle, model)
 		if err != nil {
 			s.taskService.UpdateTaskStatus(taskID, "failed", 0, "AI生成分镜板提示词失败: "+err.Error())
 			return
@@ -169,7 +169,7 @@ func (s *FramePromptService) processFramePromptGeneration(taskID string, req Gen
 		combinedPrompt := strings.Join(prompts, "\n---\n")
 		s.saveFramePrompt(req.StoryboardID, string(req.FrameType), combinedPrompt, "分镜板组合提示词", response.MultiFrame.Layout)
 	case FrameTypeAction:
-		response.MultiFrame, err = s.generateActionSequence(storyboard, scene, dramaStyle, model)
+		response.MultiFrame, err = s.generateActionSequence(episode.Drama.ID, storyboard, scene, dramaStyle, model)
 		if err != nil {
 			s.taskService.UpdateTaskStatus(taskID, "failed", 0, "AI生成动作序列提示词失败: "+err.Error())
 			return
@@ -228,12 +228,12 @@ func mustParseUint(s string) uint64 {
 }
 
 // generateFirstFrame 生成首帧提示词
-func (s *FramePromptService) generateFirstFrame(sb models.Storyboard, scene *models.Scene, dramaStyle string, model string) (*SingleFramePrompt, error) {
+func (s *FramePromptService) generateFirstFrame(dramaID uint, sb models.Storyboard, scene *models.Scene, dramaStyle string, model string) (*SingleFramePrompt, error) {
 	// 构建上下文信息
 	contextInfo := s.buildStoryboardContext(sb, scene)
 
 	// 使用国际化提示词
-	systemPrompt := s.promptI18n.GetFirstFramePrompt(dramaStyle)
+	systemPrompt := s.promptI18n.WithDramaFirstFramePrompt(dramaID, dramaStyle)
 	userPrompt := s.promptI18n.FormatUserPrompt("frame_info", contextInfo)
 
 	// 调用AI生成（如果指定了模型则使用指定的模型）
@@ -266,12 +266,12 @@ func (s *FramePromptService) generateFirstFrame(sb models.Storyboard, scene *mod
 }
 
 // generateKeyFrame 生成关键帧提示词
-func (s *FramePromptService) generateKeyFrame(sb models.Storyboard, scene *models.Scene, dramaStyle string, model string) (*SingleFramePrompt, error) {
+func (s *FramePromptService) generateKeyFrame(dramaID uint, sb models.Storyboard, scene *models.Scene, dramaStyle string, model string) (*SingleFramePrompt, error) {
 	// 构建上下文信息
 	contextInfo := s.buildStoryboardContext(sb, scene)
 
 	// 使用国际化提示词
-	systemPrompt := s.promptI18n.GetKeyFramePrompt(dramaStyle)
+	systemPrompt := s.promptI18n.WithDramaKeyFramePrompt(dramaID, dramaStyle)
 	userPrompt := s.promptI18n.FormatUserPrompt("key_frame_info", contextInfo)
 
 	// 调用AI生成
@@ -304,12 +304,12 @@ func (s *FramePromptService) generateKeyFrame(sb models.Storyboard, scene *model
 }
 
 // generateLastFrame 生成尾帧提示词
-func (s *FramePromptService) generateLastFrame(sb models.Storyboard, scene *models.Scene, dramaStyle string, model string) (*SingleFramePrompt, error) {
+func (s *FramePromptService) generateLastFrame(dramaID uint, sb models.Storyboard, scene *models.Scene, dramaStyle string, model string) (*SingleFramePrompt, error) {
 	// 构建上下文信息
 	contextInfo := s.buildStoryboardContext(sb, scene)
 
 	// 使用国际化提示词
-	systemPrompt := s.promptI18n.GetLastFramePrompt(dramaStyle)
+	systemPrompt := s.promptI18n.WithDramaLastFramePrompt(dramaID, dramaStyle)
 	userPrompt := s.promptI18n.FormatUserPrompt("last_frame_info", contextInfo)
 
 	// 调用AI生成
@@ -342,38 +342,38 @@ func (s *FramePromptService) generateLastFrame(sb models.Storyboard, scene *mode
 }
 
 // generatePanelFrames 生成分镜板提示词（多格组合）
-func (s *FramePromptService) generatePanelFrames(sb models.Storyboard, scene *models.Scene, count int, dramaStyle string, model string) (*MultiFramePrompt, error) {
+func (s *FramePromptService) generatePanelFrames(dramaID uint, sb models.Storyboard, scene *models.Scene, count int, dramaStyle string, model string) (*MultiFramePrompt, error) {
 	layout := fmt.Sprintf("horizontal_%d", count)
 
 	frames := make([]SingleFramePrompt, count)
 
 	// 固定生成：首帧 -> 关键帧 -> 尾帧
 	if count == 3 {
-		f1, err1 := s.generateFirstFrame(sb, scene, dramaStyle, model)
+		f1, err1 := s.generateFirstFrame(dramaID, sb, scene, dramaStyle, model)
 		if err1 != nil { return nil, err1 }
 		frames[0] = *f1
 		frames[0].Description = "第1格：初始状态"
 
-		f2, err2 := s.generateKeyFrame(sb, scene, dramaStyle, model)
+		f2, err2 := s.generateKeyFrame(dramaID, sb, scene, dramaStyle, model)
 		if err2 != nil { return nil, err2 }
 		frames[1] = *f2
 		frames[1].Description = "第2格：动作高潮"
 
-		f3, err3 := s.generateLastFrame(sb, scene, dramaStyle, model)
+		f3, err3 := s.generateLastFrame(dramaID, sb, scene, dramaStyle, model)
 		if err3 != nil { return nil, err3 }
 		frames[2] = *f3
 		frames[2].Description = "第3格：最终状态"
 	} else if count == 4 {
-		f1, err1 := s.generateFirstFrame(sb, scene, dramaStyle, model)
+		f1, err1 := s.generateFirstFrame(dramaID, sb, scene, dramaStyle, model)
 		if err1 != nil { return nil, err1 }
 		frames[0] = *f1
-		f2, err2 := s.generateKeyFrame(sb, scene, dramaStyle, model)
+		f2, err2 := s.generateKeyFrame(dramaID, sb, scene, dramaStyle, model)
 		if err2 != nil { return nil, err2 }
 		frames[1] = *f2
-		f3, err3 := s.generateKeyFrame(sb, scene, dramaStyle, model)
+		f3, err3 := s.generateKeyFrame(dramaID, sb, scene, dramaStyle, model)
 		if err3 != nil { return nil, err3 }
 		frames[2] = *f3
-		f4, err4 := s.generateLastFrame(sb, scene, dramaStyle, model)
+		f4, err4 := s.generateLastFrame(dramaID, sb, scene, dramaStyle, model)
 		if err4 != nil { return nil, err4 }
 		frames[3] = *f4
 	}
@@ -385,12 +385,12 @@ func (s *FramePromptService) generatePanelFrames(sb models.Storyboard, scene *mo
 }
 
 // generateActionSequence 生成动作序列提示词（3x3宫格）
-func (s *FramePromptService) generateActionSequence(sb models.Storyboard, scene *models.Scene, dramaStyle string, model string) (*MultiFramePrompt, error) {
+func (s *FramePromptService) generateActionSequence(dramaID uint, sb models.Storyboard, scene *models.Scene, dramaStyle string, model string) (*MultiFramePrompt, error) {
 	// 构建上下文信息
 	contextInfo := s.buildStoryboardContext(sb, scene)
 
 	// 使用国际化提示词 - 专门为动作序列设计的提示词
-	systemPrompt := s.promptI18n.GetActionSequenceFramePrompt(dramaStyle)
+	systemPrompt := s.promptI18n.WithDramaActionSequenceFramePrompt(dramaID, dramaStyle)
 	userPrompt := s.promptI18n.FormatUserPrompt("frame_info", contextInfo)
 
 	// 调用AI生成

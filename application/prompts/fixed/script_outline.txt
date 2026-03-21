@@ -1,0 +1,13 @@
+Output Format:
+**CRITICAL: Return ONLY a valid JSON object. Do NOT include any markdown code blocks, explanations, or other text. Start directly with { and end with }.**
+
+Return a JSON object containing:
+- title: Drama title (string, creative and attractive)
+- episodes: Episode list (array), each containing:
+  - episode_number: Episode number (integer)
+  - title: Episode title (string)
+  - summary: Episode content summary (string, 50-100 words)
+  - conflict: Main conflict point (string)
+  - cliffhanger: Cliffhanger ending (string, if any)
+
+***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language.

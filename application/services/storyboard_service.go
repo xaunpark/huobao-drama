@@ -141,14 +141,15 @@ func (s *StoryboardService) GenerateStoryboard(episodeID string, model string) (
 		"scenes", sceneList)
 
 	// 启动后台goroutine处理AI调用和后续逻辑
-	go s.processStoryboardGeneration(task.ID, episodeID, model, scriptContent, characterList, sceneList)
+	dramaIDUint, _ := strconv.ParseUint(episode.DramaID, 10, 32)
+	go s.processStoryboardGeneration(task.ID, episodeID, uint(dramaIDUint), model, scriptContent, characterList, sceneList)
 
 	// 立即返回任务ID
 	return task.ID, nil
 }
 
 // processStoryboardGeneration 后台处理故事板生成
-func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID, model, scriptContent, characterList, sceneList string) {
+func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID string, dramaID uint, model, scriptContent, characterList, sceneList string) {
 	// 更新任务状态为处理中
 	if err := s.taskService.UpdateTaskStatus(taskID, "processing", 10, "准备生成分镜头..."); err != nil {
 		s.log.Errorw("Failed to update task status", "error", err, "task_id", taskID)
@@ -157,7 +158,7 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID, model
 
 	s.log.Infow("Processing storyboard generation", "task_id", taskID, "episode_id", episodeID)
 
-	systemPrompt := s.promptI18n.GetStoryboardSystemPrompt()
+	systemPrompt := s.promptI18n.WithDramaStoryboardSystemPrompt(dramaID)
 	scriptLabel := s.promptI18n.FormatUserPrompt("script_content_label")
 	taskLabel := s.promptI18n.FormatUserPrompt("task_label")
 	taskInstruction := s.promptI18n.FormatUserPrompt("task_instruction")

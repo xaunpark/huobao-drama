@@ -1,0 +1,10 @@
+Output Format:
+**CRITICAL: Return ONLY a valid JSON object. Do NOT include any markdown code blocks, explanations, or other text. Start directly with { and end with }.**
+
+Return a JSON object containing:
+- episodes: Episode list (array), each containing:
+  - episode_number: Episode number (integer)
+  - title: Episode title (string)
+  - script_content: Detailed script content (string, 800-1200 words)
+
+***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language.

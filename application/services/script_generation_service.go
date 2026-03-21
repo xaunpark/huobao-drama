@@ -79,7 +79,7 @@ func (s *ScriptGenerationService) processCharacterGeneration(taskID string, req 
 		return
 	}
 
-	systemPrompt := s.promptI18n.GetCharacterExtractionPrompt(drama.Style, drama.CustomStyle)
+	systemPrompt := s.promptI18n.WithDramaCharacterExtractionPrompt(drama.ID, drama.Style, drama.CustomStyle)
 
 	outlineText := req.Outline
 	if outlineText == "" {
