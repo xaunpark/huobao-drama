@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	models "github.com/drama-generator/backend/domain/models"
-	"github.com/drama-generator/backend/pkg/ai"
 	"github.com/drama-generator/backend/pkg/config"
 	"github.com/drama-generator/backend/application/prompts"
 	"github.com/drama-generator/backend/pkg/logger"
@@ -123,35 +122,6 @@ func (s *StoryboardService) GenerateStoryboard(episodeID string, model string) (
 		sceneList = fmt.Sprintf("[%s]", strings.Join(sceneInfoList, ", "))
 	}
 
-	// 使用国际化提示词
-	systemPrompt := s.promptI18n.GetStoryboardSystemPrompt()
-
-	scriptLabel := s.promptI18n.FormatUserPrompt("script_content_label")
-	taskLabel := s.promptI18n.FormatUserPrompt("task_label")
-	taskInstruction := s.promptI18n.FormatUserPrompt("task_instruction")
-	charListLabel := s.promptI18n.FormatUserPrompt("character_list_label")
-	charConstraint := s.promptI18n.FormatUserPrompt("character_constraint")
-	sceneListLabel := s.promptI18n.FormatUserPrompt("scene_list_label")
-	sceneConstraint := s.promptI18n.FormatUserPrompt("scene_constraint")
-
-	formatInstructions := prompts.Get("storyboard_format_instructions.txt")
-	prompt := fmt.Sprintf(`%s
-
-%s
-%s
-
-%s
-%s
-
-%s
-%s
-%s
-
-%s
-%s
-%s
-
-%s`, systemPrompt, scriptLabel, scriptContent, taskLabel, taskInstruction, charListLabel, characterList, charConstraint, sceneListLabel, sceneList, sceneConstraint, formatInstructions)
 
 	// 创建异步任务
 	task, err := s.taskService.CreateTask("storyboard_generation", episodeID)
@@ -171,37 +141,62 @@ func (s *StoryboardService) GenerateStoryboard(episodeID string, model string) (
 		"scenes", sceneList)
 
 	// 启动后台goroutine处理AI调用和后续逻辑
-	go s.processStoryboardGeneration(task.ID, episodeID, model, prompt)
+	go s.processStoryboardGeneration(task.ID, episodeID, model, scriptContent, characterList, sceneList)
 
 	// 立即返回任务ID
 	return task.ID, nil
 }
 
 // processStoryboardGeneration 后台处理故事板生成
-func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID, model, prompt string) {
+func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID, model, scriptContent, characterList, sceneList string) {
 	// 更新任务状态为处理中
-	if err := s.taskService.UpdateTaskStatus(taskID, "processing", 10, "开始生成分镜头..."); err != nil {
+	if err := s.taskService.UpdateTaskStatus(taskID, "processing", 10, "准备生成分镜头..."); err != nil {
 		s.log.Errorw("Failed to update task status", "error", err, "task_id", taskID)
 		return
 	}
 
 	s.log.Infow("Processing storyboard generation", "task_id", taskID, "episode_id", episodeID)
 
-	// 调用AI服务生成（如果指定了模型则使用指定的模型）
-	// 设置较大的max_tokens以确保完整返回所有分镜的JSON
+	systemPrompt := s.promptI18n.GetStoryboardSystemPrompt()
+	scriptLabel := s.promptI18n.FormatUserPrompt("script_content_label")
+	taskLabel := s.promptI18n.FormatUserPrompt("task_label")
+	taskInstruction := s.promptI18n.FormatUserPrompt("task_instruction")
+	charListLabel := s.promptI18n.FormatUserPrompt("character_list_label")
+	charConstraint := s.promptI18n.FormatUserPrompt("character_constraint")
+	sceneListLabel := s.promptI18n.FormatUserPrompt("scene_list_label")
+	sceneConstraint := s.promptI18n.FormatUserPrompt("scene_constraint")
+	formatInstructions := prompts.Get("storyboard_format_instructions.txt")
+
+	prompt := fmt.Sprintf(`%s
+
+%s
+%s
+
+%s
+%s
+
+%s
+%s
+%s
+
+%s
+%s
+%s
+
+%s`, systemPrompt, scriptLabel, scriptContent, taskLabel, taskInstruction, charListLabel, characterList, charConstraint, sceneListLabel, sceneList, sceneConstraint, formatInstructions)
+
+	client, getErr := s.aiService.GetAIClientForModel("text", model)
+	if model != "" && getErr != nil {
+		s.log.Warnw("Failed to get client for specified model, using default", "model", model, "error", getErr, "task_id", taskID)
+	}
+
 	var text string
 	var err error
-	if model != "" {
-		s.log.Infow("Using specified model for storyboard generation", "model", model, "task_id", taskID)
-		client, getErr := s.aiService.GetAIClientForModel("text", model)
-		if getErr != nil {
-			s.log.Warnw("Failed to get client for specified model, using default", "model", model, "error", getErr, "task_id", taskID)
-			text, err = s.aiService.GenerateText(prompt, "", ai.WithMaxTokens(16000))
-		} else {
-			text, err = client.GenerateText(prompt, "", ai.WithMaxTokens(16000))
-		}
+	// Bỏ MaxTokens theo yêu cầu user (không giới hạn)
+	if model != "" && getErr == nil {
+		text, err = client.GenerateText(prompt, "")
 	} else {
-		text, err = s.aiService.GenerateText(prompt, "", ai.WithMaxTokens(16000))
+		text, err = s.aiService.GenerateText(prompt, "")
 	}
 
 	if err != nil {
@@ -212,27 +207,12 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID, model
 		return
 	}
 
-	// 更新任务进度
-	if err := s.taskService.UpdateTaskStatus(taskID, "processing", 50, "分镜头生成完成，正在解析结果..."); err != nil {
-		s.log.Errorw("Failed to update task status", "error", err, "task_id", taskID)
-		return
-	}
-
-	// 解析JSON结果
-	// AI可能返回两种格式：
-	// 1. 数组格式: [{...}, {...}]
-	// 2. 对象格式: {"storyboards": [{...}, {...}]}
 	var result GenerateStoryboardResult
-
-	// 先尝试解析为数组格式
-	var storyboards []Storyboard
-	if err := utils.SafeParseAIJSON(text, &storyboards); err == nil {
-		// 成功解析为数组，包装为对象
-		result.Storyboards = storyboards
-		result.Total = len(storyboards)
-		s.log.Infow("Parsed storyboard as array format", "count", len(storyboards), "task_id", taskID)
+	var allStoryboards []Storyboard
+	if err := utils.SafeParseAIJSON(text, &allStoryboards); err == nil {
+		result.Storyboards = allStoryboards
+		s.log.Infow("Parsed storyboard as array format", "count", len(allStoryboards), "task_id", taskID)
 	} else {
-		// 尝试解析为对象格式
 		if err := utils.SafeParseAIJSON(text, &result); err != nil {
 			s.log.Errorw("Failed to parse storyboard JSON in both formats", "error", err, "response", text[:min(500, len(text))], "task_id", taskID)
 			if updateErr := s.taskService.UpdateTaskError(taskID, fmt.Errorf("解析分镜头结果失败: %w", err)); updateErr != nil {
@@ -240,20 +220,31 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID, model
 			}
 			return
 		}
-		result.Total = len(result.Storyboards)
-		s.log.Infow("Parsed storyboard as object format", "count", len(result.Storyboards), "task_id", taskID)
+		allStoryboards = result.Storyboards
+		s.log.Infow("Parsed storyboard as object format", "count", len(allStoryboards), "task_id", taskID)
+	}
+
+	// 更新任务进度
+	if err := s.taskService.UpdateTaskStatus(taskID, "processing", 50, "分镜头全部生成完成，正在解析数据..."); err != nil {
+		s.log.Errorw("Failed to update task status", "error", err, "task_id", taskID)
+		return
+	}
+
+	// 重新编号所有的分镜，以保证连续性
+	for i := range allStoryboards {
+		allStoryboards[i].ShotNumber = i + 1
 	}
 
 	// 计算总时长（所有分镜时长之和）
 	totalDuration := 0
-	for _, sb := range result.Storyboards {
+	for _, sb := range allStoryboards {
 		totalDuration += sb.Duration
 	}
 
 	s.log.Infow("Storyboard generated",
 		"task_id", taskID,
 		"episode_id", episodeID,
-		"count", result.Total,
+		"count", len(allStoryboards),
 		"total_duration_seconds", totalDuration)
 
 	// 更新任务进度
@@ -263,7 +254,7 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID, model
 	}
 
 	// 保存分镜头到数据库
-	if err := s.saveStoryboards(episodeID, result.Storyboards); err != nil {
+	if err := s.saveStoryboards(episodeID, allStoryboards); err != nil {
 		s.log.Errorw("Failed to save storyboards", "error", err, "task_id", taskID)
 		if updateErr := s.taskService.UpdateTaskError(taskID, fmt.Errorf("保存分镜头失败: %w", err)); updateErr != nil {
 			s.log.Errorw("Failed to update task error", "error", updateErr, "task_id", taskID)
@@ -292,8 +283,8 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID, model
 
 	// 更新任务结果
 	resultData := gin.H{
-		"storyboards":      result.Storyboards,
-		"total":            result.Total,
+		"storyboards":      allStoryboards,
+		"total":            len(allStoryboards),
 		"total_duration":   totalDuration,
 		"duration_minutes": durationMinutes,
 	}

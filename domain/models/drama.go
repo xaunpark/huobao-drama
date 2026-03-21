@@ -13,6 +13,7 @@ type Drama struct {
 	Description   *string        `gorm:"type:text" json:"description"`
 	Genre         *string        `gorm:"type:varchar(50)" json:"genre"`
 	Style         string         `gorm:"type:varchar(50);default:'realistic'" json:"style"`
+	CustomStyle   string         `gorm:"type:text" json:"custom_style"`
 	TotalEpisodes int            `gorm:"default:1" json:"total_episodes"`
 	TotalDuration int            `gorm:"default:0" json:"total_duration"`
 	Status        string         `gorm:"type:varchar(20);default:'draft';not null" json:"status"`

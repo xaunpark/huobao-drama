@@ -22,31 +22,29 @@
     - Example: "Metallic clatter, footsteps, waves crashing."
 11. **Audience Emotion (emotion)**: [Emotion Type] ([Intensity] + [Resolution])
 
-[Output Format] You must output in JSON format, each shot containing the fields (all descriptive fields must be highly detailed):
-{
-  "storyboards": [
-    {
-      "shot_number": 1,
-      "title": "Nightmare Awakening",
-      "shot_type": "Long Shot",
-      "angle": "High-angle 45 degrees",
-      "time": "Late night 22:30, moonlight shines through the broken window, forming silver reflections on the water, corners are dim",
-      "location": "Abandoned dock warehouse, rusty shelves, water on the ground reflecting dim light, moldy air",
-      "scene_id": 1,
-      "movement": "Fixed",
-      "action": "Chen Zheng bends down, gripping a crowbar to pry the safe door. Veins bulge on his arms, his brows are tightly furrowed, sweat drips down his cheeks.",
-      "dialogue": "(Monologue) After all these years, what secret is hidden inside?",
-      "result": "The safe door springs open with a sharp metallic clatter, dust swirls in the flashlight beam, inside is completely empty except for yellowed newspaper. Chen Zheng's expression shifts from anticipation to shock.",
-      "atmosphere": "Dim cool tones, only a flashlight beam swaying, muffled sound of waves in the distance, oppressive mood",
-      "emotion": "Curiosity↑↑ to Disappointment↓ (Reversal)",
-      "duration": 9,
-      "bgm_prompt": "Low tense strings, slow rhythm",
-      "sound_effect": "Metallic clatter, dust swirling, waves crashing",
-      "characters": [159],
-      "is_primary": true
-    }
-  ]
-}
+[Output Format] You must output in JSON array format directly, starting with [ and ending with ], each shot containing the fields (all descriptive fields must be highly detailed):
+[
+  {
+    "shot_number": 1,
+    "title": "Nightmare Awakening",
+    "shot_type": "Long Shot",
+    "angle": "High-angle 45 degrees",
+    "time": "Late night 22:30, moonlight shines through the broken window, forming silver reflections on the water, corners are dim",
+    "location": "Abandoned dock warehouse, rusty shelves, water on the ground reflecting dim light, moldy air",
+    "scene_id": 1,
+    "movement": "Fixed",
+    "action": "Chen Zheng bends down, gripping a crowbar to pry the safe door. Veins bulge on his arms, his brows are tightly furrowed, sweat drips down his cheeks.",
+    "dialogue": "(Monologue) After all these years, what secret is hidden inside?",
+    "result": "The safe door springs open with a sharp metallic clatter, dust swirls in the flashlight beam, inside is completely empty except for yellowed newspaper. Chen Zheng's expression shifts from anticipation to shock.",
+    "atmosphere": "Dim cool tones, only a flashlight beam swaying, muffled sound of waves in the distance, oppressive mood",
+    "emotion": "Curiosity↑↑ to Disappointment↓ (Reversal)",
+    "duration": 9,
+    "bgm_prompt": "Low tense strings, slow rhythm",
+    "sound_effect": "Metallic clatter, dust swirling, waves crashing",
+    "characters": [159],
+    "is_primary": true
+  }
+]
 
 **dialogue Field Instructions**:
 - If dialog exists: "CharacterName: Dialogue Content" (no quotes wrapping the text). Or "(Monologue) Content"

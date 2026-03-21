@@ -267,7 +267,7 @@ func (s *ImageGenerationService) ProcessImageGeneration(imageGenID uint) {
 
 	// 如果drama有风格设置，添加风格提示词
 	if drama.Style != "" && drama.Style != "realistic" {
-		stylePrompt := s.promptI18n.GetStylePrompt(drama.Style)
+		stylePrompt := s.promptI18n.GetStylePrompt(drama.Style, drama.CustomStyle)
 		if stylePrompt != "" {
 			// 将风格提示词作为系统级约束添加到提示词前面
 			prompt = stylePrompt + "\n\n" + prompt
@@ -954,8 +954,13 @@ func (s *ImageGenerationService) extractBackgroundsFromScript(scriptContent stri
 		return nil, fmt.Errorf("failed to get AI client: %w", err)
 	}
 
+	var drama models.Drama
+	if err := s.db.First(&drama, dramaID).Error; err != nil {
+		s.log.Warnw("Failed to load drama for scene extraction", "drama_id", dramaID, "error", err)
+	}
+
 	// 使用国际化提示词
-	systemPrompt := s.promptI18n.GetSceneExtractionPrompt(style)
+	systemPrompt := s.promptI18n.GetSceneExtractionPrompt(style, drama.CustomStyle)
 	contentLabel := s.promptI18n.FormatUserPrompt("script_content_label")
 
 	// 根据语言构建不同的格式说明
@@ -1089,7 +1094,7 @@ Please strictly follow the JSON format and ensure all fields use English.`
 }
 
 // extractBackgroundsWithAI 使用AI智能分析场景并提取唯一背景
-func (s *ImageGenerationService) extractBackgroundsWithAI(storyboards []models.Storyboard, style string) ([]BackgroundInfo, error) {
+func (s *ImageGenerationService) extractBackgroundsWithAI(storyboards []models.Storyboard, dramaID uint, style string) ([]BackgroundInfo, error) {
 	if len(storyboards) == 0 {
 		return []BackgroundInfo{}, nil
 	}
@@ -1118,8 +1123,13 @@ func (s *ImageGenerationService) extractBackgroundsWithAI(storyboards []models.S
 			storyboard.StoryboardNumber, location, time, action, description)
 	}
 
+	var drama models.Drama
+	if err := s.db.First(&drama, dramaID).Error; err != nil {
+		s.log.Warnw("Failed to load drama for scene extraction", "drama_id", dramaID, "error", err)
+	}
+
 	// 使用国际化提示词
-	systemPrompt := s.promptI18n.GetSceneExtractionPrompt(style)
+	systemPrompt := s.promptI18n.GetSceneExtractionPrompt(style, drama.CustomStyle)
 	storyboardLabel := s.promptI18n.FormatUserPrompt("storyboard_list_label")
 
 	// 根据语言构建不同的提示词

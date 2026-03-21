@@ -32,6 +32,7 @@ type CreateDramaRequest struct {
 	Description string `json:"description"`
 	Genre       string `json:"genre"`
 	Style       string `json:"style"`
+	CustomStyle string `json:"custom_style"`
 	Tags        string `json:"tags"`
 }
 
@@ -40,6 +41,7 @@ type UpdateDramaRequest struct {
 	Description string `json:"description"`
 	Genre       string `json:"genre"`
 	Style       string `json:"style"`
+	CustomStyle string `json:"custom_style"`
 	Tags        string `json:"tags"`
 	Status      string `json:"status" binding:"omitempty,oneof=draft planning production completed archived"`
 }
@@ -67,6 +69,9 @@ func (s *DramaService) CreateDrama(req *CreateDramaRequest) (*models.Drama, erro
 	}
 	if req.Style != "" {
 		drama.Style = req.Style
+	}
+	if req.CustomStyle != "" {
+		drama.CustomStyle = req.CustomStyle
 	}
 
 	if err := s.db.Create(drama).Error; err != nil {
@@ -278,6 +283,9 @@ func (s *DramaService) UpdateDrama(dramaID string, req *UpdateDramaRequest) (*mo
 	}
 	if req.Style != "" {
 		updates["style"] = req.Style
+	}
+	if req.CustomStyle != "" {
+		updates["custom_style"] = req.CustomStyle
 	}
 	if req.Tags != "" {
 		updates["tags"] = req.Tags

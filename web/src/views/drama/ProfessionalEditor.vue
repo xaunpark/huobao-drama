@@ -2033,6 +2033,7 @@
       :storyboards="storyboards"
       :drama-id="dramaId"
       :style="drama?.style || ''"
+      :custom-style="drama?.custom_style || ''"
       :video-models="videoModelCapabilities"
       :default-video-model="selectedVideoModel"
       @completed="loadData"
@@ -2726,6 +2727,10 @@ watch(
       
     // 自动将剧本的预设风格（Style）添加到最前面，确保风格权重最高
     const getVideoStylePrefix = (styleCode: string): string => {
+      if (styleCode === 'custom') {
+        const customStyleDesc = drama.value?.custom_style || '';
+        return `(Art Style: ${customStyleDesc}) - `;
+      }
       const stylesMap: Record<string, string> = {
         'ghibli': 'Studio Ghibli animation film style, breathtaking masterpiece scenery, highly detailed anime art, vivid colors, beautifully graded lighting',
         'guoman': 'High quality Chinese 2D animation style, vivid wuxia/xianxia aesthetic, delicate linework, epic cinematic atmosphere',

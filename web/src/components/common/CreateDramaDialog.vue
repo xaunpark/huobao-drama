@@ -56,7 +56,20 @@
           <el-option :label="$t('drama.styles.urban')" value="urban" />
           <el-option :label="$t('drama.styles.guoman3d')" value="guoman3d" />
           <el-option :label="$t('drama.styles.chibi3d')" value="chibi3d" />
+          <el-option :label="$t('drama.styles.custom')" value="custom" />
         </el-select>
+      </el-form-item>
+
+      <el-form-item v-if="form.style === 'custom'" :label="$t('drama.customStyle')" prop="custom_style" required>
+        <el-input
+          v-model="form.custom_style"
+          type="textarea"
+          :rows="3"
+          :placeholder="$t('drama.customStylePlaceholder')"
+          maxlength="200"
+          show-word-limit
+          resize="none"
+        />
       </el-form-item>
     </el-form>
 
@@ -135,12 +148,25 @@ const rules: FormRules = {
     },
   ],
   style: [{ required: true, message: "请选择风格", trigger: "change" }],
+  custom_style: [
+    { 
+      validator: (rule, value, callback) => {
+        if (form.style === 'custom' && !value) {
+          callback(new Error('请输入自定义风格描述'))
+        } else {
+          callback()
+        }
+      }, 
+      trigger: 'blur' 
+    }
+  ]
 };
 
 // Reset form when dialog closes / 关闭时重置表单
 const handleClosed = () => {
   form.title = "";
   form.description = "";
+  form.custom_style = "";
   formRef.value?.resetFields();
 };
 

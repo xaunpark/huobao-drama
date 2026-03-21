@@ -41,15 +41,17 @@ func (p *PromptI18n) GetStoryboardSystemPrompt() string {
 }
 
 // GetSceneExtractionPrompt 获取场景提取提示词
-func (p *PromptI18n) GetSceneExtractionPrompt(style string) string {
-	// 默认图片比例
+func (p *PromptI18n) GetSceneExtractionPrompt(style string, customStyle string) string {
 	imageRatio := "16:9"
-
+	effectiveStyle := style
+	if style == "custom" && customStyle != "" {
+		effectiveStyle = customStyle
+	}
 	if true || p.IsEnglish() {
-		return fmt.Sprintf(prompts.Get("scene_extraction.txt"), style, imageRatio)
+		return fmt.Sprintf(prompts.Get("scene_extraction.txt"), effectiveStyle, imageRatio)
 	}
 
-	return fmt.Sprintf(prompts.Get("scene_extraction.txt"), style, imageRatio)
+	return fmt.Sprintf(prompts.Get("scene_extraction.txt"), effectiveStyle, imageRatio)
 }
 
 // GetFirstFramePrompt 获取首帧提示词
@@ -102,24 +104,32 @@ func (p *PromptI18n) GetOutlineGenerationPrompt() string {
 }
 
 // GetCharacterExtractionPrompt 获取角色提取提示词
-func (p *PromptI18n) GetCharacterExtractionPrompt(style string) string {
+func (p *PromptI18n) GetCharacterExtractionPrompt(style string, customStyle string) string {
 	imageRatio := "16:9"
+	effectiveStyle := style
+	if style == "custom" && customStyle != "" {
+		effectiveStyle = customStyle
+	}
 	if true || p.IsEnglish() {
-		return fmt.Sprintf(prompts.Get("character_extraction.txt"), style, imageRatio)
+		return fmt.Sprintf(prompts.Get("character_extraction.txt"), effectiveStyle, imageRatio)
 	}
 
-	return fmt.Sprintf(prompts.Get("character_extraction.txt"), style, imageRatio)
+	return fmt.Sprintf(prompts.Get("character_extraction.txt"), effectiveStyle, imageRatio)
 }
 
 // GetPropExtractionPrompt 获取道具提取提示词
-func (p *PromptI18n) GetPropExtractionPrompt(style string) string {
+func (p *PromptI18n) GetPropExtractionPrompt(style string, customStyle string) string {
 	imageRatio := "1:1"
-
-	if true || p.IsEnglish() {
-		return fmt.Sprintf(prompts.Get("prop_extraction.txt"), style, imageRatio)
+	effectiveStyle := style
+	if style == "custom" && customStyle != "" {
+		effectiveStyle = customStyle
 	}
 
-	return fmt.Sprintf(prompts.Get("prop_extraction.txt"), style, imageRatio)
+	if true || p.IsEnglish() {
+		return fmt.Sprintf(prompts.Get("prop_extraction.txt"), effectiveStyle, imageRatio)
+	}
+
+	return fmt.Sprintf(prompts.Get("prop_extraction.txt"), effectiveStyle, imageRatio)
 }
 
 // GetEpisodeScriptPrompt 获取分集剧本生成提示词
@@ -217,9 +227,13 @@ func (p *PromptI18n) FormatUserPrompt(key string, args ...interface{}) string {
 }
 
 // GetStylePrompt 获取风格提示词
-func (p *PromptI18n) GetStylePrompt(style string) string {
+func (p *PromptI18n) GetStylePrompt(style string, customStyle string) string {
 	if style == "" {
 		return ""
+	}
+
+	if style == "custom" {
+		return fmt.Sprintf("You are an expert Art Director. The exact style you must consistently follow for all visual designs and prompts is: %s", customStyle)
 	}
 
 	stylePrompts := map[string]map[string]string{

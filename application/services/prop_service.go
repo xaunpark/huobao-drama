@@ -90,8 +90,8 @@ func (s *PropService) processPropExtraction(taskID string, episode models.Episod
 		s.log.Warnw("Failed to load drama", "error", err, "drama_id", episode.DramaID)
 	}
 
-	promptTemplate := s.promptI18n.GetPropExtractionPrompt(drama.Style)
-	prompt := fmt.Sprintf(promptTemplate, script)
+	systemPrompt := s.promptI18n.GetPropExtractionPrompt(drama.Style, drama.CustomStyle)
+	prompt := fmt.Sprintf(systemPrompt, script)
 
 	response, err := s.aiService.GenerateText(prompt, "", ai.WithMaxTokens(2000))
 	if err != nil {

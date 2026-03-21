@@ -538,7 +538,7 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 		s.log.Warnw("Failed to load drama", "error", err, "drama_id", episode.DramaID)
 	}
 
-	prompt := s.promptI18n.GetCharacterExtractionPrompt(drama.Style)
+	prompt := s.promptI18n.GetCharacterExtractionPrompt(drama.Style, drama.CustomStyle)
 	userPrompt := fmt.Sprintf("【剧本内容】\n%s", script)
 
 	response, err := s.aiService.GenerateText(userPrompt, prompt, ai.WithMaxTokens(3000))

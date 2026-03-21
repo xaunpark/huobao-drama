@@ -163,8 +163,11 @@ export default {
       voxel: '方块世界',
       urban: '都市',
       guoman3d: '国漫3D',
-      chibi3d: 'Q版3D'
+      chibi3d: 'Q版3D',
+      custom: '自定义'
     },
+    customStyle: '自定义风格',
+    customStylePlaceholder: '请输入自定义风格描述（建议英文）',
     deleteConfirm: '确定要删除这个项目吗？',
     noCover: '暂无封面',
     noDescription: '暂无描述',

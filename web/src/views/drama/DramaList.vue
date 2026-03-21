@@ -132,8 +132,21 @@
                 :label="$t('drama.styles.guoman3d')"
                 value="guoman3d"
               />
+              <el-option :label="$t('drama.styles.guoman3d')" value="guoman3d" />
               <el-option :label="$t('drama.styles.chibi3d')" value="chibi3d" />
+              <el-option :label="$t('drama.styles.custom')" value="custom" />
             </el-select>
+          </el-form-item>
+          <el-form-item v-if="editForm.style === 'custom'" :label="$t('drama.customStyle')" required>
+            <el-input
+              v-model="editForm.custom_style"
+              type="textarea"
+              :rows="3"
+              :placeholder="$t('drama.customStylePlaceholder')"
+              maxlength="200"
+              show-word-limit
+              resize="none"
+            />
           </el-form-item>
         </el-form>
         <template #footer>
@@ -258,6 +271,7 @@ const editForm = ref({
   title: "",
   description: "",
   style: "ghibli",
+  custom_style: "",
 });
 
 // Open edit dialog / 打开编辑对话框
@@ -271,6 +285,7 @@ const editDrama = async (id: string) => {
       title: drama.title,
       description: drama.description || "",
       style: drama.style || "ghibli",
+      custom_style: drama.custom_style || "",
     };
   } catch (error: any) {
     ElMessage.error(error.message || "加载失败");
@@ -293,6 +308,7 @@ const saveEdit = async () => {
       title: editForm.value.title,
       description: editForm.value.description,
       style: editForm.value.style,
+      custom_style: editForm.value.custom_style,
     });
     ElMessage.success("保存成功");
     editDialogVisible.value = false;

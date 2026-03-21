@@ -127,6 +127,7 @@ const props = defineProps<{
   storyboards: Storyboard[]
   dramaId: number
   style?: string
+  customStyle?: string
   videoModels: any[]
   defaultVideoModel?: string
 }>()
@@ -236,6 +237,10 @@ const processPrompt = async (sb: Storyboard) => {
 
     // 如果项目有风格设定，则作为前缀加入提示词 (Style always at top)
     const getStylePrefix = (styleCode: string): string => {
+      if (styleCode === 'custom') {
+        const customStyleDesc = props.customStyle || '';
+        return `(Art Style: ${customStyleDesc}) - `;
+      }
       const stylesMap: Record<string, string> = {
         'ghibli': 'Studio Ghibli animation film style, breathtaking masterpiece scenery, highly detailed anime art, vivid colors, beautifully graded lighting',
         'guoman': 'High quality Chinese 2D animation style, vivid wuxia/xianxia aesthetic, delicate linework, epic cinematic atmosphere',
