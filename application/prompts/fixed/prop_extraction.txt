@@ -1,10 +1,32 @@
 [Output Format]
 **CRITICAL: Return ONLY a valid JSON array. Do NOT include any markdown code blocks, explanations, or other text. Start directly with [ and end with ].**
 
-Each object containing:
-- name: Prop Name (string)
-- type: Type (string, e.g., "Weapon", "Key Item", "Daily Item", "Special Device")
-- description: Role in the drama and visual description (string)
-- image_prompt: English image generation prompt (string, focus on the object, isolated, detailed)
+Each object contains:
+- name: Prop name (string)
+- type: Category (string: "Weapon", "Key Item", "Vehicle", "Document", "Technology", "Daily Item", or "Special Device")
+- description: Role in the drama and visual description (string, 80-150 words)
+- image_prompt: English prompt for AI image generation (string). Describe the isolated object in detail: materials, colors, condition, size, distinctive features. Always end with "isolated on white background, product photography style, high detail".
 
-***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language.
+[Example]
+[
+  {
+    "name": "The Cracked Pocket Watch",
+    "type": "Key Item",
+    "description": "A family heirloom that belonged to the protagonist's late father. It serves as a recurring symbol of fractured time and broken promises. The watch stopped at the exact moment of the father's death and cannot be repaired. It appears in pivotal scenes when the protagonist must make an impossible choice, acting as a moral anchor and emotional trigger.",
+    "image_prompt": "An antique brass pocket watch with a cracked glass face, intricate floral engraving on the case, worn gold chain, hands frozen at 11:47, aged patina with visible scratches, slightly dented cover, isolated on white background, product photography style, high detail"
+  },
+  {
+    "name": "Encrypted USB Drive",
+    "type": "Technology",
+    "description": "A small black USB drive containing classified government files that expose the central conspiracy. It is the MacGuffin driving the story's main tension. Multiple factions pursue it throughout the series. It has a distinctive red stripe and a tiny engraved serial number on one side that becomes a crucial plot clue.",
+    "image_prompt": "A small matte black USB flash drive with a bold red stripe along its side, tiny engraved serial number 'XK-7741' on the body, sleek modern design with a metal cap removed revealing the connector, isolated on white background, product photography style, high detail"
+  },
+  {
+    "name": "Worn Leather Journal",
+    "type": "Document",
+    "description": "The antagonist's personal journal filled with cryptic notes, maps, and contact lists. Finding it marks a major turning point in Act 2. The cover is deeply stained and the pages are filled with a cramped, erratic handwriting style that reflects the author's deteriorating mental state.",
+    "image_prompt": "A weathered dark brown leather journal with a cracked spine, frayed edges, a leather strap closure with a brass clasp, visible water stains and burn marks on the cover, slightly warped pages visible at the sides, isolated on white background, product photography style, high detail"
+  }
+]
+
+***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response, including ALL JSON field values, STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language.

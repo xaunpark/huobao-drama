@@ -1,9 +1,27 @@
-[Output Format]
-**CRITICAL: Return ONLY a valid JSON array. Do NOT include any markdown code blocks, explanations, or other text. Start directly with [ and end with ].**
+[Output JSON Format]
+**CRITICAL: Return ONLY a valid JSON object. Do NOT include any markdown code blocks, explanations, or other text.**
 
-Each element containing:
-- location: Location description (string, e.g., "luxurious office")
-- time: Time period (string, e.g., "afternoon")
-- prompt: Complete English image generation prompt (string, pure background, explicitly stating no people)
+{
+  "backgrounds": [
+    {
+      "location": "Location name (English)",
+      "time": "Time description (English)",
+      "atmosphere": "Atmosphere description (English)",
+      "prompt": "A cinematic pure background scene depicting [location description] at [time]. The scene shows [environment details, architecture, objects, lighting — NO characters]. Style: rich details, high quality, consistent with requested art style. Mood: [environment mood description].",
+      "scene_numbers": [1, 2, 3]
+    }
+  ]
+}
+
+[Rules]
+- prompt field: English only, pure background (NO people, NO characters, NO figures)
+- scene_numbers: list all shot numbers using this background
+- Every shot must be assigned to exactly one background
+- Merge shots that share the same location+time into a single background entry
+
+[Wrong Examples — forbidden]
+❌ "Depicting protagonist standing on the street" — contains character
+❌ "People hurrying by" — contains characters
+❌ "Character moving in the room" — contains character
 
 ***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response, including all JSON values STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language.

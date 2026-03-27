@@ -1,14 +1,26 @@
-**Output Specification:**
+[Output Format]
+**CRITICAL: Return ONLY a valid JSON object. Do NOT include any markdown code blocks, explanations, or other text.**
 
-You must return a **JSON object** with the following structure:
+The JSON object must contain exactly these two fields:
+- prompt: A complete, detailed English image generation prompt (string). Describe: subject, pose/action, environment, lighting, mood, camera angle, visual style. Be specific and descriptive.
+- description: A concise English summary of what the image shows (string, 1-2 sentences).
 
-- **prompt**: A **complete English image generation prompt** (string, describing the visual scene for AI image generation).
-- **description**: A **simplified English description** (string, summarizing the core content).
-
-**Example Format:**
+[Example — First Frame (static opening pose)]
 {
-  "prompt": "A detailed scene description for image generation...",
-  "description": "Brief summary of the visual content."
+  "prompt": "A young Chinese man in his late 20s stands at the edge of a rain-soaked rooftop at dusk, back straight, hands in jacket pockets, looking out over a glittering city skyline. The warm amber glow of street lights below contrasts with the cool blue twilight sky. Low-angle shot, shallow depth of field, cinematic lighting, dramatic mood. Art style: consistent with project visual direction.",
+  "description": "Chen Wei stands alone on a rooftop overlooking the city at dusk, conveying quiet determination before the confrontation."
 }
 
-***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language.
+[Example — Key Frame (peak action moment)]
+{
+  "prompt": "A young Chinese man lunges forward in a narrow rain-soaked alley, one arm outstretched catching a falling woman by the wrist. His face is tense with effort, water droplets frozen mid-air around them. Harsh overhead street lamp casts sharp shadows. Dynamic diagonal composition, motion blur on periphery, ultra-detailed, cinematic. Art style: consistent with project visual direction.",
+  "description": "Chen Wei catches Lin Xiao mid-fall in the alley, the peak action moment of the rooftop chase sequence."
+}
+
+[Example — Last Frame (result/end state)]
+{
+  "prompt": "A young Chinese man kneels on wet asphalt in a dark alley, cradling an unconscious woman in his arms. His expression has shifted from urgency to quiet relief. Soft cool moonlight falls on them from above, contrasting with the distant warm city glow. Low-angle wide shot, still and cinematic atmosphere, shallow depth of field. Art style: consistent with project visual direction.",
+  "description": "Chen Wei holds the unconscious Lin Xiao in the alley — the resolved end state after the chase, safe but shaken."
+}
+
+***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response, including ALL JSON field values, STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language.

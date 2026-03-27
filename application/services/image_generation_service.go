@@ -11,6 +11,7 @@ import (
 	"time"
 
 	models "github.com/drama-generator/backend/domain/models"
+	"github.com/drama-generator/backend/application/prompts/fixed"
 	"github.com/drama-generator/backend/infrastructure/storage"
 	"github.com/drama-generator/backend/pkg/ai"
 	"github.com/drama-generator/backend/pkg/config"
@@ -963,85 +964,8 @@ func (s *ImageGenerationService) extractBackgroundsFromScript(scriptContent stri
 	systemPrompt := s.promptI18n.WithDramaSceneExtractionPrompt(drama.ID, style, drama.CustomStyle)
 	contentLabel := s.promptI18n.FormatUserPrompt("script_content_label")
 
-	// 根据语言构建不同的格式说明
-	var formatInstructions string
-	if true || s.promptI18n.IsEnglish() {
-		formatInstructions = `[Output JSON Format]
-{
-  "backgrounds": [
-    {
-      "location": "Location name (English)",
-      "time": "Time description (English)",
-      "atmosphere": "Atmosphere description (English)",
-      "prompt": "A cinematic pure background scene depicting [location description] at [time]. The scene shows [environment details, architecture, objects, lighting, no characters]. Style: rich details, high quality, consistent with requested art style. Mood: [environment mood description]."
-    }
-  ]
-}
-
-[Example]
-Correct example (note: no characters):
-{
-  "backgrounds": [
-    {
-      "location": "Repair Shop Interior",
-      "time": "Late Night",
-      "atmosphere": "Dim, lonely, industrial",
-      "prompt": "A cinematic pure background scene depicting a messy repair shop interior at late night. Under dim fluorescent lights, the workbench is scattered with various wrenches, screwdrivers and mechanical parts, oil-stained tool boards and faded posters hang on walls, oil stains on the floor, used tires piled in corners. Style: rich details, high quality, consistent with requested art style. Mood: lonely, industrial."
-    },
-    {
-      "location": "City Street",
-      "time": "Dusk",
-      "atmosphere": "Warm, busy, lively",
-      "prompt": "A cinematic pure background scene depicting a bustling city street at dusk. Sunset afterglow shines on the asphalt road, neon lights of shops on both sides begin to light up, bicycle racks and bus stops on the street, high-rise buildings in the distance, sky showing orange-red gradient. Style: rich details, high quality, warm atmosphere. Mood: lively, busy."
-    }
-  ]
-}
-
-[Wrong Examples (containing characters, forbidden)]:
-❌ "Depicting protagonist standing on the street" - contains character
-❌ "People hurrying by" - contains characters
-❌ "Character moving in the room" - contains character
-
-Please strictly follow the JSON format and ensure all fields use English.`
-	} else {
-		formatInstructions = `【输出JSON格式】
-{
-  "backgrounds": [
-    {
-      "location": "地点名称（中文）",
-      "time": "时间描述（中文）",
-      "atmosphere": "氛围描述（中文）",
-      "prompt": "一个电影感的动漫风格纯背景场景，展现[地点描述]在[时间]的环境。画面呈现[环境细节、建筑、物品、光线等，不包含人物]。风格：细节丰富，高质量，氛围光照。情绪：[环境情绪描述]。"
-    }
-  ]
-}
-
-【示例】
-正确示例（注意：不包含人物）：
-{
-  "backgrounds": [
-    {
-      "location": "维修店内部",
-      "time": "深夜",
-      "atmosphere": "昏暗、孤独、工业感",
-      "prompt": "一个电影感的动漫风格纯背景场景，展现凌乱的维修店内部在深夜的环境。昏暗的日光灯照射下，工作台上散落着各种扳手、螺丝刀和机械零件，墙上挂着油污斑斑的工具挂板和褪色海报，地面有油渍痕迹，角落堆放着废旧轮胎。风格：细节丰富，高质量，昏暗氛围。情绪：孤独、工业感。"
-    },
-    {
-      "location": "城市街道",
-      "time": "黄昏",
-      "atmosphere": "温暖、繁忙、生活气息",
-      "prompt": "一个电影感的动漫风格纯背景场景，展现繁华的城市街道在黄昏时分的环境。夕阳的余晖洒在街道的沥青路面上，两旁的商铺霓虹灯开始点亮，街边有自行车停靠架和公交站牌，远处高楼林立，天空呈现橙红色渐变。风格：细节丰富，高质量，温暖氛围。情绪：生活气息、繁忙。"
-    }
-  ]
-}
-
-【错误示例（包含人物，禁止）】：
-❌ "展现主角站在街道上的场景" - 包含人物
-❌ "人们匆匆而过" - 包含人物
-❌ "角色在房间里活动" - 包含人物
-
-请严格按照JSON格式输出，确保所有字段都使用中文。`
-	}
+	// Fixed format instructions from embedded file
+	formatInstructions := fixed.Get("scene_extraction")
 
 	prompt := fmt.Sprintf(`%s
 
@@ -1132,81 +1056,8 @@ func (s *ImageGenerationService) extractBackgroundsWithAI(storyboards []models.S
 	systemPrompt := s.promptI18n.WithDramaSceneExtractionPrompt(drama.ID, style, drama.CustomStyle)
 	storyboardLabel := s.promptI18n.FormatUserPrompt("storyboard_list_label")
 
-	// 根据语言构建不同的提示词
-	var formatInstructions string
-	if true || s.promptI18n.IsEnglish() {
-		formatInstructions = `[Output JSON Format]
-{
-  "backgrounds": [
-    {
-      "location": "Location name (English)",
-      "time": "Time description (English)",
-      "prompt": "A cinematic background depicting [location description] at [time]. The scene shows [detail description]. Style: rich details, high quality, consistent with requested art style. Mood: [mood description].",
-      "scene_numbers": [1, 2, 3]
-    }
-  ]
-}
-
-[Example]
-Correct example:
-{
-  "backgrounds": [
-    {
-      "location": "Repair Shop",
-      "time": "Late Night",
-      "prompt": "A cinematic background depicting a messy repair shop interior at late night. Under dim lighting, the workbench is scattered with various tools and parts, with greasy posters hanging on the walls. Style: rich details, high quality, consistent with requested art style. Mood: lonely, industrial.",
-      "scene_numbers": [1, 5, 6, 10, 15]
-    },
-    {
-      "location": "City Panorama",
-      "time": "Late Night with Acid Rain",
-      "prompt": "A cinematic background depicting a coastal city panorama in late night acid rain. Neon lights blur in the rain, skyscrapers shrouded in gray-green rain curtain, streets reflecting colorful lights. Style: rich details, high quality, consistent with requested art style. Mood: oppressive, sci-fi, apocalyptic.",
-      "scene_numbers": [2, 7]
-    }
-  ]
-}
-
-Please strictly follow the JSON format and ensure:
-1. prompt field uses English
-2. scene_numbers includes all scene numbers using this background
-3. All scenes are assigned to a background`
-	} else {
-		formatInstructions = `【输出JSON格式】
-{
-  "backgrounds": [
-    {
-      "location": "地点名称（中文）",
-      "time": "时间描述（中文）",
-      "prompt": "一个电影感的动漫风格背景，展现[地点描述]在[时间]的场景。画面呈现[细节描述]。风格：细节丰富，高质量，氛围光照。情绪：[情绪描述]。",
-      "scene_numbers": [1, 2, 3]
-    }
-  ]
-}
-
-【示例】
-正确示例：
-{
-  "backgrounds": [
-    {
-      "location": "维修店",
-      "time": "深夜",
-      "prompt": "一个电影感的动漫风格背景，展现凌乱的维修店内部在深夜的场景。昏暗的灯光下，工作台上散落着各种工具和零件，墙上挂着油污的海报。风格：细节丰富，高质量，昏暗氛围。情绪：孤独、工业感。",
-      "scene_numbers": [1, 5, 6, 10, 15]
-    },
-    {
-      "location": "城市全景",
-      "time": "深夜·酸雨",
-      "prompt": "一个电影感的动漫风格背景，展现沿海城市全景在深夜酸雨中的场景。霓虹灯在雨中模糊，高楼大厦笼罩在灰绿色的雨幕中，街道反射着五颜六色的光。风格：细节丰富，高质量，赛博朋克氛围。情绪：压抑、科幻、末世感。",
-      "scene_numbers": [2, 7]
-    }
-  ]
-}
-
-请严格按照JSON格式输出，确保：
-1. prompt字段使用中文
-2. scene_numbers包含所有使用该背景的场景编号
-3. 所有场景都被分配到某个背景`
-	}
+	// Fixed format instructions from embedded file
+	formatInstructions := fixed.Get("scene_extraction")
 
 	prompt := fmt.Sprintf(`%s
 

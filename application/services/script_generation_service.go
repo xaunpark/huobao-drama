@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/drama-generator/backend/application/prompts/fixed"
 	"github.com/drama-generator/backend/domain/models"
 	"github.com/drama-generator/backend/pkg/ai"
 	"github.com/drama-generator/backend/pkg/config"
@@ -88,22 +89,8 @@ func (s *ScriptGenerationService) processCharacterGeneration(taskID string, req 
 
 	userPrompt := s.promptI18n.FormatUserPrompt("character_request", outlineText, count)
 
-	formatInstructions := `
-[Output JSON Format]
-CRITICAL: Return ONLY a valid JSON array. Do NOT include any markdown code blocks, explanations, or other text. Start directly with [ and end with ].
-[
-  {
-    "name": "Character Name",
-    "role": "main/supporting/minor",
-    "appearance": "Physical appearance description (150-300 words), detailed enough for AI image generation (gender, age, body type, facial features, hairstyle, clothing style...). DO NOT include background or environment details.",
-    "personality": "Personality traits (100-200 words)",
-    "description": "Background story and character relationships (100-200 words)",
-    "voice_style": "Voice style for TTS (e.g. deep, energetic, calm)"
-  }
-]
-***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response, including all JSON values, STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language.
-`
-	userPrompt = userPrompt + "\n\n" + formatInstructions
+	fixedInstructions := fixed.Get("character_extraction")
+	userPrompt = userPrompt + "\n\n" + fixedInstructions
 
 	temperature := req.Temperature
 	if temperature == 0 {

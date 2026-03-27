@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/drama-generator/backend/application/prompts/fixed"
 	"github.com/drama-generator/backend/domain/models"
 	"github.com/drama-generator/backend/pkg/config"
 	"github.com/drama-generator/backend/pkg/logger"
@@ -233,7 +234,8 @@ func (s *FramePromptService) generateFirstFrame(dramaID uint, sb models.Storyboa
 	contextInfo := s.buildStoryboardContext(sb, scene)
 
 	// 使用国际化提示词
-	systemPrompt := s.promptI18n.WithDramaFirstFramePrompt(dramaID, dramaStyle)
+	dynamicPrompt := s.promptI18n.WithDramaFirstFramePrompt(dramaID, dramaStyle)
+	systemPrompt := dynamicPrompt + "\n\n" + fixed.Get("image_generation")
 	userPrompt := s.promptI18n.FormatUserPrompt("frame_info", contextInfo)
 
 	// 调用AI生成（如果指定了模型则使用指定的模型）
@@ -271,7 +273,8 @@ func (s *FramePromptService) generateKeyFrame(dramaID uint, sb models.Storyboard
 	contextInfo := s.buildStoryboardContext(sb, scene)
 
 	// 使用国际化提示词
-	systemPrompt := s.promptI18n.WithDramaKeyFramePrompt(dramaID, dramaStyle)
+	dynamicPrompt := s.promptI18n.WithDramaKeyFramePrompt(dramaID, dramaStyle)
+	systemPrompt := dynamicPrompt + "\n\n" + fixed.Get("image_generation")
 	userPrompt := s.promptI18n.FormatUserPrompt("key_frame_info", contextInfo)
 
 	// 调用AI生成
@@ -309,7 +312,8 @@ func (s *FramePromptService) generateLastFrame(dramaID uint, sb models.Storyboar
 	contextInfo := s.buildStoryboardContext(sb, scene)
 
 	// 使用国际化提示词
-	systemPrompt := s.promptI18n.WithDramaLastFramePrompt(dramaID, dramaStyle)
+	dynamicPrompt := s.promptI18n.WithDramaLastFramePrompt(dramaID, dramaStyle)
+	systemPrompt := dynamicPrompt + "\n\n" + fixed.Get("image_generation")
 	userPrompt := s.promptI18n.FormatUserPrompt("last_frame_info", contextInfo)
 
 	// 调用AI生成
@@ -390,7 +394,8 @@ func (s *FramePromptService) generateActionSequence(dramaID uint, sb models.Stor
 	contextInfo := s.buildStoryboardContext(sb, scene)
 
 	// 使用国际化提示词 - 专门为动作序列设计的提示词
-	systemPrompt := s.promptI18n.WithDramaActionSequenceFramePrompt(dramaID, dramaStyle)
+	dynamicPrompt := s.promptI18n.WithDramaActionSequenceFramePrompt(dramaID, dramaStyle)
+	systemPrompt := dynamicPrompt + "\n\n" + fixed.Get("image_generation")
 	userPrompt := s.promptI18n.FormatUserPrompt("frame_info", contextInfo)
 
 	// 调用AI生成

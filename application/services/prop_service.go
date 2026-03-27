@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	// Added missing import
 	models "github.com/drama-generator/backend/domain/models"
+	"github.com/drama-generator/backend/application/prompts/fixed"
 	"github.com/drama-generator/backend/pkg/ai"
 	"github.com/drama-generator/backend/pkg/config"
 	"github.com/drama-generator/backend/pkg/logger"
@@ -90,10 +90,12 @@ func (s *PropService) processPropExtraction(taskID string, episode models.Episod
 		s.log.Warnw("Failed to load drama", "error", err, "drama_id", episode.DramaID)
 	}
 
-	systemPrompt := s.promptI18n.WithDramaPropExtractionPrompt(drama.ID, drama.Style, drama.CustomStyle)
-	prompt := fmt.Sprintf(systemPrompt, script)
+	dynamicPrompt := s.promptI18n.WithDramaPropExtractionPrompt(drama.ID, drama.Style, drama.CustomStyle)
+	fixedPrompt := fixed.Get("prop_extraction")
+	systemPrompt := dynamicPrompt + "\n\n" + fixedPrompt
+	userPrompt := fmt.Sprintf("Script content:\n%s", script)
 
-	response, err := s.aiService.GenerateText(prompt, "", ai.WithMaxTokens(2000))
+	response, err := s.aiService.GenerateText(userPrompt, systemPrompt, ai.WithMaxTokens(2000))
 	if err != nil {
 		s.taskService.UpdateTaskError(taskID, err)
 		return

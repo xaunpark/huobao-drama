@@ -6,6 +6,7 @@ import (
 	"time"
 
 	models "github.com/drama-generator/backend/domain/models"
+	"github.com/drama-generator/backend/application/prompts/fixed"
 	"github.com/drama-generator/backend/pkg/ai"
 	"github.com/drama-generator/backend/pkg/config"
 	"github.com/drama-generator/backend/pkg/logger"
@@ -539,10 +540,12 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 		s.log.Warnw("Failed to load drama", "error", err, "drama_id", episode.DramaID)
 	}
 
-	prompt := s.promptI18n.WithDramaCharacterExtractionPrompt(drama.ID, drama.Style, drama.CustomStyle)
-	userPrompt := fmt.Sprintf("【剧本内容】\n%s", script)
+	dynamicPrompt := s.promptI18n.WithDramaCharacterExtractionPrompt(drama.ID, drama.Style, drama.CustomStyle)
+	fixedPrompt := fixed.Get("character_extraction")
+	systemPrompt := dynamicPrompt + "\n\n" + fixedPrompt
+	userPrompt := fmt.Sprintf("《剧本内容》\n%s", script)
 
-	response, err := s.aiService.GenerateText(userPrompt, prompt, ai.WithMaxTokens(3000))
+	response, err := s.aiService.GenerateText(userPrompt, systemPrompt, ai.WithMaxTokens(3000))
 	if err != nil {
 		s.taskService.UpdateTaskError(taskID, err)
 		return
