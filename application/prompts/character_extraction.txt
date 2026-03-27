@@ -4,18 +4,6 @@ Your task is to extract and organize detailed character settings for all charact
 
 Requirements:
 1. Extract all characters with names (ignore unnamed passersby or background characters)
-2. For each character, extract:
-   - name: Character name
-   - role: Character role (main/supporting/minor)
-   - appearance: Physical appearance description (150-300 words)
-   - personality: Personality traits (100-200 words)
-   - description: Background story and character relationships (100-200 words)
-3. Appearance must be detailed enough for AI image generation, including: gender, age, body type, facial features, hairstyle, clothing style, etc. but do not include any scene, background, environment information
-4. Main characters require more detailed descriptions, supporting characters can be simplified
+2. Main characters require more detailed descriptions, supporting characters can be simplified
 - **Style Requirement**: %s
 - **Image Ratio**: %s
-Output Format:
-**CRITICAL: Return ONLY a valid JSON array. Do NOT include any markdown code blocks, explanations, or other text. Start directly with [ and end with ].**
-Each element is a character object containing the above fields.
-
-***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response, including all JSON values, descriptions, character dialogue, and action sequences STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language.
