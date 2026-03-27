@@ -428,22 +428,36 @@ func (s *FramePromptService) generateActionSequence(dramaID uint, sb models.Stor
 }
 
 // buildStoryboardContext 构建镜头上下文信息
+// Action and Result are placed first as they define the core of the shot.
+// A hard constraints summary is appended to ensure AI maintains shot fidelity.
 func (s *FramePromptService) buildStoryboardContext(sb models.Storyboard, scene *models.Scene) string {
 	var parts []string
 
-	// 镜头描述（最重要）
-	if sb.Description != nil && *sb.Description != "" {
-		parts = append(parts, s.promptI18n.FormatUserPrompt("shot_description_label", *sb.Description))
+	// === PRIMARY: Action & Result define WHAT the shot IS ===
+	// 动作（核心 - 必须第一位）
+	if sb.Action != nil && *sb.Action != "" {
+		parts = append(parts, s.promptI18n.FormatUserPrompt("action_label", *sb.Action))
 	}
 
-	// 场景信息
-	if scene != nil {
-		parts = append(parts, s.promptI18n.FormatUserPrompt("scene_label", scene.Location, scene.Time))
-	} else if sb.Location != nil && sb.Time != nil {
-		parts = append(parts, s.promptI18n.FormatUserPrompt("scene_label", *sb.Location, *sb.Time))
+	// 结果（动作的最终状态 - Frame 9 应该描绘这个结果）
+	if sb.Result != nil && *sb.Result != "" {
+		parts = append(parts, s.promptI18n.FormatUserPrompt("result_label", *sb.Result))
 	}
 
-	// 角色
+	// === SECONDARY: Camera & composition define HOW the shot looks ===
+	// 镜头参数
+	if sb.ShotType != nil {
+		parts = append(parts, s.promptI18n.FormatUserPrompt("shot_type_label", *sb.ShotType))
+	}
+	if sb.Angle != nil {
+		parts = append(parts, s.promptI18n.FormatUserPrompt("angle_label", *sb.Angle))
+	}
+	if sb.Movement != nil {
+		parts = append(parts, s.promptI18n.FormatUserPrompt("movement_label", *sb.Movement))
+	}
+
+	// === CONTEXT: Characters first (subject identity), then scene, atmosphere ===
+	// 角色/主体 — 放在场景之前，避免场景名称语义覆盖主体身份
 	if len(sb.Characters) > 0 {
 		var charNames []string
 		for _, char := range sb.Characters {
@@ -456,19 +470,11 @@ func (s *FramePromptService) buildStoryboardContext(sb models.Storyboard, scene 
 		parts = append(parts, s.promptI18n.FormatUserPrompt("characters_label", strings.Join(charNames, "; ")))
 	}
 
-	// 动作
-	if sb.Action != nil && *sb.Action != "" {
-		parts = append(parts, s.promptI18n.FormatUserPrompt("action_label", *sb.Action))
-	}
-
-	// 结果
-	if sb.Result != nil && *sb.Result != "" {
-		parts = append(parts, s.promptI18n.FormatUserPrompt("result_label", *sb.Result))
-	}
-
-	// 对白
-	if sb.Dialogue != nil && *sb.Dialogue != "" {
-		parts = append(parts, s.promptI18n.FormatUserPrompt("dialogue_label", *sb.Dialogue))
+	// 场景信息
+	if scene != nil {
+		parts = append(parts, s.promptI18n.FormatUserPrompt("scene_label", scene.Location, scene.Time))
+	} else if sb.Location != nil && sb.Time != nil {
+		parts = append(parts, s.promptI18n.FormatUserPrompt("scene_label", *sb.Location, *sb.Time))
 	}
 
 	// 氛围
@@ -476,16 +482,34 @@ func (s *FramePromptService) buildStoryboardContext(sb models.Storyboard, scene 
 		parts = append(parts, s.promptI18n.FormatUserPrompt("atmosphere_label", *sb.Atmosphere))
 	}
 
-	// 镜头参数
-	if sb.ShotType != nil {
-		parts = append(parts, s.promptI18n.FormatUserPrompt("shot_type_label", *sb.ShotType))
+	// 对白
+	if sb.Dialogue != nil && *sb.Dialogue != "" {
+		parts = append(parts, s.promptI18n.FormatUserPrompt("dialogue_label", *sb.Dialogue))
 	}
-	if sb.Angle != nil {
-		parts = append(parts, s.promptI18n.FormatUserPrompt("angle_label", *sb.Angle))
+
+	// 镜头描述（补充信息）
+	if sb.Description != nil && *sb.Description != "" {
+		parts = append(parts, s.promptI18n.FormatUserPrompt("shot_description_label", *sb.Description))
 	}
-	if sb.Movement != nil {
-		parts = append(parts, s.promptI18n.FormatUserPrompt("movement_label", *sb.Movement))
+
+	// === HARD CONSTRAINTS REMINDER ===
+	// Append constraint summary to reinforce shot fidelity
+	var constraints []string
+	constraints = append(constraints, "\n**[HARD CONSTRAINTS - DO NOT VIOLATE]**")
+	constraints = append(constraints, "- You MUST depict ONLY the action described above. Do NOT invent additional events, story beats, or dramatic escalation.")
+	if sb.Action != nil && *sb.Action != "" {
+		constraints = append(constraints, "- The visual focus/hero subject of this shot is defined by the Action field. Maintain this focus across ALL frames.")
 	}
+	if sb.ShotType != nil || sb.Angle != nil || sb.Movement != nil {
+		constraints = append(constraints, "- Camera angle, shot type, and movement MUST remain consistent across all frames as specified above.")
+	}
+	constraints = append(constraints, "- If the Action describes FG/MG/BG layering, maintain that EXACT layering in every frame.")
+	constraints = append(constraints, "- Frame 9 MUST depict the Result described above — this is the end state of the action.")
+	if len(sb.Characters) > 0 {
+		constraints = append(constraints, "- Do not change or substitute the subject/characters listed above.")
+	}
+
+	parts = append(parts, strings.Join(constraints, "\n"))
 
 	return strings.Join(parts, "\n")
 }

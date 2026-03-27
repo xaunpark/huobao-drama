@@ -307,12 +307,30 @@ const processPrompt = async (sb: Storyboard) => {
 const processImage = async (sb: Storyboard, prompt: string) => {
   taskStates[sb.id].image = 'loading'
   try {
+    // 收集参考图片（角色+场景），与 ProfessionalEditor 保持一致
+    const referenceImages: string[] = []
+
+    // 1. 添加场景图片
+    if ((sb as any).background?.local_path) {
+      referenceImages.push((sb as any).background.local_path)
+    }
+
+    // 2. 添加当前镜头登场的角色图片
+    if (sb.characters && Array.isArray(sb.characters)) {
+      sb.characters.forEach((char: any) => {
+        if (char.local_path) {
+          referenceImages.push(char.local_path)
+        }
+      })
+    }
+
     const result = await imageAPI.generateImage({
       drama_id: props.dramaId.toString(),
       prompt: prompt,
       storyboard_id: Number(sb.id),
       image_type: 'storyboard',
-      frame_type: 'action'
+      frame_type: 'action',
+      reference_images: referenceImages.length > 0 ? referenceImages : undefined
     })
 
     // 轮询图片直到完成
@@ -334,6 +352,7 @@ const processImage = async (sb: Storyboard, prompt: string) => {
     throw e
   }
 }
+
 
 // 从模型名称提取provider (copied from ProfessionalEditor for consistency)
 const extractProviderFromModel = (modelName: string): string => {

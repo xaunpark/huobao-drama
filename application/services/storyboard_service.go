@@ -443,17 +443,20 @@ func extractCompositionType(shotType string) string {
 }
 
 // generateVideoPrompt 生成专门用于视频生成的提示词（包含运镜和动态元素）
+// NOTE: BGM is intentionally excluded — video generation AI produces visuals, not audio.
+// Including BGM can conflict with style DNA (e.g., styles that require ZERO music).
+// Sound effects are included as environmental context to help AI understand the scene's physics.
 func (s *StoryboardService) generateVideoPrompt(sb Storyboard) string {
 	var parts []string
 	videoRatio := "16:9"
-	// 1. 人物动作
+	// 1. 人物动作（核心 - 定义shot内容）
 	if sb.Action != "" {
 		parts = append(parts, fmt.Sprintf("Action: %s", sb.Action))
 	}
 
-	// 2. 对话
-	if sb.Dialogue != "" {
-		parts = append(parts, fmt.Sprintf("Dialogue: %s", sb.Dialogue))
+	// 2. 结果（动作的最终视觉状态 - 紧跟Action以保持叙事连贯）
+	if sb.Result != "" {
+		parts = append(parts, fmt.Sprintf("Result: %s", sb.Result))
 	}
 
 	// 3. 镜头运动（视频特有）
@@ -483,18 +486,13 @@ func (s *StoryboardService) generateVideoPrompt(sb Storyboard) string {
 		parts = append(parts, fmt.Sprintf("Atmosphere: %s", sb.Atmosphere))
 	}
 
-	// 7. 情绪和结果
-	if sb.Emotion != "" {
-		parts = append(parts, fmt.Sprintf("Mood: %s", sb.Emotion))
-	}
-	if sb.Result != "" {
-		parts = append(parts, fmt.Sprintf("Result: %s", sb.Result))
+	// 7. 对话
+	if sb.Dialogue != "" {
+		parts = append(parts, fmt.Sprintf("Dialogue: %s", sb.Dialogue))
 	}
 
-	// 8. 音频元素
-	if sb.BgmPrompt != "" {
-		parts = append(parts, fmt.Sprintf("BGM: %s", sb.BgmPrompt))
-	}
+	// 8. 音效（作为环境物理上下文，帮助AI理解场景的物理特性）
+	// BGM intentionally omitted - could conflict with style DNA (some styles require ZERO music)
 	if sb.SoundEffect != "" {
 		parts = append(parts, fmt.Sprintf("Sound effects: %s", sb.SoundEffect))
 	}
@@ -504,7 +502,7 @@ func (s *StoryboardService) generateVideoPrompt(sb Storyboard) string {
 	if len(parts) > 0 {
 		return strings.Join(parts, ". ")
 	}
-	return "Anime style video scene"
+	return "Cinematic video scene"
 }
 
 func (s *StoryboardService) saveStoryboards(episodeID string, storyboards []Storyboard) error {
