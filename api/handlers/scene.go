@@ -22,19 +22,25 @@ func NewSceneHandler(db *gorm.DB, log *logger.Logger, imageGenService *services2
 
 func (h *SceneHandler) GetStoryboardsForEpisode(c *gin.Context) {
 	episodeID := c.Param("episode_id")
+	view := c.DefaultQuery("view", "") // "production", "editorial", or "" (auto)
 
-	storyboards, err := h.sceneService.GetScenesForEpisode(episodeID)
+	storyboards, err := h.sceneService.GetScenesForEpisode(episodeID, view)
 	if err != nil {
 		h.log.Errorw("Failed to get storyboards for episode", "error", err, "episode_id", episodeID)
 		response.InternalError(c, err.Error())
 		return
 	}
 
+	// Check if episode has rapid cut production shots independently of current view
+	hasRapidCut := h.sceneService.HasProductionShots(episodeID)
+
 	response.Success(c, gin.H{
-		"storyboards": storyboards,
-		"total":       len(storyboards),
+		"storyboards":   storyboards,
+		"total":         len(storyboards),
+		"has_rapid_cut": hasRapidCut,
 	})
 }
+
 
 func (h *SceneHandler) UpdateScene(c *gin.Context) {
 	sceneID := c.Param("scene_id")

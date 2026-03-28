@@ -319,6 +319,20 @@ func (s *VideoGenerationService) ProcessVideoGeneration(videoGenID uint) {
 		}
 	}
 
+	// Check if this storyboard uses rapid cut mode → use rapid cut video constraint
+	if videoGen.StoryboardID != nil {
+		var storyboard models.Storyboard
+		if err := s.db.First(&storyboard, *videoGen.StoryboardID).Error; err == nil {
+			if storyboard.PacingMode != nil && *storyboard.PacingMode == "rapid_cut" {
+				referenceMode = "rapid_cut"
+				s.log.Infow("Detected rapid cut production shot",
+					"id", videoGenID,
+					"storyboard_id", *videoGen.StoryboardID,
+					"pacing_mode", *storyboard.PacingMode)
+			}
+		}
+	}
+
 	constraintPrompt := s.promptI18n.WithDramaVideoConstraintPrompt(videoGen.DramaID, referenceMode)
 	if constraintPrompt != "" {
 		prompt = constraintPrompt + "\n\n" + prompt

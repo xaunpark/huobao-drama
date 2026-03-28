@@ -91,8 +91,22 @@ export const dramaAPI = {
     })
   },
 
-  getStoryboards(episodeId: string) {
-    return request.get(`/episodes/${episodeId}/storyboards`)
+  getStoryboards(episodeId: string, view?: string) {
+    const params = view ? { view } : {};
+    return request.get(`/episodes/${episodeId}/storyboards`, { params })
+  },
+
+  // Rapid Cut APIs
+  generateRapidCut(episodeId: string, model?: string) {
+    return request.post<{ task_id: string; status: string; message: string }>(`/episodes/${episodeId}/rapid-cut`, { model })
+  },
+
+  deleteRapidCut(episodeId: string) {
+    return request.delete(`/episodes/${episodeId}/rapid-cut`)
+  },
+
+  getRapidCutStatus(episodeId: string) {
+    return request.get<{ has_rapid_cut: boolean }>(`/episodes/${episodeId}/rapid-cut/status`)
   },
 
   updateStoryboard(storyboardId: string, data: any) {

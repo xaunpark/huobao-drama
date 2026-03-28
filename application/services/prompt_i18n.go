@@ -151,6 +151,12 @@ func (p *PromptI18n) GetActionSequenceFramePrompt(style string) string {
 	return fmt.Sprintf(prompts.Get("image_action_sequence.txt"), style, imageRatio)
 }
 
+// GetRapidCutActionSequenceFramePrompt 获取rapid cut多场景动作序列提示词
+func (p *PromptI18n) GetRapidCutActionSequenceFramePrompt(style string) string {
+	imageRatio := "16:9"
+	return fmt.Sprintf(prompts.Get("image_action_sequence_rapid_cut.txt"), style, imageRatio)
+}
+
 // GetLastFramePrompt 获取尾帧提示词
 func (p *PromptI18n) GetLastFramePrompt(style string) string {
 	imageRatio := "16:9"
@@ -359,8 +365,13 @@ func (p *PromptI18n) GetStylePrompt(style string, customStyle string) string {
 }
 
 // GetVideoConstraintPrompt 获取视频生成的约束提示词
-// referenceMode: "single" (单图), "first_last" (首尾帧), "multiple" (多图), "action_sequence" (动作序列)
+// referenceMode: "single" (单图), "first_last" (首尾帧), "multiple" (多图), "action_sequence" (动作序列), "rapid_cut" (rapid cut多场景)
 func (p *PromptI18n) GetVideoConstraintPrompt(referenceMode string) string {
+	// Rapid cut mode—use rapid cut specific constraint
+	if referenceMode == "rapid_cut" {
+		return prompts.Get("video_constraint_rapid_cut.txt")
+	}
+
 	// 动作序列图（1x3横向条带）的约束提示词
 	actionSequencePrompts := map[string]string{
 		"zh": prompts.Get("video_constraint_prefixes.txt"),
@@ -517,12 +528,32 @@ func (p *PromptI18n) WithDramaActionSequenceFramePrompt(dramaID uint, style stri
 
 // WithDramaVideoConstraintPrompt resolves video constraint prompt for a specific drama
 func (p *PromptI18n) WithDramaVideoConstraintPrompt(dramaID uint, referenceMode string) string {
+	// Rapid cut mode always uses the rapid cut constraint, bypassing templates
+	if referenceMode == "rapid_cut" {
+		return prompts.Get("video_constraint_rapid_cut.txt")
+	}
+
 	template := p.resolvePrompt(dramaID, "video_constraint")
 	if template == "" {
 		// Fallback to original logic
 		return p.GetVideoConstraintPrompt(referenceMode)
 	}
 	return template
+}
+
+// WithDramaRapidCutActionSequenceFramePrompt resolves rapid cut action sequence prompt for a specific drama
+func (p *PromptI18n) WithDramaRapidCutActionSequenceFramePrompt(dramaID uint, style string) string {
+	imageRatio := "16:9"
+	effectiveStyle := p.resolveEffectiveStyle(dramaID, style, "")
+	// For now, rapid cut always uses the rapid cut prompt (no template override)
+	template := prompts.Get("image_action_sequence_rapid_cut.txt")
+	if strings.Contains(template, "%s") {
+		return fmt.Sprintf(template, effectiveStyle, imageRatio)
+	}
+	return formatPromptWithVars(template, map[string]string{
+		"{{STYLE}}": effectiveStyle,
+		"{{RATIO}}": imageRatio,
+	})
 }
 
 // WithDramaStylePrompt resolves style prompt for a specific drama

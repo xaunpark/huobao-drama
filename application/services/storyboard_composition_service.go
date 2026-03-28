@@ -67,9 +67,18 @@ type SceneCompositionInfo struct {
 	ImageGenerationStatus *string              `json:"image_generation_status,omitempty"`
 	VideoGenerationID     *uint                `json:"video_generation_id,omitempty"`
 	VideoGenerationStatus *string              `json:"video_generation_status,omitempty"`
+	// Rapid Cut fields
+	IsProduction  bool   `json:"is_production"`
+	PacingMode    string `json:"pacing_mode,omitempty"`
+	SourceShotIDs []uint `json:"source_shot_ids,omitempty"`
+}
+func (s *StoryboardCompositionService) HasProductionShots(episodeID string) bool {
+	var count int64
+	s.db.Model(&models.Storyboard{}).Where("episode_id = ? AND is_production = ?", episodeID, true).Count(&count)
+	return count > 0
 }
 
-func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string) ([]SceneCompositionInfo, error) {
+func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string, view string) ([]SceneCompositionInfo, error) {
 	// 验证权限
 	var episode models.Episode
 	err := s.db.Preload("Drama").Where("id = ?", episodeID).First(&episode).Error
@@ -78,13 +87,32 @@ func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string) ([]
 		return nil, fmt.Errorf("episode not found")
 	}
 
-	s.log.Infow("GetScenesForEpisode auth check",
+	s.log.Infow("GetScenesForEpisode",
 		"episode_id", episodeID,
-		"drama_id", episode.DramaID)
+		"drama_id", episode.DramaID,
+		"view", view)
 
-	// 获取分镜列表
+	// 获取分镜列表 — filter by view mode
 	var storyboards []models.Storyboard
-	if err := s.db.Where("episode_id = ?", episodeID).
+	query := s.db.Where("episode_id = ?", episodeID)
+
+	switch view {
+	case "production":
+		query = query.Where("is_production = ?", true)
+	case "editorial":
+		query = query.Where("is_production = ?", false)
+	default:
+		// Auto mode: prefer production shots if they exist, otherwise editorial
+		var prodCount int64
+		s.db.Model(&models.Storyboard{}).Where("episode_id = ? AND is_production = ?", episodeID, true).Count(&prodCount)
+		if prodCount > 0 {
+			query = query.Where("is_production = ?", true)
+		} else {
+			query = query.Where("is_production = ?", false)
+		}
+	}
+
+	if err := query.
 		Preload("Characters").
 		Order("storyboard_number ASC").
 		Find(&storyboards).Error; err != nil {
@@ -205,6 +233,7 @@ func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string) ([]
 			ImagePrompt:      storyboard.ImagePrompt,
 			VideoPrompt:      storyboard.VideoPrompt,
 			SceneID:          storyboard.SceneID,
+			IsProduction:     storyboard.IsProduction,
 		}
 
 		// 直接使用关联的角色信息

@@ -393,8 +393,18 @@ func (s *FramePromptService) generateActionSequence(dramaID uint, sb models.Stor
 	// 构建上下文信息
 	contextInfo := s.buildStoryboardContext(sb, scene)
 
-	// 使用国际化提示词 - 专门为动作序列设计的提示词
-	dynamicPrompt := s.promptI18n.WithDramaActionSequenceFramePrompt(dramaID, dramaStyle)
+	// 使用国际化提示词 - 根据 pacing_mode 选择不同的提示词
+	var dynamicPrompt string
+	if sb.PacingMode != nil && *sb.PacingMode == "rapid_cut" {
+		// Rapid cut mode: 3 panels = 3 distinct micro-shots
+		dynamicPrompt = s.promptI18n.WithDramaRapidCutActionSequenceFramePrompt(dramaID, dramaStyle)
+		s.log.Infow("Using rapid cut action sequence prompt",
+			"storyboard_id", sb.ID,
+			"pacing_mode", *sb.PacingMode)
+	} else {
+		// Standard mode: 3 panels = Start → Peak → End of one action
+		dynamicPrompt = s.promptI18n.WithDramaActionSequenceFramePrompt(dramaID, dramaStyle)
+	}
 	systemPrompt := dynamicPrompt + "\n\n" + fixed.Get("image_generation")
 	userPrompt := s.promptI18n.FormatUserPrompt("frame_info", contextInfo)
 

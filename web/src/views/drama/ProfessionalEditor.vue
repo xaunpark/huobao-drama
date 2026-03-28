@@ -24,15 +24,37 @@
     <div class="editor-main">
       <!-- 左侧分镜列表 -->
       <div class="storyboard-panel">
-        <div class="panel-header">
-          <h3>{{ $t("storyboard.scriptStructure") }}</h3>
-          <div class="header-actions">
-            <el-button text :icon="MagicStick" @click="showBatchDialog = true" :title="$t('professionalEditor.batch.title')">
-              {{ $t("common.batch") }}
+        <div class="panel-header" style="flex-direction: column; align-items: stretch; gap: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3>
+              {{ $t("storyboard.scriptStructure") }}
+              <el-tag size="small" :type="currentViewMode === 'production' ? 'success' : 'info'" v-if="hasRapidCut" style="margin-left: 4px;">
+                {{ currentViewMode === 'production' ? 'Rapid Cut' : 'Standard' }}
+              </el-tag>
+            </h3>
+            <div class="header-actions">
+              <el-button text :icon="MagicStick" @click="showBatchDialog = true" :title="$t('professionalEditor.batch.title')">
+                {{ $t("common.batch") }}
+              </el-button>
+              <el-button text :icon="Plus" @click="handleAddStoryboard" v-if="currentViewMode === 'editorial'">
+                {{ $t("storyboard.add") }}
+              </el-button>
+            </div>
+          </div>
+          
+          <div class="rapid-cut-toolbar" v-if="hasRapidCut" style="display: flex; gap: 8px;">
+            <el-radio-group v-model="currentViewMode" size="small" @change="loadStoryboardsView" style="flex: 1;">
+              <el-radio-button label="editorial">Standard</el-radio-button>
+              <el-radio-button label="production">Rapid Cut</el-radio-button>
+            </el-radio-group>
+            <el-button v-if="currentViewMode === 'production'" type="danger" size="small" text @click="handleRevertRapidCut" :loading="revertingRapidCut">
+              Delete Mode
             </el-button>
-            <el-button text :icon="Plus" @click="handleAddStoryboard">{{
-              $t("storyboard.add")
-            }}</el-button>
+          </div>
+          <div class="rapid-cut-toolbar" v-else style="display: flex;">
+            <el-button type="primary" size="small" plain @click="handleGenerateRapidCut" :loading="generatingRapidCut" style="width: 100%;">
+              {{ generatingRapidCut ? 'Generating Rapid Cut...' : '⚡ Generate Rapid Cut Mode' }}
+            </el-button>
           </div>
         </div>
 
@@ -1991,7 +2013,7 @@
             <el-button
               v-if="previewVideo.video_url"
               size="small"
-              @click="window.open(previewVideo.video_url, '_blank')"
+              @click="openUrl(previewVideo.video_url)"
             >
               {{ $t("professionalEditor.downloadVideo") }}
             </el-button>
@@ -2132,6 +2154,14 @@ const showBatchDialog = ref(false);
 const showVideoPreview = ref(false);
 const previewVideo = ref<VideoGeneration | null>(null);
 const addingToAssets = ref<Set<number>>(new Set());
+
+const openUrl = (url: string) => window.open(url, '_blank');
+
+// Rapid Cut state
+const currentViewMode = ref<'editorial' | 'production'>('editorial');
+const hasRapidCut = ref(false);
+const generatingRapidCut = ref(false);
+const revertingRapidCut = ref(false);
 
 const currentPlayState = ref<"playing" | "paused">("paused");
 const currentTime = ref(0);
@@ -3768,6 +3798,112 @@ const removeCharacterFromShot = async (charId: number) => {
   }
 };
 
+const loadStoryboardsView = async (viewDir?: string) => {
+  if (viewDir) {
+    currentViewMode.value = viewDir as any;
+  }
+  
+  const storyboardsRes = await dramaAPI.getStoryboards(episodeId.value.toString(), currentViewMode.value);
+  const data = storyboardsRes as any;
+  
+  storyboards.value = data?.storyboards || [];
+  hasRapidCut.value = data?.has_rapid_cut || false;
+  
+  // Auto-switch logic when initially loading without explicit viewDir
+  if (!viewDir) {
+    currentViewMode.value = hasRapidCut.value ? 'production' : 'editorial';
+  }
+
+  // Preserve selection if it still exists, otherwise select first
+  if (storyboards.value.length > 0) {
+    const exists = storyboards.value.find((s) => s.id.toString() === currentStoryboardId.value);
+    if (!exists) {
+      currentStoryboardId.value = storyboards.value[0].id.toString();
+    }
+  } else {
+    currentStoryboardId.value = null;
+  }
+};
+
+const handleGenerateRapidCut = async () => {
+  try {
+    await ElMessageBox.confirm(
+      "Rapid Cut 模式会将现有的分镜自动合并为一系列快速切换的生产分镜 (Production Shots)。这不会删除您的原始分镜结构，但会在时间线中生成一组新的分镜用于视频合成。是否继续？",
+      "生成 Rapid Cut 分镜",
+      {
+        confirmButtonText: "确定合并",
+        cancelButtonText: "取消",
+        type: "info",
+      }
+    );
+    
+    generatingRapidCut.value = true;
+    
+    // Rapid Cut uses the default Text AI model to merge shots, so no video model is needed here.
+    const res = await dramaAPI.generateRapidCut(episodeId.value.toString());
+    ElMessage.success("Rapid Cut 生成任务已提交，请稍候...");
+    
+    // Start polling the task logic
+    const taskId = res.task_id;
+    pollRapidCutTask(taskId);
+    
+  } catch (error: any) {
+    if (error !== "cancel") {
+      ElMessage.error(error.message || "提交失败");
+      generatingRapidCut.value = false;
+    }
+  }
+};
+
+const pollRapidCutTask = (taskId: string) => {
+  const timer = setInterval(async () => {
+    try {
+      const res = await taskAPI.getStatus(taskId);
+      if (res.status === 'completed') {
+        clearInterval(timer);
+        generatingRapidCut.value = false;
+        ElMessage.success("Rapid Cut 生成完毕");
+        await loadStoryboardsView('production');
+      } else if (res.status === 'failed') {
+        clearInterval(timer);
+        generatingRapidCut.value = false;
+        ElMessage.error("Rapid Cut 生成失败: " + res.error);
+      }
+    } catch (error) {
+      clearInterval(timer);
+      generatingRapidCut.value = false;
+      console.error("轮询 Rapid Cut 状态失败:", error);
+    }
+  }, 3000);
+};
+
+const handleRevertRapidCut = async () => {
+  try {
+    await ElMessageBox.confirm(
+      "确定要返回标准模式(Standard Mode)吗？这将删除所有已生成的 Rapid Cut 分镜及其包含的图片/视频，此操作不可逆。",
+      "返回 Standard Mode",
+      {
+        confirmButtonText: "确定返回并删除",
+        cancelButtonText: "取消",
+        type: "warning",
+      }
+    );
+    
+    revertingRapidCut.value = true;
+    await dramaAPI.deleteRapidCut(episodeId.value.toString());
+    ElMessage.success("已恢复到标准模式");
+    
+    await loadStoryboardsView('editorial');
+    
+  } catch (error: any) {
+    if (error !== "cancel") {
+      ElMessage.error(error.message || "操作失败");
+    }
+  } finally {
+    revertingRapidCut.value = false;
+  }
+};
+
 const loadData = async () => {
   try {
     // 加载剧集信息
@@ -3787,16 +3923,8 @@ const loadData = async () => {
     episode.value = ep;
     episodeId.value = ep.id;
 
-    // 加载分镜列表
-    const storyboardsRes = await dramaAPI.getStoryboards(ep.id.toString());
-
-    // API返回格式: {storyboards: [...], total: number}
-    storyboards.value = storyboardsRes?.storyboards || [];
-
-    // 默认选中第一个分镜
-    if (storyboards.value.length > 0 && !currentStoryboardId.value) {
-      currentStoryboardId.value = storyboards.value[0].id;
-    }
+    // 加载分镜列表 (auto-detects production vs editorial)
+    await loadStoryboardsView();
 
     // 加载角色列表
     characters.value = dramaRes.characters || [];

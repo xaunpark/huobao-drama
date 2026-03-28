@@ -115,6 +115,10 @@ type Storyboard struct {
 	ComposedImage    *string        `gorm:"type:text" json:"composed_image"`
 	VideoURL         *string        `gorm:"type:text" json:"video_url"`
 	Status           string         `gorm:"type:varchar(20);default:'pending'" json:"status"`
+	// Rapid Cut fields
+	IsProduction  bool           `gorm:"default:false" json:"is_production"`             // true = production shot (rapid cut result)
+	PacingMode    *string        `gorm:"size:20" json:"pacing_mode"`                     // "standard" | "rapid_cut"
+	SourceShotIDs datatypes.JSON `gorm:"type:json" json:"source_shot_ids"`               // [1,2,3] — IDs of original editorial shots merged
 	CreatedAt        time.Time      `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt        time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
 	DeletedAt        gorm.DeletedAt `gorm:"index" json:"-"`

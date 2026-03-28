@@ -311,7 +311,14 @@ func (c *FlowToolVideoClient) GetTaskStatus(taskID string) (*VideoResult, error)
 	case "success", "completed", "done":
 		result.Completed = true
 		if len(jobResp.ResultURLs) > 0 {
-			result.VideoURL = jobResp.ResultURLs[0]
+			url := jobResp.ResultURLs[0]
+			if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
+				if !strings.HasPrefix(url, "/") {
+					url = "/" + url
+				}
+				url = c.BaseURL + url
+			}
+			result.VideoURL = url
 		}
 	case "failed", "error":
 		errMsg := "video generation failed"

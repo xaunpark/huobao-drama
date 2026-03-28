@@ -58,6 +58,7 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 	settingsHandler := handlers2.NewSettingsHandler(cfg, log)
 	propHandler := handlers2.NewPropHandler(db, cfg, log, aiService, imageGenService)
 	promptTemplateHandler := handlers2.NewPromptTemplateHandler(db, log)
+	rapidCutHandler := handlers2.NewRapidCutHandler(db, cfg, log)
 
 	api := r.Group("/api/v1")
 	{
@@ -141,6 +142,10 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 			episodes.GET("/:episode_id/storyboards", sceneHandler.GetStoryboardsForEpisode)
 			episodes.POST("/:episode_id/finalize", dramaHandler.FinalizeEpisode)
 			episodes.GET("/:episode_id/download", dramaHandler.DownloadEpisodeVideo)
+			// Rapid Cut routes
+			episodes.POST("/:episode_id/rapid-cut", rapidCutHandler.GenerateRapidCut)
+			episodes.DELETE("/:episode_id/rapid-cut", rapidCutHandler.DeleteRapidCut)
+			episodes.GET("/:episode_id/rapid-cut/status", rapidCutHandler.GetRapidCutStatus)
 		}
 
 		// 任务路由
