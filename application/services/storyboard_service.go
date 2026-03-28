@@ -1,6 +1,7 @@
 package services
 
 import (
+	"regexp"
 	"strconv"
 
 	"fmt"
@@ -61,7 +62,7 @@ type GenerateStoryboardResult struct {
 	Total       int          `json:"total"`
 }
 
-func (s *StoryboardService) GenerateStoryboard(episodeID string, model string) (string, error) {
+func (s *StoryboardService) GenerateStoryboard(episodeID string, model string, splitMode string) (string, error) {
 	// 从数据库获取剧集信息
 	var episode struct {
 		ID            string
@@ -123,6 +124,18 @@ func (s *StoryboardService) GenerateStoryboard(episodeID string, model string) (
 	}
 
 
+	// Auto-detect split mode: if script has timestamp patterns, use "preserve" mode
+	effectiveSplitMode := splitMode
+	if effectiveSplitMode == "" || effectiveSplitMode == "auto" {
+		if detectTimestampPattern(scriptContent) {
+			effectiveSplitMode = "preserve"
+			s.log.Infow("Auto-detected timestamp pattern in script, using preserve mode",
+				"episode_id", episodeID)
+		} else {
+			effectiveSplitMode = "breakdown"
+		}
+	}
+
 	// 创建异步任务
 	task, err := s.taskService.CreateTask("storyboard_generation", episodeID)
 	if err != nil {
@@ -138,30 +151,67 @@ func (s *StoryboardService) GenerateStoryboard(episodeID string, model string) (
 		"character_count", len(characters),
 		"characters", characterList,
 		"scene_count", len(scenes),
-		"scenes", sceneList)
+		"scenes", sceneList,
+		"split_mode", effectiveSplitMode)
 
 	// 启动后台goroutine处理AI调用和后续逻辑
 	dramaIDUint, _ := strconv.ParseUint(episode.DramaID, 10, 32)
-	go s.processStoryboardGeneration(task.ID, episodeID, uint(dramaIDUint), model, scriptContent, characterList, sceneList)
+	go s.processStoryboardGeneration(task.ID, episodeID, uint(dramaIDUint), model, effectiveSplitMode, scriptContent, characterList, sceneList)
 
 	// 立即返回任务ID
 	return task.ID, nil
 }
 
+// detectTimestampPattern checks if the script contains timestamp patterns
+// like (0:00 – 0:06), (0:06 – 0:12), indicating pre-defined shot boundaries.
+func detectTimestampPattern(script string) bool {
+	// Match patterns like (0:00 – 0:06), (00:00 - 00:06), (0:00–0:06), etc.
+	// Also match patterns like (0:00 ~ 0:06) or [0:00 - 0:06]
+	patterns := []string{
+		`\(?\d{1,2}:\d{2}\s*[–\-~]\s*\d{1,2}:\d{2}\)?`,  // Timestamp ranges
+		`(?i)^\s*shot\s+\d+`,                                // "Shot 1", "Shot 2"
+		`(?i)^\s*scene\s+\d+`,                               // "Scene 1", "Scene 2"
+	}
+
+	timestampCount := 0
+	for _, pattern := range patterns {
+		re := regexp.MustCompile(pattern)
+		matches := re.FindAllString(script, -1)
+		timestampCount += len(matches)
+	}
+
+	// If we detect 5+ timestamp/shot markers, it's a pre-structured script
+	return timestampCount >= 5
+}
+
 // processStoryboardGeneration 后台处理故事板生成
-func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID string, dramaID uint, model, scriptContent, characterList, sceneList string) {
+func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID string, dramaID uint, model, splitMode, scriptContent, characterList, sceneList string) {
 	// 更新任务状态为处理中
 	if err := s.taskService.UpdateTaskStatus(taskID, "processing", 10, "准备生成分镜头..."); err != nil {
 		s.log.Errorw("Failed to update task status", "error", err, "task_id", taskID)
 		return
 	}
 
-	s.log.Infow("Processing storyboard generation", "task_id", taskID, "episode_id", episodeID)
+	s.log.Infow("Processing storyboard generation", "task_id", taskID, "episode_id", episodeID, "split_mode", splitMode)
 
-	systemPrompt := s.promptI18n.WithDramaStoryboardSystemPrompt(dramaID)
+	// Choose system prompt based on split mode
+	var systemPrompt string
+	if splitMode == "preserve" {
+		systemPrompt = prompts.Get("storyboard_preserve_shots.txt")
+		s.log.Infow("Using PRESERVE mode — keeping script shot structure", "task_id", taskID)
+	} else {
+		systemPrompt = s.promptI18n.WithDramaStoryboardSystemPrompt(dramaID)
+		s.log.Infow("Using BREAKDOWN mode — AI action unit analysis", "task_id", taskID)
+	}
+
 	scriptLabel := s.promptI18n.FormatUserPrompt("script_content_label")
 	taskLabel := s.promptI18n.FormatUserPrompt("task_label")
-	taskInstruction := s.promptI18n.FormatUserPrompt("task_instruction")
+	var taskInstruction string
+	if splitMode == "preserve" {
+		taskInstruction = "Preserve each shot/block from the script as a separate storyboard entry. Do NOT merge or skip any shots. Enrich each with cinematography metadata."
+	} else {
+		taskInstruction = s.promptI18n.FormatUserPrompt("task_instruction")
+	}
 	charListLabel := s.promptI18n.FormatUserPrompt("character_list_label")
 	charConstraint := s.promptI18n.FormatUserPrompt("character_constraint")
 	sceneListLabel := s.promptI18n.FormatUserPrompt("scene_list_label")

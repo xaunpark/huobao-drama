@@ -642,6 +642,36 @@
             <!-- 未拆分时显示 -->
             <div v-else class="empty-shots">
               <el-empty :description="$t('workflow.splitStoryboardFirst')">
+                <div class="split-mode-selector" style="margin-bottom: 16px;">
+                  <span style="font-size: 13px; color: var(--el-text-color-secondary); margin-right: 8px;">{{ $t('workflow.splitMode') }}:</span>
+                  <el-radio-group v-model="shotSplitMode" size="small">
+                    <el-radio-button value="auto">
+                      <el-icon style="margin-right: 4px;"><MagicStick /></el-icon>
+                      {{ $t('workflow.splitModeAuto') }}
+                    </el-radio-button>
+                    <el-radio-button value="preserve">
+                      <el-icon style="margin-right: 4px;"><Document /></el-icon>
+                      {{ $t('workflow.splitModePreserve') }}
+                    </el-radio-button>
+                    <el-radio-button value="breakdown">
+                      <el-icon style="margin-right: 4px;"><ScaleToOriginal /></el-icon>
+                      {{ $t('workflow.splitModeBreakdown') }}
+                    </el-radio-button>
+                  </el-radio-group>
+                </div>
+                <div v-if="shotSplitMode !== 'auto'" style="margin-bottom: 12px;">
+                  <el-alert
+                    :type="shotSplitMode === 'preserve' ? 'success' : 'info'"
+                    :closable="false"
+                    style="display: inline-block; max-width: 500px;"
+                  >
+                    <template #title>
+                      <span style="font-size: 12px;">
+                        {{ shotSplitMode === 'preserve' ? $t('workflow.splitModePreserveTip') : $t('workflow.splitModeBreakdownTip') }}
+                      </span>
+                    </template>
+                  </el-alert>
+                </div>
                 <el-button
                   type="primary"
                   @click="generateShots"
@@ -757,9 +787,23 @@
             <el-icon><ArrowLeft /></el-icon>
             {{ $t("workflow.prevStep") }}
           </el-button>
-          <el-button size="large" @click="regenerateShots" :icon="MagicStick">
+          <el-dropdown split-button size="large" @click="regenerateShots" @command="(cmd: string) => { shotSplitMode = cmd; regenerateShots(); }">
+            <el-icon style="margin-right: 4px;"><MagicStick /></el-icon>
             {{ $t("workflow.reSplitShots") }}
-          </el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="auto">
+                  <el-icon><MagicStick /></el-icon> {{ $t('workflow.splitModeAuto') }}
+                </el-dropdown-item>
+                <el-dropdown-item command="preserve">
+                  <el-icon><Document /></el-icon> {{ $t('workflow.splitModePreserve') }}
+                </el-dropdown-item>
+                <el-dropdown-item command="breakdown">
+                  <el-icon><ScaleToOriginal /></el-icon> {{ $t('workflow.splitModeBreakdown') }}
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
           <el-button type="success" size="large" @click="goToProfessionalUI">
             {{ $t("workflow.enterProfessional") }}
             <el-icon><ArrowRight /></el-icon>
@@ -1282,6 +1326,7 @@ import {
   Document,
   Plus,
   Close,
+  ScaleToOriginal,
 } from "@element-plus/icons-vue";
 import { dramaAPI } from "@/api/drama";
 import { generationAPI } from "@/api/generation";
@@ -2042,6 +2087,7 @@ const batchGenerateSceneImages = async () => {
 
 const taskProgress = ref(0);
 const taskMessage = ref("");
+const shotSplitMode = ref("auto"); // "auto" | "preserve" | "breakdown"
 let pollTimer: any = null;
 
 const generateShots = async () => {
@@ -2079,6 +2125,7 @@ const generateShots = async () => {
     const response = await generationAPI.generateStoryboard(
       episodeId,
       selectedTextModel.value,
+      shotSplitMode.value,
     );
 
     taskMessage.value = response.message || "任务已创建";
