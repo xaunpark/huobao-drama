@@ -425,9 +425,9 @@ func (s *FramePromptService) generateActionSequence(dramaID uint, sb models.Stor
 		return nil, fmt.Errorf("解析AI结果失败")
 	}
 
-	// 动作序列是一个整体的3x3宫格图片，所以只返回一个prompt
+	// 动作序列是一个整体的1x3横向条带图片（Start → Peak → End），只返回一个prompt
 	return &MultiFramePrompt{
-		Layout: "grid_3x3",
+		Layout: "horizontal_strip_3",
 		Frames: []SingleFramePrompt{*result},
 	}, nil
 }
@@ -444,7 +444,7 @@ func (s *FramePromptService) buildStoryboardContext(sb models.Storyboard, scene 
 		parts = append(parts, s.promptI18n.FormatUserPrompt("action_label", *sb.Action))
 	}
 
-	// 结果（动作的最终状态 - Frame 9 应该描绘这个结果）
+	// 结果（动作的最终状态 - Panel 3/End Frame 应该描绘这个结果）
 	if sb.Result != nil && *sb.Result != "" {
 		parts = append(parts, s.promptI18n.FormatUserPrompt("result_label", *sb.Result))
 	}

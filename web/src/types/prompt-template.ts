@@ -67,7 +67,7 @@ export const PROMPT_TYPE_GROUPS = [
       { key: 'image_first_frame', label: 'Prompt ảnh: Đầu cảnh' },
       { key: 'image_key_frame', label: 'Prompt ảnh: Cảnh đinh' },
       { key: 'image_last_frame', label: 'Prompt ảnh: Cuối cảnh' },
-      { key: 'image_action_sequence', label: 'Prompt ảnh: Lưới hành động' },
+      { key: 'image_action_sequence', label: 'Prompt ảnh: Dải hành động 1×3' },
     ]
   },
   {

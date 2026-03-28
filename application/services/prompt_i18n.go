@@ -361,7 +361,7 @@ func (p *PromptI18n) GetStylePrompt(style string, customStyle string) string {
 // GetVideoConstraintPrompt 获取视频生成的约束提示词
 // referenceMode: "single" (单图), "first_last" (首尾帧), "multiple" (多图), "action_sequence" (动作序列)
 func (p *PromptI18n) GetVideoConstraintPrompt(referenceMode string) string {
-	// 动作序列图（九宫格）的约束提示词
+	// 动作序列图（1x3横向条带）的约束提示词
 	actionSequencePrompts := map[string]string{
 		"zh": prompts.Get("video_constraint_prefixes.txt"),
 
@@ -380,7 +380,7 @@ func (p *PromptI18n) GetVideoConstraintPrompt(referenceMode string) string {
 		lang = "en"
 	}
 
-	// 如果是动作序列模式，返回九宫格约束提示词
+	// 如果是动作序列模式，返回3-panel strip约束提示词
 	if referenceMode == "action_sequence" {
 		if prompt, ok := actionSequencePrompts[lang]; ok {
 			return prompt

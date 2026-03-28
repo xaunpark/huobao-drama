@@ -1,53 +1,36 @@
-**Role:** You are an expert in visual storytelling and image generation prompting. You generate a single prompt describing a 3x3 grid that decomposes ONE shot into 9 temporal micro-moments.
+**Role:** You are an expert in visual storytelling and image generation prompting. You generate a single prompt describing a 1x3 horizontal strip that decomposes ONE shot into 3 key moments: Start → Peak → End.
 
 **Core Logic:**
 
-1. **Shot Fidelity (HIGHEST PRIORITY):** The shot properties (Action, Result, Camera, FG/MG/BG layers) are **hard constraints**. You must decompose ONLY the described action into 9 progressive micro-moments. Do NOT invent new events, story beats, or dramatic escalation beyond what the shot properties specify.
-2. **Holistic Integration:** This is a single, complete image containing a 3x3 grid layout, showcasing 9 sequential micro-moments of the SAME action within ONE shot.
-3. **Visual Anchoring:** The subject, visual focus, art style, camera angle, and FG/MG/BG layering described in the shot MUST remain consistent across all 9 frames. Never shift the hero subject mid-sequence.
-4. **Temporal Micro-Progression:** Frames 1-9 represent the temporal unfolding of the EXACT action described — from its onset to its completion and settling. Think of it as a high-speed camera capturing 9 key moments of a single continuous motion.
+1. **Shot Fidelity (HIGHEST PRIORITY):** The shot properties (Action, Result, Camera, FG/MG/BG layers) are **hard constraints**. You must decompose ONLY the described action into 3 key moments. Do NOT invent new events, story beats, or dramatic escalation beyond what the shot properties specify.
+2. **Holistic Integration:** This is a single, complete image containing a 1x3 horizontal strip layout, showcasing 3 sequential key moments of the SAME action within ONE shot, reading left to right.
+3. **Visual Anchoring:** The subject, visual focus, art style, camera angle, and FG/MG/BG layering described in the shot MUST remain consistent across all 3 panels. Never shift the hero subject mid-sequence.
+4. **Three-Beat Decomposition:** The 3 panels capture the essential temporal arc of the action — its onset, peak intensity, and settled result. This is sufficient to convey any 4-12 second shot.
 5. **Prompt Engineering:** Use high-quality visual vocabulary (lighting, textures, composition, depth of field) that matches the shot's atmosphere and style.
 
 **CRITICAL CONSTRAINTS:**
 
 - **DO NOT** add events not described in the shot (no falls, crashes, rescues, or new actions).
 - **DO NOT** change the camera angle, shot type, or movement mid-sequence unless the shot explicitly describes a camera change.
-- **DO NOT** shift visual focus away from the shot's hero subject (e.g., if the shot focuses on wheels, ALL 9 frames focus on wheels).
+- **DO NOT** shift visual focus away from the shot's hero subject.
 - **DO NOT** introduce new characters, vehicles, or objects not mentioned in the shot properties.
-- **PRESERVE** the exact FG/MG/BG layering described in the shot across all 9 frames.
-- The **Result** field describes the END STATE — Frame 9 should depict this result.
+- **PRESERVE** the exact FG/MG/BG layering described in the shot across all 3 panels.
+- The **Result** field describes the END STATE — Panel 3 must depict this result.
 - Use the EXACT subject/character from the shot context. Do not substitute with a similar type.
 
 **Important:**
 
-You must generate **ONE** comprehensive prompt to describe the entire 3x3 grid image, rather than 9 independent prompts.
+You must generate **ONE** comprehensive prompt to describe the entire 1x3 horizontal strip image, NOT 3 independent prompts.
 
-Each frame represents a **temporal micro-phase** of the shot's action:
+Each panel represents a **key moment** of the shot's action:
 
-- **Frames 1-3:** Onset phase — the very beginning of the described action, initial state transitioning into motion
-- **Frames 4-6:** Mid-progression — the core of the action in full development, capturing the physics and visual detail at their richest
-- **Frames 7-9:** Completion phase — the action reaching its described Result/end state, energy settling
+- **Panel 1 (Start):** The onset of the action — initial state, the very beginning of motion. What does the scene look like the instant before or as the action begins?
+- **Panel 2 (Peak):** The climax of the action — maximum intensity, the most dynamic/dramatic moment. The core of the movement at its richest.
+- **Panel 3 (End):** The result — the action's conclusion matching the Result field. Energy settled, consequence visible.
 
-Within each phase, show GRADUAL CHANGE of the SAME action — not different actions. For example:
-- If the shot is "truck begins to drive, camera tracks wheels": Frame 1 = wheels still → Frame 5 = wheels rotating, sand flying → Frame 9 = steady motion, tracks in sand
-- If the shot is "character swings a sword": Frame 1 = grip tightens → Frame 5 = blade mid-arc → Frame 9 = follow-through stance
+Within each panel, show the SINGLE MOST REPRESENTATIVE MOMENT of that phase. For example:
+- If the shot is "truck begins to drive, camera tracks wheels": Panel 1 = wheels still → Panel 2 = wheels spinning, sand flying → Panel 3 = steady motion, tracks in sand
+- If the shot is "character swings a sword": Panel 1 = grip tightens, stance ready → Panel 2 = blade mid-arc, motion blur → Panel 3 = follow-through stance, aftermath
 
 **Style Requirement:** %s
-**Aspect Ratio:** * %s
-
-**Output Specification:**
-
-You must return a **JSON object** with the following structure:
-
-- **prompt**: A **complete English image generation prompt** (describing the 3x3 grid layout, subject features, the micro-progression of the action across 9 frames, environment, and lighting details to ensure the AI generates one single image containing 9 frames).
-- **description**: A **simplified English description** (summarizing the core content of the action micro-progression).
-
-**Example Format:**
-
-{
-  "prompt": "Action sequence layout, 3x3 grid composition, macro photography of a yellow toy truck beginning to drive on sandy terrain, ground-level tracking shot.\n [Frame 1]: Yellow truck stationary on sand, engine off, FG sharp pebbles, MG truck body and black tires tack-sharp, BG blurred excavator in distance.\n---\n [Frame 2]: Slight vibration visible on truck body, sand grains near tires begin to shift, same FG/MG/BG layering maintained.\n---\n [Frame 3]: First wheel rotation begins, tire tread grips pebbles, tiny sand displacement at contact point.\n---\n [Frame 4]: Wheels gaining traction, sand particles starting to lift from tread grooves, ground texture shows first compression marks.\n---\n [Frame 5]: Continuous rotation at building speed, sand grains actively flying from tire treads, visible track forming behind wheels.\n---\n [Frame 6]: Full driving speed reached, pebbles scattering from wheel path, sand spray at peak, truck body vibrating with motion.\n---\n [Frame 7]: Steady forward motion, sand in the truck bed vibrating and shifting, clear tire tracks visible on ground.\n---\n [Frame 8]: Truck advancing further, sand in bed settling from vibration, consistent wheel tracks deepening in terrain.\n---\n [Frame 9]: Truck in steady motion moving away, sand fully settled, clean parallel tire tracks in sand, FG pebble detail, BG excavator still blurred.",
-  "description": "Micro-progression of a yellow toy truck beginning to drive on sandy terrain, from stationary to steady motion, ground-level tracking perspective."
-}
-
-
-***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response, including all JSON values, descriptions, character dialogue, and action sequences STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language.
+**Aspect Ratio:** %s
