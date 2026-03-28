@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	services2 "github.com/drama-generator/backend/application/services"
 	"github.com/drama-generator/backend/pkg/logger"
 	"github.com/drama-generator/backend/pkg/response"
@@ -13,9 +14,9 @@ type SceneHandler struct {
 	log          *logger.Logger
 }
 
-func NewSceneHandler(db *gorm.DB, log *logger.Logger, imageGenService *services2.ImageGenerationService) *SceneHandler {
+func NewSceneHandler(db *gorm.DB, log *logger.Logger, imageGenService *services2.ImageGenerationService, promptI18n *services2.PromptI18n) *SceneHandler {
 	return &SceneHandler{
-		sceneService: services2.NewStoryboardCompositionService(db, log, imageGenService),
+		sceneService: services2.NewStoryboardCompositionService(db, log, imageGenService, promptI18n),
 		log:          log,
 	}
 }
@@ -138,4 +139,32 @@ func (h *SceneHandler) CreateScene(c *gin.Context) {
 	}
 
 	response.Success(c, scene)
+}
+
+func (h *SceneHandler) GetSceneFullPrompt(c *gin.Context) {
+	sceneIDStr := c.Param("scene_id")
+	var sceneID uint
+	if _, err := fmt.Sscanf(sceneIDStr, "%d", &sceneID); err != nil {
+		response.BadRequest(c, "Invalid scene ID")
+		return
+	}
+
+	fullPrompt, err := h.sceneService.BuildSceneFullPrompt(sceneID)
+	if err != nil {
+		if err.Error() == "scene not found" {
+			response.NotFound(c, "场景不存在")
+			return
+		}
+		if err.Error() == "unauthorized" {
+			response.Forbidden(c, "无权限")
+			return
+		}
+		h.log.Errorw("Failed to build scene full prompt", "error", err, "scene_id", sceneID)
+		response.InternalError(c, "获取完整提示词失败")
+		return
+	}
+
+	response.Success(c, gin.H{
+		"prompt": fullPrompt,
+	})
 }

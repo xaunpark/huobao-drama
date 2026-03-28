@@ -506,13 +506,13 @@
                       type="primary"
                       :disabled="
                         isGeneratingPrompt(
-                          currentStoryboard?.id,
+                          Number(currentStoryboard?.id || 0),
                           selectedFrameType,
                         )
                       "
                       :loading="
                         isGeneratingPrompt(
-                          currentStoryboard?.id,
+                          Number(currentStoryboard?.id || 0),
                           selectedFrameType,
                         )
                       "
@@ -2679,10 +2679,10 @@ watch(currentStoryboard, async (newStoryboard) => {
   await loadAllGeneratedImages();
 
   // 加载视频参考图片（所有帧类型）
-  await loadVideoReferenceImages(newStoryboard.id);
+  await loadVideoReferenceImages(Number(newStoryboard.id));
 
   // 加载该分镜的视频列表
-  await loadStoryboardVideos(newStoryboard.id);
+  await loadStoryboardVideos(Number(newStoryboard.id));
 
   // 加载上一镜头的尾帧
   await loadPreviousStoryboardLastFrame();
@@ -3137,7 +3137,7 @@ const startPolling = () => {
         stopPolling();
         // 刷新视频参考图片列表
         if (currentStoryboard.value) {
-          loadVideoReferenceImages(currentStoryboard.value.id);
+          loadVideoReferenceImages(Number(currentStoryboard.value.id));
         }
       }
     } catch (error) {
@@ -3182,7 +3182,7 @@ const generateFrameImage = async () => {
     const result = await imageAPI.generateImage({
       drama_id: dramaId.toString(),
       prompt: currentFramePrompt.value,
-      storyboard_id: currentStoryboard.value.id,
+      storyboard_id: Number(currentStoryboard.value.id),
       image_type: "storyboard",
       frame_type: selectedFrameType.value,
       reference_images:
@@ -3524,7 +3524,7 @@ const generateVideo = async () => {
     // 构建请求参数
     const requestParams: any = {
       drama_id: dramaId.toString(),
-      storyboard_id: currentStoryboard.value.id,
+      storyboard_id: Number(currentStoryboard.value.id),
       prompt: currentVideoPrompt.value || "Anime style video scene",
       duration: videoDuration.value,
       provider: provider,
@@ -4042,8 +4042,8 @@ const uploadImage = () => {
       if (imageUrl && currentStoryboard.value) {
         // 创建图片生成记录（关联到当前镜头和帧类型）
         await imageAPI.uploadImage({
-          storyboard_id: currentStoryboard.value.id,
-          drama_id: parseInt(dramaId),
+          storyboard_id: Number(currentStoryboard.value.id),
+          drama_id: Number(dramaId),
           frame_type: selectedFrameType.value || "first",
           image_url: imageUrl,
           prompt: currentFramePrompt.value || "用户上传图片",

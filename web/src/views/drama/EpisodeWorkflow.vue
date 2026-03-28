@@ -1016,8 +1016,8 @@
                 >
                   <div class="upload-placeholder">
                     <el-icon :size="32" color="#909399"><Upload /></el-icon>
-                    <p>拖拽或点击上传参考图片</p>
-                    <p class="upload-tip">上传后将使用 I2I（图生图）模式生成</p>
+                    <p>Drag or click to upload reference image</p>
+                    <p class="upload-tip">Will use I2I (Image-to-Image) mode when generating</p>
                   </div>
                 </el-upload>
               </div>
@@ -1028,7 +1028,7 @@
                 show-icon
                 style="margin-top: 8px;"
               >
-                已设置参考图片，生成时将使用 I2I（图生图）模式
+                Reference image set. Generation will use I2I (Image-to-Image) mode
               </el-alert>
             </div>
           </el-form-item>
@@ -1047,7 +1047,7 @@
               :loading="generatingFromDialog"
             >
               <el-icon><MagicStick /></el-icon>
-              {{ referenceImageUrl ? '保存并生成 (I2I)' : '保存并生成 (T2I)' }}
+              {{ referenceImageUrl ? 'Save & Generate (I2I)' : 'Save & Generate (T2I)' }}
             </el-button>
           </div>
         </template>
@@ -2214,8 +2214,18 @@ const openPromptDialog = async (item: any, type: "character" | "scene") => {
       loadingPrompt.value = false;
     }
   } else {
-    // 场景的prompt字段就是完整提示词
-    editPrompt.value = item.prompt || item.description || "";
+    // 从后端获取完整场景提示词（包含风格和背景修饰）
+    loadingPrompt.value = true;
+    editPrompt.value = "";
+    try {
+      const result = await dramaAPI.getSceneFullPrompt(item.id);
+      editPrompt.value = result.prompt || item.prompt || item.description || "";
+    } catch (error) {
+      // 如果API失败，回退到本地数据
+      editPrompt.value = item.prompt || item.description || "";
+    } finally {
+      loadingPrompt.value = false;
+    }
   }
 };
 

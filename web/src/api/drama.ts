@@ -150,6 +150,10 @@ export const dramaAPI = {
     return request.put(`/scenes/${sceneId}/prompt`, { prompt })
   },
 
+  getSceneFullPrompt(sceneId: string | number) {
+    return request.get<{ prompt: string }>(`/scenes/${sceneId}/full-prompt`)
+  },
+
   deleteScene(sceneId: string) {
     return request.delete(`/scenes/${sceneId}`)
   },

@@ -63,7 +63,7 @@ type GenerateVideoRequest struct {
 	// 多图模式
 	ReferenceImageURLs []string `json:"reference_image_urls"`
 
-	Prompt       string  `json:"prompt" binding:"required,min=5,max=8000"`
+	Prompt       string  `json:"prompt" binding:"required,min=1"`
 	Provider     string  `json:"provider"`
 	Model        string  `json:"model"`
 	Duration     *int    `json:"duration"`

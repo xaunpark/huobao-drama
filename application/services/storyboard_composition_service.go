@@ -2,7 +2,9 @@ package services
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"strings"
 
 	models "github.com/drama-generator/backend/domain/models"
 	"github.com/drama-generator/backend/pkg/logger"
@@ -11,15 +13,17 @@ import (
 
 type StoryboardCompositionService struct {
 	db       *gorm.DB
-	log      *logger.Logger
-	imageGen *ImageGenerationService
+	log        *logger.Logger
+	imageGen   *ImageGenerationService
+	promptI18n *PromptI18n
 }
 
-func NewStoryboardCompositionService(db *gorm.DB, log *logger.Logger, imageGen *ImageGenerationService) *StoryboardCompositionService {
+func NewStoryboardCompositionService(db *gorm.DB, log *logger.Logger, imageGen *ImageGenerationService, promptI18n *PromptI18n) *StoryboardCompositionService {
 	return &StoryboardCompositionService{
-		db:       db,
-		log:      log,
-		imageGen: imageGen,
+		db:         db,
+		log:        log,
+		imageGen:   imageGen,
+		promptI18n: promptI18n,
 	}
 }
 
@@ -376,6 +380,51 @@ func (s *StoryboardCompositionService) UpdateScene(sceneID string, req *UpdateSc
 	return nil
 }
 
+// BuildSceneFullPrompt builds the complete prompt that would be sent to the AI
+// for scene image generation, including the effective style.
+func (s *StoryboardCompositionService) BuildSceneFullPrompt(sceneID uint) (string, error) {
+	// 获取场景
+	var scene models.Scene
+	if err := s.db.Where("id = ?", sceneID).First(&scene).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return "", errors.New("scene not found")
+		}
+		return "", err
+	}
+
+	// 查找Drama
+	var drama models.Drama
+	if err := s.db.Where("id = ?", scene.DramaID).First(&drama).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return "", errors.New("unauthorized")
+		}
+		return "", err
+	}
+
+	prompt := scene.Prompt
+	if prompt == "" {
+		prompt = fmt.Sprintf("%s场景，%s", scene.Location, scene.Time)
+	}
+
+	// Double append prevention: look for our background-only marker.
+	if strings.Contains(prompt, "background only") {
+		return prompt, nil
+	}
+
+	// Get effective style. For scenes, we use the same effectiveStyle to keep consistency.
+	if s.promptI18n != nil {
+		effectiveStyle := s.promptI18n.ResolveEffectiveStylePublic(drama.ID, drama.Style, drama.CustomStyle)
+		if effectiveStyle != "" && effectiveStyle != "realistic" {
+			prompt += ", " + effectiveStyle
+		}
+	}
+
+	// Append background suffix
+	prompt += ", background only, no characters"
+
+	return prompt, nil
+}
+
 type GenerateSceneImageRequest struct {
 	SceneID           uint    `json:"scene_id"`
 	Prompt            string  `json:"prompt"`
@@ -400,13 +449,21 @@ func (s *StoryboardCompositionService) GenerateSceneImage(req *GenerateSceneImag
 	// 构建场景图片生成提示词
 	prompt := req.Prompt
 	if prompt == "" {
-		// 使用场景的Prompt字段
-		prompt = scene.Prompt
-		if prompt == "" {
-			// 如果Prompt为空，使用Location和Time构建
-			prompt = fmt.Sprintf("%s场景，%s", scene.Location, scene.Time)
+		fullPrompt, err := s.BuildSceneFullPrompt(req.SceneID)
+		if err != nil {
+			return nil, err
 		}
-		s.log.Infow("Using scene prompt", "scene_id", req.SceneID, "prompt", prompt)
+		prompt = fullPrompt
+	} else if req.Prompt != scene.Prompt {
+		// If req.Prompt is passed (e.g. from dialog) but it doesn't match the DB,
+		// it might be a custom build or edited prompt.
+		prompt = req.Prompt
+	} else {
+		fullPrompt, err := s.BuildSceneFullPrompt(req.SceneID)
+		if err != nil {
+			return nil, err
+		}
+		prompt = fullPrompt
 	}
 
 	// 使用imageGen服务直接生成

@@ -76,7 +76,7 @@ type GenerateImageRequest struct {
 	PropID          *uint    `json:"prop_id"`
 	ImageType       string   `json:"image_type"` // character, scene, storyboard
 	FrameType       *string  `json:"frame_type"` // first, key, last, panel, action
-	Prompt          string   `json:"prompt" binding:"required,min=5,max=8000"`
+	Prompt          string   `json:"prompt" binding:"required,min=1"`
 	NegativePrompt  *string  `json:"negative_prompt"`
 	Provider        string   `json:"provider"`
 	Model           string   `json:"model"`
