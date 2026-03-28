@@ -109,6 +109,11 @@ export const characterLibraryAPI = {
     return request.delete(`/characters/${characterId}`)
   },
 
+  // 获取角色完整提示词（包含风格和character sheet后缀）
+  getCharacterFullPrompt(characterId: number | string) {
+    return request.get<{ prompt: string }>(`/characters/${characterId}/full-prompt`)
+  },
+
   // 从剧本提取角色
   extractFromEpisode(episodeId: number) {
     return request.post<{ task_id: string; message: string }>(`/episodes/${episodeId}/characters/extract`)

@@ -116,6 +116,7 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 			characters.PUT("/:id/image", characterLibraryHandler.UploadCharacterImage)
 			characters.PUT("/:id/image-from-library", characterLibraryHandler.ApplyLibraryItemToCharacter)
 			characters.POST("/:id/add-to-library", characterLibraryHandler.AddCharacterToLibrary)
+			characters.GET("/:id/full-prompt", characterLibraryHandler.GetCharacterFullPrompt)
 		}
 
 		props := api.Group("/props")

@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	models "github.com/drama-generator/backend/domain/models"
@@ -303,6 +304,64 @@ func (s *CharacterLibraryService) DeleteCharacter(characterID uint) error {
 	return nil
 }
 
+// BuildCharacterFullPrompt builds the complete prompt that would be sent to the AI
+// for character image generation. This is the exact prompt used by GenerateCharacterImage.
+func (s *CharacterLibraryService) BuildCharacterFullPrompt(characterID string) (string, error) {
+	// 查找角色
+	var character models.Character
+	if err := s.db.Where("id = ?", characterID).First(&character).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return "", errors.New("character not found")
+		}
+		return "", err
+	}
+
+	// 查询Drama
+	var drama models.Drama
+	if err := s.db.Where("id = ? ", character.DramaID).First(&drama).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return "", errors.New("unauthorized")
+		}
+		return "", err
+	}
+
+	return s.buildCharacterPrompt(&character, &drama), nil
+}
+
+// buildCharacterPrompt builds the full prompt from character + drama info.
+// If the appearance already contains the character sheet marker (from a previous Edit Prompt save),
+// it is used as-is to avoid double-appending style and suffix.
+func (s *CharacterLibraryService) buildCharacterPrompt(character *models.Character, drama *models.Drama) string {
+	prompt := ""
+
+	// 优先使用appearance字段，它包含了最详细的外貌描述
+	if character.Appearance != nil && *character.Appearance != "" {
+		prompt = *character.Appearance
+	} else if character.Description != nil && *character.Description != "" {
+		prompt = *character.Description
+	} else {
+		prompt = character.Name
+	}
+
+	// If the appearance already contains the character sheet marker,
+	// it means the user has previously edited and saved the full prompt.
+	// Use it as-is to avoid double-appending style and suffix.
+	if strings.Contains(prompt, "character sheet") {
+		return prompt
+	}
+
+	// Resolve effective style — respects template's style_prompt if available
+	effectiveStyle := s.promptI18n.ResolveEffectiveStylePublic(drama.ID, drama.Style, drama.CustomStyle)
+	if effectiveStyle != "" && effectiveStyle != "realistic" {
+		prompt += ", " + effectiveStyle
+	}
+
+	// Add special character sheet requirements
+	prompt += ", t-pose, character sheet, turn around character, white background, no text overlay"
+
+	return prompt
+}
+
 // GenerateCharacterImage AI生成角色形象
 func (s *CharacterLibraryService) GenerateCharacterImage(characterID string, imageService *ImageGenerationService, modelName string, style string) (*models.ImageGeneration, error) {
 	// 查找角色
@@ -323,26 +382,8 @@ func (s *CharacterLibraryService) GenerateCharacterImage(characterID string, ima
 		return nil, err
 	}
 
-	// 构建生成提示词 - 使用详细的外貌描述，添加干净背景要求
-	prompt := ""
-
-	// 优先使用appearance字段，它包含了最详细的外貌描述
-	if character.Appearance != nil && *character.Appearance != "" {
-		prompt = *character.Appearance
-	} else if character.Description != nil && *character.Description != "" {
-		prompt = *character.Description
-	} else {
-		prompt = character.Name
-	}
-
-	// Resolve effective style — respects template's style_prompt if available
-	effectiveStyle := s.promptI18n.ResolveEffectiveStylePublic(drama.ID, drama.Style, drama.CustomStyle)
-	if effectiveStyle != "" && effectiveStyle != "realistic" {
-		prompt += ", " + effectiveStyle
-	}
-
-	// Add special character sheet requirements
-	prompt += ", t-pose, character sheet, turn around character, white background, no text overlay"
+	// 构建生成提示词 - 使用统一的方法构建完整提示词
+	prompt := s.buildCharacterPrompt(&character, &drama)
 
 	// 调用图片生成服务
 	dramaIDStr := fmt.Sprintf("%d", character.DramaID)

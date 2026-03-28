@@ -979,8 +979,9 @@
             <el-input
               v-model="editPrompt"
               type="textarea"
-              :rows="6"
-              :placeholder="$t('workflow.imagePromptPlaceholder')"
+              :rows="10"
+              :loading="loadingPrompt"
+              :placeholder="loadingPrompt ? '加载完整提示词中...' : $t('workflow.imagePromptPlaceholder')"
             />
           </el-form-item>
         </el-form>
@@ -2129,12 +2130,30 @@ const saveShotEdit = async () => {
 };
 
 // 对话框相关方法
-const openPromptDialog = (item: any, type: "character" | "scene") => {
+const loadingPrompt = ref(false);
+const openPromptDialog = async (item: any, type: "character" | "scene") => {
   currentEditItem.value = item;
   currentEditItem.value.name = item.name || item.location;
   currentEditType.value = type;
-  editPrompt.value = item.prompt || item.appearance || item.description || "";
   promptDialogVisible.value = true;
+
+  if (type === "character") {
+    // 从后端获取完整提示词（包含风格和character sheet后缀）
+    loadingPrompt.value = true;
+    editPrompt.value = "";
+    try {
+      const result = await characterLibraryAPI.getCharacterFullPrompt(item.id);
+      editPrompt.value = result.prompt || item.appearance || item.description || "";
+    } catch (error) {
+      // 如果API失败，回退到本地数据
+      editPrompt.value = item.appearance || item.description || "";
+    } finally {
+      loadingPrompt.value = false;
+    }
+  } else {
+    // 场景的prompt字段就是完整提示词
+    editPrompt.value = item.prompt || item.description || "";
+  }
 };
 
 const savePrompt = async () => {
@@ -2143,7 +2162,8 @@ const savePrompt = async () => {
       await characterLibraryAPI.updateCharacter(currentEditItem.value.id, {
         appearance: editPrompt.value,
       });
-      await generateCharacterImage(currentEditItem.value.id);
+      ElMessage.success("提示词已保存");
+      await loadDramaData();
     } else {
       // 保存场景提示词和时间（合并到一个 API 调用）
       await dramaAPI.updateScene(currentEditItem.value.id.toString(), {
