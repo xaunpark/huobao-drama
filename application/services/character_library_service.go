@@ -363,7 +363,7 @@ func (s *CharacterLibraryService) buildCharacterPrompt(character *models.Charact
 }
 
 // GenerateCharacterImage AI生成角色形象
-func (s *CharacterLibraryService) GenerateCharacterImage(characterID string, imageService *ImageGenerationService, modelName string, style string) (*models.ImageGeneration, error) {
+func (s *CharacterLibraryService) GenerateCharacterImage(characterID string, imageService *ImageGenerationService, modelName string, style string, referenceImageURL *string) (*models.ImageGeneration, error) {
 	// 查找角色
 	var character models.Character
 	if err := s.db.Where("id = ?", characterID).First(&character).Error; err != nil {
@@ -399,6 +399,11 @@ func (s *CharacterLibraryService) GenerateCharacterImage(characterID string, ima
 		Quality:     "standard",
 	}
 
+	// 如果有参考图片，添加到请求中（I2I模式）
+	if referenceImageURL != nil && *referenceImageURL != "" {
+		req.ReferenceImages = []string{*referenceImageURL}
+	}
+
 	imageGen, err := imageService.GenerateImage(req)
 	if err != nil {
 		s.log.Errorw("Failed to generate character image", "error", err)
@@ -409,7 +414,7 @@ func (s *CharacterLibraryService) GenerateCharacterImage(characterID string, ima
 	go s.waitAndUpdateCharacterImage(character.ID, imageGen.ID)
 
 	// 立即返回ImageGeneration对象，让前端可以轮询状态
-	s.log.Infow("Character image generation started", "character_id", characterID, "image_gen_id", imageGen.ID)
+	s.log.Infow("Character image generation started", "character_id", characterID, "image_gen_id", imageGen.ID, "has_reference", referenceImageURL != nil && *referenceImageURL != "")
 	return imageGen, nil
 }
 
@@ -528,7 +533,7 @@ func (s *CharacterLibraryService) BatchGenerateCharacterImages(characterIDs []st
 	for _, characterID := range characterIDs {
 		// 为每个角色启动单独的 goroutine
 		go func(charID string) {
-			imageGen, err := s.GenerateCharacterImage(charID, imageService, modelName, "") // 批量生成暂不支持自定义风格，使用默认值
+			imageGen, err := s.GenerateCharacterImage(charID, imageService, modelName, "", nil) // 批量生成暂不支持自定义风格和参考图片
 			if err != nil {
 				s.log.Errorw("Failed to generate character image in batch",
 					"character_id", charID,

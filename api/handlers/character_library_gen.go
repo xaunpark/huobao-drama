@@ -10,14 +10,15 @@ func (h *CharacterLibraryHandler) GenerateCharacterImage(c *gin.Context) {
 
 	characterID := c.Param("id")
 
-	// 获取请求体中的model和style参数
+	// 获取请求体中的model、style和reference_image_url参数
 	var req struct {
-		Model string `json:"model"`
-		Style string `json:"style"`
+		Model             string  `json:"model"`
+		Style             string  `json:"style"`
+		ReferenceImageURL *string `json:"reference_image_url"`
 	}
 	c.ShouldBindJSON(&req)
 
-	imageGen, err := h.libraryService.GenerateCharacterImage(characterID, h.imageService, req.Model, req.Style)
+	imageGen, err := h.libraryService.GenerateCharacterImage(characterID, h.imageService, req.Model, req.Style, req.ReferenceImageURL)
 	if err != nil {
 		if err.Error() == "character not found" {
 			response.NotFound(c, "角色不存在")

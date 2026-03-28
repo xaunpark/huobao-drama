@@ -142,7 +142,7 @@ export const dramaAPI = {
     return request.post('/scenes', data)
   },
 
-  generateSceneImage(data: { scene_id: number; prompt?: string; model?: string }) {
+  generateSceneImage(data: { scene_id: number; prompt?: string; model?: string; reference_image_url?: string }) {
     return request.post<{ image_generation: { id: number } }>('/scenes/generate-image', data)
   },
 

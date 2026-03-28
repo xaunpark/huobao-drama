@@ -377,9 +377,10 @@ func (s *StoryboardCompositionService) UpdateScene(sceneID string, req *UpdateSc
 }
 
 type GenerateSceneImageRequest struct {
-	SceneID uint   `json:"scene_id"`
-	Prompt  string `json:"prompt"`
-	Model   string `json:"model"`
+	SceneID           uint    `json:"scene_id"`
+	Prompt            string  `json:"prompt"`
+	Model             string  `json:"model"`
+	ReferenceImageURL *string `json:"reference_image_url"`
 }
 
 func (s *StoryboardCompositionService) GenerateSceneImage(req *GenerateSceneImageRequest) (*models.ImageGeneration, error) {
@@ -419,6 +420,12 @@ func (s *StoryboardCompositionService) GenerateSceneImage(req *GenerateSceneImag
 			Size:      "2560x1440", // 3,686,400像素，满足doubao模型最低要求（16:9比例）
 			Quality:   "standard",
 		}
+
+		// 如果有参考图片，添加到请求中（I2I模式）
+		if req.ReferenceImageURL != nil && *req.ReferenceImageURL != "" {
+			genReq.ReferenceImages = []string{*req.ReferenceImageURL}
+		}
+
 		imageGen, err := s.imageGen.GenerateImage(genReq)
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate image: %w", err)
@@ -433,7 +440,7 @@ func (s *StoryboardCompositionService) GenerateSceneImage(req *GenerateSceneImag
 			}
 		}
 
-		s.log.Infow("Scene image generation created", "scene_id", req.SceneID, "image_gen_id", imageGen.ID)
+		s.log.Infow("Scene image generation created", "scene_id", req.SceneID, "image_gen_id", imageGen.ID, "has_reference", req.ReferenceImageURL != nil && *req.ReferenceImageURL != "")
 		return imageGen, nil
 	}
 

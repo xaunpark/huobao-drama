@@ -960,9 +960,10 @@
       <el-dialog
         v-model="promptDialogVisible"
         :title="$t('workflow.editPrompt')"
-        width="600px"
+        width="700px"
+        @close="clearReferenceImage"
       >
-        <el-form label-width="80px">
+        <el-form label-width="100px">
           <el-form-item :label="$t('common.name')">
             <el-input v-model="currentEditItem.name" disabled />
           </el-form-item>
@@ -979,19 +980,76 @@
             <el-input
               v-model="editPrompt"
               type="textarea"
-              :rows="10"
+              :rows="8"
               :loading="loadingPrompt"
               :placeholder="loadingPrompt ? '加载完整提示词中...' : $t('workflow.imagePromptPlaceholder')"
             />
           </el-form-item>
+          <el-form-item label="参考图片">
+            <div class="reference-image-section">
+              <div v-if="referenceImagePreview" class="reference-preview">
+                <el-image
+                  :src="referenceImagePreview"
+                  fit="contain"
+                  style="max-height: 160px; max-width: 100%; border-radius: 8px;"
+                />
+                <el-button
+                  class="remove-ref-btn"
+                  type="danger"
+                  size="small"
+                  circle
+                  :icon="Close"
+                  @click="clearReferenceImage"
+                />
+              </div>
+              <div v-else class="reference-upload-zone">
+                <el-upload
+                  :action="uploadAction"
+                  :headers="uploadHeaders"
+                  name="file"
+                  :show-file-list="false"
+                  :before-upload="beforeReferenceUpload"
+                  :on-success="handleReferenceUploadSuccess"
+                  :on-error="handleReferenceUploadError"
+                  accept="image/jpeg,image/png,image/webp"
+                  :drag="true"
+                >
+                  <div class="upload-placeholder">
+                    <el-icon :size="32" color="#909399"><Upload /></el-icon>
+                    <p>拖拽或点击上传参考图片</p>
+                    <p class="upload-tip">上传后将使用 I2I（图生图）模式生成</p>
+                  </div>
+                </el-upload>
+              </div>
+              <el-alert
+                v-if="referenceImagePreview"
+                type="success"
+                :closable="false"
+                show-icon
+                style="margin-top: 8px;"
+              >
+                已设置参考图片，生成时将使用 I2I（图生图）模式
+              </el-alert>
+            </div>
+          </el-form-item>
         </el-form>
         <template #footer>
-          <el-button @click="promptDialogVisible = false">{{
-            $t("common.cancel")
-          }}</el-button>
-          <el-button type="primary" @click="savePrompt">{{
-            $t("common.save")
-          }}</el-button>
+          <div class="prompt-dialog-footer">
+            <el-button @click="promptDialogVisible = false">{{
+              $t("common.cancel")
+            }}</el-button>
+            <el-button @click="savePrompt">{{
+              $t("common.save")
+            }}</el-button>
+            <el-button
+              type="primary"
+              @click="saveAndGenerate"
+              :loading="generatingFromDialog"
+            >
+              <el-icon><MagicStick /></el-icon>
+              {{ referenceImageUrl ? '保存并生成 (I2I)' : '保存并生成 (T2I)' }}
+            </el-button>
+          </div>
         </template>
       </el-dialog>
 
@@ -1223,6 +1281,7 @@ import {
   WarningFilled,
   Document,
   Plus,
+  Close,
 } from "@element-plus/icons-vue";
 import { dramaAPI } from "@/api/drama";
 import { generationAPI } from "@/api/generation";
@@ -1276,6 +1335,9 @@ const currentEditType = ref<"character" | "scene">("character");
 const editPrompt = ref("");
 const libraryItems = ref<any[]>([]);
 const currentUploadTarget = ref<any>(null);
+const referenceImageUrl = ref<string>("");
+const referenceImagePreview = ref<string>("");
+const generatingFromDialog = ref(false);
 
 // 添加场景相关
 const newScene = ref<any>({
@@ -2135,6 +2197,7 @@ const openPromptDialog = async (item: any, type: "character" | "scene") => {
   currentEditItem.value = item;
   currentEditItem.value.name = item.name || item.location;
   currentEditType.value = type;
+  clearReferenceImage();
   promptDialogVisible.value = true;
 
   if (type === "character") {
@@ -2177,6 +2240,120 @@ const savePrompt = async () => {
     promptDialogVisible.value = false;
   } catch (error: any) {
     ElMessage.error(error.message || "保存失败");
+  }
+};
+
+// 参考图片相关方法
+const clearReferenceImage = () => {
+  referenceImageUrl.value = "";
+  referenceImagePreview.value = "";
+};
+
+const beforeReferenceUpload = (file: any) => {
+  const isImage = file.type.startsWith("image/");
+  const isLt10M = file.size / 1024 / 1024 < 10;
+  if (!isImage) {
+    ElMessage.error("只能上传图片文件!");
+    return false;
+  }
+  if (!isLt10M) {
+    ElMessage.error("参考图片大小不能超过10MB!");
+    return false;
+  }
+  return true;
+};
+
+const handleReferenceUploadSuccess = (response: any) => {
+  const url = response?.data?.url || response?.url;
+  const localPath = response?.data?.local_path || response?.local_path;
+  if (localPath) {
+    // 优先使用 local_path（后端可以直接转base64）
+    referenceImageUrl.value = localPath;
+  } else if (url) {
+    referenceImageUrl.value = url;
+  }
+  // 设置预览URL
+  if (url) {
+    referenceImagePreview.value = url;
+  } else if (localPath) {
+    referenceImagePreview.value = `/api/v1/static/${localPath}`;
+  }
+  ElMessage.success("参考图片上传成功");
+};
+
+const handleReferenceUploadError = () => {
+  ElMessage.error("参考图片上传失败");
+};
+
+// 保存提示词并立即生成图片（支持参考图片 I2I）
+const saveAndGenerate = async () => {
+  generatingFromDialog.value = true;
+  try {
+    // 先保存提示词
+    if (currentEditType.value === "character") {
+      await characterLibraryAPI.updateCharacter(currentEditItem.value.id, {
+        appearance: editPrompt.value,
+      });
+    } else {
+      await dramaAPI.updateScene(currentEditItem.value.id.toString(), {
+        prompt: editPrompt.value,
+        time: currentEditItem.value.time || "",
+      });
+    }
+
+    // 然后生成图片，传递参考图片URL
+    const refUrl = referenceImageUrl.value || undefined;
+    const model = selectedImageModel.value || undefined;
+
+    if (currentEditType.value === "character") {
+      const response = await characterLibraryAPI.generateCharacterImage(
+        currentEditItem.value.id.toString(),
+        model,
+        refUrl,
+      );
+      const imageGenId = (response as any).image_generation?.id;
+      promptDialogVisible.value = false;
+      clearReferenceImage();
+
+      if (imageGenId) {
+        ElMessage.info(refUrl ? "角色图片生成中 (I2I模式)..." : "角色图片生成中...");
+        generatingCharacterImages.value[currentEditItem.value.id] = true;
+        await pollImageStatus(imageGenId, async () => {
+          await loadDramaData();
+          ElMessage.success("角色图片生成完成！");
+        });
+        generatingCharacterImages.value[currentEditItem.value.id] = false;
+      } else {
+        ElMessage.success("图片生成已启动");
+        await loadDramaData();
+      }
+    } else {
+      const response = await dramaAPI.generateSceneImage({
+        scene_id: parseInt(currentEditItem.value.id),
+        model,
+        reference_image_url: refUrl,
+      });
+      const imageGenId = response.image_generation?.id;
+      promptDialogVisible.value = false;
+      clearReferenceImage();
+
+      if (imageGenId) {
+        ElMessage.info(refUrl ? "场景图片生成中 (I2I模式)..." : "场景图片生成中...");
+        generatingSceneImages.value[currentEditItem.value.id] = true;
+        await pollImageStatus(imageGenId, async () => {
+          await loadDramaData();
+          ElMessage.success("场景图片生成完成！");
+        });
+        generatingSceneImages.value[currentEditItem.value.id] = false;
+      } else {
+        ElMessage.success("图片生成已启动");
+        await loadDramaData();
+      }
+    }
+  } catch (error: any) {
+    ElMessage.error(error.message || "生成失败");
+  } finally {
+    generatingFromDialog.value = false;
   }
 };
 
@@ -3069,5 +3246,66 @@ onMounted(() => {
 :deep(.el-upload-dragger) {
   background: var(--bg-secondary);
   border-color: var(--border-primary);
+}
+
+/* Reference image upload styles */
+.reference-image-section {
+  width: 100%;
+}
+
+.reference-preview {
+  position: relative;
+  display: inline-block;
+  border: 2px solid #67c23a;
+  border-radius: 8px;
+  padding: 4px;
+  background: #f0f9eb;
+}
+
+.dark .reference-preview {
+  background: #1a2e1a;
+  border-color: #67c23a;
+}
+
+.remove-ref-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  z-index: 1;
+}
+
+.reference-upload-zone {
+  width: 100%;
+}
+
+.reference-upload-zone :deep(.el-upload) {
+  width: 100%;
+}
+
+.reference-upload-zone :deep(.el-upload-dragger) {
+  width: 100%;
+  padding: 20px;
+  min-height: 100px;
+}
+
+.upload-placeholder {
+  text-align: center;
+  color: #909399;
+}
+
+.upload-placeholder p {
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+.upload-placeholder .upload-tip {
+  font-size: 12px;
+  color: #c0c4cc;
+}
+
+.prompt-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
 </style>
