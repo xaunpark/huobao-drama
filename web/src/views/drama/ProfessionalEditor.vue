@@ -2031,6 +2031,7 @@
     <BatchGenerationDialog
       v-model="showBatchDialog"
       :storyboards="storyboards"
+      :episode-id="episodeId"
       :drama-id="dramaId"
       :style="drama?.style || ''"
       :custom-style="drama?.custom_style || ''"

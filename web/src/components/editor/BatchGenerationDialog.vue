@@ -57,7 +57,7 @@
 
       <!-- 分镜列表状态 -->
       <div class="shot-progress-list">
-        <el-table :data="storyboards" style="width: 100%" height="400px">
+        <el-table :data="storyboards" style="width: 100%" height="400px" v-loading="isBatching && localStoryboards.length === 0">
           <el-table-column :label="$t('professionalEditor.batch.shot')" width="80" property="storyboard_number">
             <template #default="scope">
               {{ $t('professionalEditor.batch.shot') }} {{ scope.row.storyboard_number }}
@@ -122,9 +122,13 @@ import { videoAPI } from '@/api/video'
 import { taskAPI } from '@/api/task'
 import type { Storyboard } from '@/types/drama'
 
+// Local mutable copy of storyboards that can be refreshed from DB
+const localStoryboards = ref<Storyboard[]>([])
+
 const props = defineProps<{
   modelValue: boolean
   storyboards: Storyboard[]
+  episodeId: number
   dramaId: number
   style?: string
   customStyle?: string
@@ -132,7 +136,7 @@ const props = defineProps<{
   defaultVideoModel?: string
 }>()
 
-const emit = defineEmits(['update:modelValue', 'completed'])
+const emit = defineEmits(['update:modelValue', 'completed', 'refresh'])
 const { t } = useI18n()
 
 const visible = computed({
@@ -147,8 +151,33 @@ const shouldStop = ref(false)
 // 任务状态追踪 map: shotId -> { step: 'prompt'|'image'|'video', status: 'pending'|'loading'|'done'|'error', progress: number }
 const taskStates = reactive<Record<string, any>>({})
 
-const initTaskStates = () => {
-  props.storyboards.forEach(sb => {
+// Refresh storyboard data from DB to get latest status
+const refreshStoryboardsFromDB = async () => {
+  if (!props.episodeId) {
+    // Fallback: use props data
+    localStoryboards.value = [...props.storyboards]
+    return
+  }
+  try {
+    const res = await dramaAPI.getStoryboards(props.episodeId.toString())
+    const freshStoryboards: Storyboard[] = res?.storyboards || []
+    if (freshStoryboards.length > 0) {
+      localStoryboards.value = freshStoryboards
+    } else {
+      localStoryboards.value = [...props.storyboards]
+    }
+  } catch (e) {
+    console.warn('Failed to refresh storyboards from DB, using props data', e)
+    localStoryboards.value = [...props.storyboards]
+  }
+}
+
+const initTaskStates = async () => {
+  // Fetch fresh data from DB before determining status
+  await refreshStoryboardsFromDB()
+  
+  // Also check image/video records per storyboard from DB for accurate status
+  for (const sb of localStoryboards.value) {
     // Check if prompt exists in DB ONLY. 
     // AND it must NOT be the backend-generated default fallback ("first frame" or "continuous movement progression")
     const isFallback = typeof sb.image_prompt === 'string' && (
@@ -157,9 +186,25 @@ const initTaskStates = () => {
     )
     const hasPrompt = sb.image_prompt && String(sb.image_prompt) !== 'null' && String(sb.image_prompt) !== 'undefined' && String(sb.image_prompt).trim().length > 0 && !isFallback;
     
-    // Check if image or video exists in DB
-    const hasImage = !!sb.composed_image || !!sb.image_url
-    const hasVideo = !!sb.video_url
+    // Check image status from DB (not just from storyboard fields)
+    let hasImage = !!sb.composed_image || !!sb.image_url
+    if (!hasImage) {
+      try {
+        const imgRes = await imageAPI.listImages({ storyboard_id: Number(sb.id), frame_type: 'action' })
+        const completedImg = imgRes.items?.find((i: any) => i.status === 'completed')
+        if (completedImg) hasImage = true
+      } catch { /* ignore */ }
+    }
+    
+    // Check video status from DB
+    let hasVideo = !!sb.video_url
+    if (!hasVideo) {
+      try {
+        const vidRes = await videoAPI.listVideos({ storyboard_id: String(sb.id) })
+        const completedVid = vidRes.items?.find((v: any) => v.status === 'completed')
+        if (completedVid) hasVideo = true
+      } catch { /* ignore */ }
+    }
     
     let progress = 0
     if (hasVideo) progress = 100
@@ -172,7 +217,7 @@ const initTaskStates = () => {
       video: hasVideo ? 'done' : 'pending',
       progress: progress
     }
-  })
+  }
 }
 
 const getStatusTag = (id: string, type: string) => {
@@ -441,12 +486,12 @@ const startFullBatch = async () => {
   }
   isBatching.value = true
   shouldStop.value = false
-  initTaskStates()
+  await initTaskStates()
 
   const promptCache = new Map<string, string>()
 
   // Phase 1: All Prompts
-  await runConcurrently(props.storyboards, 4, async (sb) => {
+  await runConcurrently(localStoryboards.value, 4, async (sb) => {
     if (taskStates[sb.id]?.prompt === 'done') return
     try {
       const p = await processPrompt(sb)
@@ -459,7 +504,7 @@ const startFullBatch = async () => {
 
   // Phase 2: All Images
   if (!shouldStop.value) {
-    await runConcurrently(props.storyboards, 4, async (sb) => {
+    await runConcurrently(localStoryboards.value, 4, async (sb) => {
       if (taskStates[sb.id]?.prompt !== 'done' || taskStates[sb.id]?.image === 'done') return
       try {
         const p = promptCache.get(sb.id) || sb.image_prompt || ""
@@ -473,7 +518,7 @@ const startFullBatch = async () => {
 
   // Phase 3: All Videos
   if (!shouldStop.value) {
-    await runConcurrently(props.storyboards, 4, async (sb) => {
+    await runConcurrently(localStoryboards.value, 4, async (sb) => {
       if (taskStates[sb.id]?.image !== 'done' || taskStates[sb.id]?.video === 'done') return
       try {
          const res = await imageAPI.listImages({ storyboard_id: Number(sb.id), frame_type: 'action' })
@@ -501,9 +546,9 @@ const startStep = async (step: string) => {
   }
   isBatching.value = true
   shouldStop.value = false
-  initTaskStates()
+  await initTaskStates()
 
-  await runConcurrently(props.storyboards, 4, async (sb) => {
+  await runConcurrently(localStoryboards.value, 4, async (sb) => {
     try {
       if (step === 'prompt') {
         if (taskStates[sb.id]?.prompt !== 'done') await processPrompt(sb)
@@ -539,6 +584,11 @@ const startStep = async (step: string) => {
 
 watch(() => props.modelValue, (newVal) => {
   if (newVal) initTaskStates()
+})
+
+// Also expose storyboards for the table display
+const storyboards = computed(() => {
+  return localStoryboards.value.length > 0 ? localStoryboards.value : props.storyboards
 })
 </script>
 
