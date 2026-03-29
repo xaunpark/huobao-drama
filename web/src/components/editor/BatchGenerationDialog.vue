@@ -36,7 +36,10 @@
           </div>
           <div class="config-item">
             <span class="label">{{ $t('professionalEditor.batch.generationMode') }}</span>
-            <el-tag size="small" type="success">{{ $t('professionalEditor.batch.r2vMode') }}</el-tag>
+            <el-select v-model="generationMode" size="small" style="width: 150px">
+              <el-option :label="$t('professionalEditor.batch.keyframeMode')" value="key" />
+              <el-option :label="$t('professionalEditor.batch.r2vMode')" value="action" />
+            </el-select>
           </div>
         </div>
 
@@ -148,6 +151,7 @@ const visible = computed({
 const selectedVideoModel = ref(props.defaultVideoModel || '')
 const isBatching = ref(false)
 const shouldStop = ref(false)
+const generationMode = ref<'key'|'action'>('action')
 const { maxConcurrentThreads } = useAISettings()
 
 // 任务状态追踪 map: shotId -> { step: 'prompt'|'image'|'video', status: 'pending'|'loading'|'done'|'error', progress: number }
@@ -192,8 +196,8 @@ const initTaskStates = async () => {
     let hasImage = !!sb.composed_image || !!sb.image_url
     if (!hasImage) {
       try {
-        const imgRes = await imageAPI.listImages({ storyboard_id: Number(sb.id), frame_type: 'action' })
-        const completedImg = imgRes.items?.find((i: any) => i.status === 'completed')
+        const imgRes = await imageAPI.listImages({ storyboard_id: Number(sb.id), frame_type: generationMode.value as any })
+        const completedImg = imgRes.items?.find((i: any) => i.status === 'completed' && (i.image_url || i.local_path))
         if (completedImg) hasImage = true
       } catch { /* ignore */ }
     }
@@ -258,7 +262,7 @@ const processPrompt = async (sb: Storyboard) => {
   taskStates[sb.id].prompt = 'loading'
   taskStates[sb.id].progress = 10
   try {
-    const { task_id } = await generateFramePrompt(Number(sb.id), { frame_type: 'action' })
+    const { task_id } = await generateFramePrompt(Number(sb.id), { frame_type: generationMode.value as any })
     
     // 轮询
     let result = null
@@ -339,7 +343,7 @@ const processPrompt = async (sb: Storyboard) => {
     await dramaAPI.updateStoryboard(sb.id.toString(), { image_prompt: finalPrompt })
     
     // ALSO save to sessionStorage to keep it in sync with ProfessionalEditor UI (Action sequence)
-    sessionStorage.setItem(`frame_prompt_${sb.id}_action`, finalPrompt)
+    sessionStorage.setItem(`frame_prompt_${sb.id}_${generationMode.value}`, finalPrompt)
     
     taskStates[sb.id].prompt = 'done'
     taskStates[sb.id].progress = 30
@@ -376,21 +380,21 @@ const processImage = async (sb: Storyboard, prompt: string) => {
       prompt: prompt,
       storyboard_id: Number(sb.id),
       image_type: 'storyboard',
-      frame_type: 'action',
+      frame_type: generationMode.value as any,
       reference_images: referenceImages.length > 0 ? referenceImages : undefined
     })
 
     // 轮询图片直到完成
     while (true) {
       if (shouldStop.value) throw new Error('Stopped')
-      const res = await imageAPI.listImages({ storyboard_id: Number(sb.id), frame_type: 'action' })
+      const res = await imageAPI.listImages({ storyboard_id: Number(sb.id), frame_type: generationMode.value as any })
       const img = res.items?.find((i: any) => i.id === result.id)
       if (img?.status === 'completed') {
         taskStates[sb.id].image = 'done'
         taskStates[sb.id].progress = 60
         return img
       } else if (img?.status === 'failed') {
-        throw new Error('Image generation failed')
+        throw new Error(img.error_msg || 'Image generation failed')
       }
       await new Promise(r => setTimeout(r, 3000))
     }
@@ -523,8 +527,8 @@ const startFullBatch = async () => {
     await runConcurrently(localStoryboards.value, maxConcurrentThreads.value, async (sb) => {
       if (taskStates[sb.id]?.image !== 'done' || taskStates[sb.id]?.video === 'done') return
       try {
-         const res = await imageAPI.listImages({ storyboard_id: Number(sb.id), frame_type: 'action' })
-         const img = res.items?.find((i: any) => i.status === 'completed')
+         const res = await imageAPI.listImages({ storyboard_id: Number(sb.id), frame_type: generationMode.value as any })
+         const img = res.items?.find((i: any) => i.status === 'completed' && (i.image_url || i.local_path))
          if (img) await processVideo(sb, img)
          else ElMessage.warning(t('professionalEditor.batch.lackActionImage', { number: sb.storyboard_number }))
       } catch (e: any) {
@@ -563,8 +567,8 @@ const startStep = async (step: string) => {
       }
       else if (step === 'video') {
          if (taskStates[sb.id]?.video !== 'done') {
-           const res = await imageAPI.listImages({ storyboard_id: Number(sb.id), frame_type: 'action' })
-           const img = res.items?.find((i: any) => i.status === 'completed')
+           const res = await imageAPI.listImages({ storyboard_id: Number(sb.id), frame_type: generationMode.value as any })
+           const img = res.items?.find((i: any) => i.status === 'completed' && (i.image_url || i.local_path))
            if (img) await processVideo(sb, img)
            else ElMessage.warning(t('professionalEditor.batch.lackActionImage', { number: sb.storyboard_number }))
          }

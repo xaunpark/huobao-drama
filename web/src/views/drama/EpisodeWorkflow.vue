@@ -1219,7 +1219,7 @@
             <el-button
               type="primary"
               @click="saveAndGenerate"
-              :loading="generatingFromDialog"
+              :loading="generatingFromDialogId === currentEditItem.id"
             >
               <el-icon><MagicStick /></el-icon>
               {{ referenceImageUrl ? 'Save & Generate (I2I)' : 'Save & Generate (T2I)' }}
@@ -1519,7 +1519,7 @@ const libraryItems = ref<any[]>([]);
 const currentUploadTarget = ref<any>(null);
 const referenceImageUrl = ref<string>("");
 const referenceImagePreview = ref<string>("");
-const generatingFromDialog = ref(false);
+const generatingFromDialogId = ref<number | string | null>(null);
 
 // 添加场景相关
 const newScene = ref<any>({
@@ -2571,7 +2571,8 @@ const handleReferenceUploadError = () => {
 
 // 保存提示词并立即生成图片（支持参考图片 I2I）
 const saveAndGenerate = async () => {
-  generatingFromDialog.value = true;
+  const editItemId = currentEditItem.value.id;
+  generatingFromDialogId.value = editItemId;
   try {
     // 先保存提示词
     if (currentEditType.value === "character") {
@@ -2658,7 +2659,9 @@ const saveAndGenerate = async () => {
   } catch (error: any) {
     ElMessage.error(error.message || "生成失败");
   } finally {
-    generatingFromDialog.value = false;
+    if (generatingFromDialogId.value === editItemId) {
+      generatingFromDialogId.value = null;
+    }
   }
 };
 

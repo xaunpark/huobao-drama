@@ -309,8 +309,8 @@ func (c *FlowToolVideoClient) GetTaskStatus(taskID string) (*VideoResult, error)
 	// Map Flow-Tool status to VideoResult
 	switch strings.ToLower(jobResp.Status) {
 	case "success", "completed", "done":
-		result.Completed = true
-		if len(jobResp.ResultURLs) > 0 {
+		if len(jobResp.ResultURLs) > 0 && jobResp.ResultURLs[0] != "" {
+			result.Completed = true
 			url := jobResp.ResultURLs[0]
 			if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
 				if !strings.HasPrefix(url, "/") {
@@ -319,6 +319,9 @@ func (c *FlowToolVideoClient) GetTaskStatus(taskID string) (*VideoResult, error)
 				url = c.BaseURL + url
 			}
 			result.VideoURL = url
+		} else {
+			result.Completed = true
+			result.Error = "video generation returned success but no result URLs were found"
 		}
 	case "failed", "error":
 		errMsg := "video generation failed"

@@ -310,7 +310,7 @@ func (s *ImageGenerationService) ProcessImageGeneration(imageGenID uint) {
 }
 
 func (s *ImageGenerationService) pollTaskStatus(imageGenID uint, client image.ImageClient, taskID string) {
-	maxAttempts := 60
+	maxAttempts := 360 // Increased to 30 mins (360 * 5s) for batch queues
 	pollInterval := 5 * time.Second
 
 	for i := 0; i < maxAttempts; i++ {

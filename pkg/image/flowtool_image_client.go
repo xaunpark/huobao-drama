@@ -276,8 +276,8 @@ func (c *FlowToolImageClient) GetTaskStatus(taskID string) (*ImageResult, error)
 	// Map Flow-Tool status to ImageResult
 	switch strings.ToLower(jobResp.Status) {
 	case "success", "completed", "done":
-		result.Completed = true
-		if len(jobResp.ResultURLs) > 0 {
+		if len(jobResp.ResultURLs) > 0 && jobResp.ResultURLs[0] != "" {
+			result.Completed = true
 			url := jobResp.ResultURLs[0]
 			if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
 				if !strings.HasPrefix(url, "/") {
@@ -286,6 +286,9 @@ func (c *FlowToolImageClient) GetTaskStatus(taskID string) (*ImageResult, error)
 				url = c.BaseURL + url
 			}
 			result.ImageURL = url
+		} else {
+			result.Completed = true
+			result.Error = "image generation returned success but no result URLs were found"
 		}
 	case "failed", "error":
 		errMsg := "image generation failed"
