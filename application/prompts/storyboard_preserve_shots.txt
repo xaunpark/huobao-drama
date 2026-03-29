@@ -39,6 +39,7 @@ For each shot block, extract or infer:
 12. **Sound Effect**: Key audio effects
 13. **scene_id**: Match to available scene backgrounds
 14. **characters**: Match to available character IDs
+15. **props**: Match to available prop IDs
 
 [Duration Rules — CRITICAL]
 - If the script has timestamps like (0:00 – 0:06), calculate duration = 6 seconds

@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/drama-generator/backend/domain/models"
 )
@@ -10,8 +11,23 @@ import (
 func (s *StoryboardService) UpdateStoryboard(storyboardID string, updates map[string]interface{}) error {
 	// 查找分镜
 	var storyboard models.Storyboard
-	if err := s.db.First(&storyboard, storyboardID).Error; err != nil {
+	if err := s.db.Preload("Props").First(&storyboard, storyboardID).Error; err != nil {
 		return fmt.Errorf("storyboard not found: %w", err)
+	}
+
+	// 提取道具描述
+	var propDescriptions string
+	if len(storyboard.Props) > 0 {
+		var names []string
+		for _, p := range storyboard.Props {
+			desc := p.Name
+			if p.Prompt != nil && *p.Prompt != "" {
+				desc += " (" + *p.Prompt + ")"
+			}
+			names = append(names, desc)
+		}
+		fromStr := strings.Join(names, ", ")
+		propDescriptions = fromStr
 	}
 
 	// 构建用于重新生成提示词的Storyboard结构
@@ -131,7 +147,7 @@ func (s *StoryboardService) UpdateStoryboard(storyboardID string, updates map[st
 
 	// 只重新生成video_prompt
 	// image_prompt不自动更新，因为可能对应多张已生成的帧图片
-	videoPrompt := s.generateVideoPrompt(sb)
+	videoPrompt := s.generateVideoPrompt(sb, propDescriptions)
 
 	updateData["video_prompt"] = videoPrompt
 

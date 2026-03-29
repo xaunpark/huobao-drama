@@ -942,7 +942,7 @@ const addClipToTimeline = async (scene: Scene, insertAtPosition?: number) => {
     position: clipPosition,
     order: timelineClips.value.length,
     transition: {
-      type: 'fade',
+      type: 'none',
       duration: 1.0,
     },
   }

@@ -166,6 +166,28 @@
                     </el-tag>
                   </div>
                 </div>
+
+                <!-- 道具列表 -->
+                <div
+                  v-if="
+                    drama?.props && drama.props.length > 0
+                  "
+                  style="margin-top: 16px"
+                >
+                  <h4 class="extracted-title">
+                    {{ $t("workflow.extractedProps") }}：
+                  </h4>
+                  <div style="display: flex; flex-wrap: wrap; gap: 8px">
+                    <el-tag
+                      v-for="prop in drama.props"
+                      :key="prop.id"
+                      type="success"
+                    >
+                      {{ prop.name }}
+                      <span v-if="prop.type" class="secondary-text">· {{ prop.type }}</span>
+                    </el-tag>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -503,6 +525,115 @@
                           size="small"
                           @click="uploadSceneImage(scene.id)"
                           :icon="Upload"
+                          circle
+                        />
+                      </el-tooltip>
+                    </div>
+                  </el-card>
+                </div>
+              </div>
+            </div>
+
+            <el-divider />
+
+            <!-- 道具图片生成 -->
+            <div class="image-gen-section" v-if="drama?.props && drama.props.length > 0">
+              <div class="section-header">
+                <div class="section-title">
+                  <h3>
+                    <el-icon><Box /></el-icon>
+                    {{ $t("workflow.propImages") }}
+                  </h3>
+                  <el-alert type="info" :closable="false" style="margin: 0">
+                    {{
+                      $t("workflow.propCount", {
+                        count: drama.props.length,
+                      })
+                    }}
+                  </el-alert>
+                </div>
+                <div class="section-actions">
+                  <el-checkbox
+                    v-model="selectAllProps"
+                    @change="toggleSelectAllProps"
+                    style="margin-right: 12px"
+                  >
+                    {{ $t("workflow.selectAll") }}
+                  </el-checkbox>
+                  <el-button
+                    type="primary"
+                    @click="batchGeneratePropImages"
+                    :loading="batchGeneratingProps"
+                    :disabled="selectedPropIds.length === 0"
+                    size="default"
+                  >
+                    {{ $t("workflow.batchGenerate") }} ({{
+                      selectedPropIds.length
+                    }})
+                  </el-button>
+                </div>
+              </div>
+
+              <div class="scene-image-list">
+                <div
+                  v-for="prop in drama.props"
+                  :key="prop.id"
+                  class="scene-item"
+                >
+                  <el-card shadow="hover" class="fixed-card">
+                    <div class="card-header">
+                      <el-checkbox
+                        v-model="selectedPropIds"
+                        :value="prop.id"
+                        style="margin-right: 8px"
+                      />
+                      <div class="header-left">
+                        <h4>{{ prop.name }}</h4>
+                        <el-tag v-if="prop.type" size="small" type="success">{{ prop.type }}</el-tag>
+                      </div>
+                    </div>
+
+                    <div class="card-image-container">
+                      <div v-if="prop.image_url" class="scene-image">
+                        <el-image :src="getImageUrl(prop)" fit="cover" />
+                      </div>
+                      <div
+                        v-else-if="generatingPropImages[prop.id]"
+                        class="scene-placeholder generating"
+                      >
+                        <el-icon :size="64" class="rotating"
+                          ><Loading
+                        /></el-icon>
+                        <span>{{ $t("common.generating") }}</span>
+                      </div>
+                      <div v-else class="scene-placeholder">
+                        <el-icon :size="64"><Box /></el-icon>
+                        <span>{{ $t("common.notGenerated") }}</span>
+                      </div>
+                    </div>
+
+                    <div class="card-actions">
+                      <el-tooltip
+                        :content="$t('tooltip.editPrompt')"
+                        placement="top"
+                      >
+                        <el-button
+                          size="small"
+                          @click="openPromptDialog(prop, 'prop')"
+                          :icon="Edit"
+                          circle
+                        />
+                      </el-tooltip>
+                      <el-tooltip
+                        :content="$t('tooltip.aiGenerate')"
+                        placement="top"
+                      >
+                        <el-button
+                          type="primary"
+                          size="small"
+                          @click="generatePropImage(prop.id)"
+                          :loading="generatingPropImages[prop.id]"
+                          :icon="MagicStick"
                           circle
                         />
                       </el-tooltip>
@@ -1327,6 +1458,7 @@ import {
   Plus,
   Close,
   ScaleToOriginal,
+  Box,
 } from "@element-plus/icons-vue";
 import { dramaAPI } from "@/api/drama";
 import { generationAPI } from "@/api/generation";
@@ -1334,6 +1466,7 @@ import { characterLibraryAPI } from "@/api/character-library";
 import { aiAPI } from "@/api/ai";
 import type { AIServiceConfig } from "@/types/ai";
 import { imageAPI } from "@/api/image";
+import { propAPI } from "@/api/prop";
 import type { Drama } from "@/types/drama";
 import { AppHeader } from "@/components/common";
 import { getImageUrl, hasImage } from "@/utils/image";
@@ -1359,14 +1492,18 @@ const generatingShots = ref(false);
 const extractingCharactersAndBackgrounds = ref(false);
 const batchGeneratingCharacters = ref(false);
 const batchGeneratingScenes = ref(false);
+const batchGeneratingProps = ref(false);
 const generatingCharacterImages = ref<Record<number, boolean>>({});
 const generatingSceneImages = ref<Record<string, boolean>>({});
+const generatingPropImages = ref<Record<number, boolean>>({});
 
 // 选择状态
 const selectedCharacterIds = ref<number[]>([]);
-const selectedSceneIds = ref<number[]>([]);
+const selectedSceneIds = ref<string[]>([]);
+const selectedPropIds = ref<number[]>([]);
 const selectAllCharacters = ref(false);
 const selectAllScenes = ref(false);
+const selectAllProps = ref(false);
 
 // 对话框状态
 const promptDialogVisible = ref(false);
@@ -1376,7 +1513,7 @@ const modelConfigDialogVisible = ref(false);
 const addSceneDialogVisible = ref(false);
 const extractScenesDialogVisible = ref(false);
 const currentEditItem = ref<any>({ name: "" });
-const currentEditType = ref<"character" | "scene">("character");
+const currentEditType = ref<"character" | "scene" | "prop">("character");
 const editPrompt = ref("");
 const libraryItems = ref<any[]>([]);
 const currentUploadTarget = ref<any>(null);
@@ -1847,7 +1984,7 @@ const extractCharactersAndBackgrounds = async () => {
     ElMessage.success("正在创建角色提取任务...");
     const characterTask = await generationAPI.generateCharacters({
       drama_id: dramaId.toString(),
-      episode_id: episodeId,
+      episode_id: Number(episodeId),
       outline: currentEpisode.value.script_content || "",
       count: 0,
       model: selectedTextModel.value, // 传递用户选择的文本模型
@@ -1864,6 +2001,15 @@ const extractCharactersAndBackgrounds = async () => {
 
     ElMessage.success("场景提取任务正在处理...");
     await pollExtractTask(backgroundTask.task_id, "background");
+
+    // 提取道具（串行执行，在场景提取完成后）
+    ElMessage.success("场景提取完成，正在创建道具提取任务...");
+    const propTask = await propAPI.extractFromScript(
+      typeof episodeId === 'string' ? parseInt(episodeId) : episodeId,
+    );
+
+    ElMessage.success("道具提取任务正在处理...");
+    await pollExtractTask(propTask.task_id, "prop");
 
     ElMessage.success($t("workflow.charactersAndScenesExtractSuccess"));
     await loadDramaData();
@@ -1895,7 +2041,7 @@ const extractCharactersAndBackgrounds = async () => {
 // 轮询提取任务状态
 const pollExtractTask = async (
   taskId: string,
-  type: "character" | "background",
+  type: "character" | "background" | "prop",
 ) => {
   const maxAttempts = 60; // 最多轮询60次（2分钟）
   const interval = 2000; // 每2秒查询一次
@@ -1925,11 +2071,13 @@ const pollExtractTask = async (
         return;
       } else if (task.status === "failed") {
         // 任务失败
+        const failMsg = type === "character"
+          ? $t("workflow.characterGenerationFailed")
+          : type === "background"
+            ? $t("workflow.sceneExtractionFailed")
+            : $t("workflow.propExtractionFailed");
         throw new Error(
-          task.error || task.message ||
-            (type === "character"
-              ? $t("workflow.characterGenerationFailed")
-              : $t("workflow.sceneExtractionFailed")),
+          task.error || task.message || failMsg,
         );
       }
       // 否则继续轮询
@@ -1939,11 +2087,12 @@ const pollExtractTask = async (
     }
   }
 
-  throw new Error(
-    type === "character"
-      ? $t("workflow.characterGenerationTimeout")
-      : $t("workflow.sceneExtractionTimeout"),
-  );
+  const timeoutMsg = type === "character"
+    ? $t("workflow.characterGenerationTimeout")
+    : type === "background"
+      ? $t("workflow.sceneExtractionTimeout")
+      : $t("workflow.propExtractionTimeout");
+  throw new Error(timeoutMsg);
 };
 
 const generateCharacterImage = async (characterId: number) => {
@@ -1982,6 +2131,74 @@ const toggleSelectAllCharacters = () => {
       currentEpisode.value?.characters?.map((char) => char.id) || [];
   } else {
     selectedCharacterIds.value = [];
+  }
+};
+
+const toggleSelectAllProps = () => {
+  if (selectAllProps.value) {
+    selectedPropIds.value =
+      drama.value?.props?.map((prop) => prop.id) || [];
+  } else {
+    selectedPropIds.value = [];
+  }
+};
+
+const generatePropImage = async (propId: number) => {
+  generatingPropImages.value[propId] = true;
+
+  try {
+    const response = await propAPI.generateImage(propId);
+    const taskId = response.task_id;
+
+    if (taskId) {
+      ElMessage.info($t("workflow.propImageGenerating"));
+      // 轮询检查生成状态
+      await pollExtractTask(taskId, "prop");
+      await loadDramaData();
+      ElMessage.success($t("workflow.propImageComplete"));
+    } else {
+      ElMessage.success($t("workflow.propImageStarted"));
+      await loadDramaData();
+    }
+  } catch (error: any) {
+    ElMessage.error(error.message || "生成失败");
+  } finally {
+    generatingPropImages.value[propId] = false;
+  }
+};
+
+const batchGeneratePropImages = async () => {
+  if (selectedPropIds.value.length === 0) {
+    ElMessage.warning("请先选择要生成的道具");
+    return;
+  }
+
+  batchGeneratingProps.value = true;
+  try {
+    const promises = selectedPropIds.value.map((propId) =>
+      generatePropImage(propId),
+    );
+    const results = await Promise.allSettled(promises);
+
+    const successCount = results.filter((r) => r.status === "fulfilled").length;
+    const failCount = results.filter((r) => r.status === "rejected").length;
+
+    if (failCount === 0) {
+      ElMessage.success(
+        $t("workflow.batchCompleteSuccess", { count: successCount }),
+      );
+    } else {
+      ElMessage.warning(
+        $t("workflow.batchCompletePartial", {
+          success: successCount,
+          fail: failCount,
+        }),
+      );
+    }
+  } catch (error: any) {
+    ElMessage.error(error.message || "批量生成失败");
+  } finally {
+    batchGeneratingProps.value = false;
   }
 };
 
@@ -2240,7 +2457,7 @@ const saveShotEdit = async () => {
 
 // 对话框相关方法
 const loadingPrompt = ref(false);
-const openPromptDialog = async (item: any, type: "character" | "scene") => {
+const openPromptDialog = async (item: any, type: "character" | "scene" | "prop") => {
   currentEditItem.value = item;
   currentEditItem.value.name = item.name || item.location;
   currentEditType.value = type;
@@ -2260,6 +2477,10 @@ const openPromptDialog = async (item: any, type: "character" | "scene") => {
     } finally {
       loadingPrompt.value = false;
     }
+  } else if (type === "prop") {
+    // 道具提示词
+    loadingPrompt.value = false;
+    editPrompt.value = item.prompt || item.description || "";
   } else {
     // 从后端获取完整场景提示词（包含风格和背景修饰）
     loadingPrompt.value = true;
@@ -2281,6 +2502,12 @@ const savePrompt = async () => {
     if (currentEditType.value === "character") {
       await characterLibraryAPI.updateCharacter(currentEditItem.value.id, {
         appearance: editPrompt.value,
+      });
+      ElMessage.success("提示词已保存");
+      await loadDramaData();
+    } else if (currentEditType.value === "prop") {
+      await propAPI.update(currentEditItem.value.id, {
+        prompt: editPrompt.value,
       });
       ElMessage.success("提示词已保存");
       await loadDramaData();
@@ -2351,6 +2578,10 @@ const saveAndGenerate = async () => {
       await characterLibraryAPI.updateCharacter(currentEditItem.value.id, {
         appearance: editPrompt.value,
       });
+    } else if (currentEditType.value === "prop") {
+      await propAPI.update(currentEditItem.value.id, {
+        prompt: editPrompt.value,
+      });
     } else {
       await dramaAPI.updateScene(currentEditItem.value.id.toString(), {
         prompt: editPrompt.value,
@@ -2380,6 +2611,23 @@ const saveAndGenerate = async () => {
           ElMessage.success("角色图片生成完成！");
         });
         generatingCharacterImages.value[currentEditItem.value.id] = false;
+      } else {
+        ElMessage.success("图片生成已启动");
+        await loadDramaData();
+      }
+    } else if (currentEditType.value === "prop") {
+      const response = await propAPI.generateImage(currentEditItem.value.id);
+      const taskId = response.task_id;
+      promptDialogVisible.value = false;
+      clearReferenceImage();
+
+      if (taskId) {
+        ElMessage.info(refUrl ? "道具图片生成中 (I2I模式)..." : "道具图片生成中...");
+        generatingPropImages.value[currentEditItem.value.id] = true;
+        await pollExtractTask(taskId, "prop");
+        await loadDramaData();
+        ElMessage.success("道具图片生成完成！");
+        generatingPropImages.value[currentEditItem.value.id] = false;
       } else {
         ElMessage.success("图片生成已启动");
         await loadDramaData();

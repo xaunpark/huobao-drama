@@ -174,10 +174,11 @@ func (f *FFmpeg) trimVideo(inputPath, outputPath string, startTime, endTime floa
 		f.log.Infow("No valid trim range, re-encoding entire video")
 
 		cmd := exec.Command("ffmpeg",
+			"-hwaccel", "cuda",
 			"-i", inputPath,
-			"-c:v", "libx264",
-			"-preset", "fast",
-			"-crf", "23",
+			"-c:v", "h264_nvenc",
+			"-preset", "p4",
+			"-cq", "23",
 			"-c:a", "aac",
 			"-b:a", "128k",
 			"-movflags", "+faststart",
@@ -203,12 +204,13 @@ func (f *FFmpeg) trimVideo(inputPath, outputPath string, startTime, endTime floa
 	if endTime > 0 {
 		// 有明确的结束时间
 		cmd = exec.Command("ffmpeg",
+			"-hwaccel", "cuda",
 			"-i", inputPath,
 			"-ss", fmt.Sprintf("%.2f", startTime),
 			"-to", fmt.Sprintf("%.2f", endTime),
-			"-c:v", "libx264",
-			"-preset", "fast",
-			"-crf", "23",
+			"-c:v", "h264_nvenc",
+			"-preset", "p4",
+			"-cq", "23",
 			"-c:a", "aac",
 			"-b:a", "128k",
 			"-movflags", "+faststart",
@@ -218,11 +220,12 @@ func (f *FFmpeg) trimVideo(inputPath, outputPath string, startTime, endTime floa
 	} else {
 		// 只有开始时间，裁剪到视频末尾
 		cmd = exec.Command("ffmpeg",
+			"-hwaccel", "cuda",
 			"-i", inputPath,
 			"-ss", fmt.Sprintf("%.2f", startTime),
-			"-c:v", "libx264",
-			"-preset", "fast",
-			"-crf", "23",
+			"-c:v", "h264_nvenc",
+			"-preset", "p4",
+			"-cq", "23",
 			"-c:a", "aac",
 			"-b:a", "128k",
 			"-movflags", "+faststart",
@@ -596,9 +599,9 @@ func (f *FFmpeg) mergeWithXfade(inputPaths []string, clips []VideoClip, outputPa
 	}
 
 	args = append(args,
-		"-c:v", "libx264",
-		"-preset", "medium",
-		"-crf", "23",
+		"-c:v", "h264_nvenc",
+		"-preset", "p4",
+		"-cq", "23",
 	)
 
 	// 仅在有任何音频时设置音频编码参数

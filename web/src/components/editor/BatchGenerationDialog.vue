@@ -121,6 +121,7 @@ import { imageAPI } from '@/api/image'
 import { videoAPI } from '@/api/video'
 import { taskAPI } from '@/api/task'
 import type { Storyboard } from '@/types/drama'
+import { useAISettings } from '@/composables/useAISettings'
 
 // Local mutable copy of storyboards that can be refreshed from DB
 const localStoryboards = ref<Storyboard[]>([])
@@ -147,6 +148,7 @@ const visible = computed({
 const selectedVideoModel = ref(props.defaultVideoModel || '')
 const isBatching = ref(false)
 const shouldStop = ref(false)
+const { maxConcurrentThreads } = useAISettings()
 
 // 任务状态追踪 map: shotId -> { step: 'prompt'|'image'|'video', status: 'pending'|'loading'|'done'|'error', progress: number }
 const taskStates = reactive<Record<string, any>>({})
@@ -491,7 +493,7 @@ const startFullBatch = async () => {
   const promptCache = new Map<string, string>()
 
   // Phase 1: All Prompts
-  await runConcurrently(localStoryboards.value, 4, async (sb) => {
+  await runConcurrently(localStoryboards.value, maxConcurrentThreads.value, async (sb) => {
     if (taskStates[sb.id]?.prompt === 'done') return
     try {
       const p = await processPrompt(sb)
@@ -504,7 +506,7 @@ const startFullBatch = async () => {
 
   // Phase 2: All Images
   if (!shouldStop.value) {
-    await runConcurrently(localStoryboards.value, 4, async (sb) => {
+    await runConcurrently(localStoryboards.value, maxConcurrentThreads.value, async (sb) => {
       if (taskStates[sb.id]?.prompt !== 'done' || taskStates[sb.id]?.image === 'done') return
       try {
         const p = promptCache.get(sb.id) || sb.image_prompt || ""
@@ -518,7 +520,7 @@ const startFullBatch = async () => {
 
   // Phase 3: All Videos
   if (!shouldStop.value) {
-    await runConcurrently(localStoryboards.value, 4, async (sb) => {
+    await runConcurrently(localStoryboards.value, maxConcurrentThreads.value, async (sb) => {
       if (taskStates[sb.id]?.image !== 'done' || taskStates[sb.id]?.video === 'done') return
       try {
          const res = await imageAPI.listImages({ storyboard_id: Number(sb.id), frame_type: 'action' })
@@ -548,7 +550,7 @@ const startStep = async (step: string) => {
   shouldStop.value = false
   await initTaskStates()
 
-  await runConcurrently(localStoryboards.value, 4, async (sb) => {
+  await runConcurrently(localStoryboards.value, maxConcurrentThreads.value, async (sb) => {
     try {
       if (step === 'prompt') {
         if (taskStates[sb.id]?.prompt !== 'done') await processPrompt(sb)

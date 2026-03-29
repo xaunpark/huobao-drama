@@ -91,6 +91,7 @@ export default {
   },
   aiConfig: {
     title: 'AI 服务配置',
+    subtitle: '管理 AI 服务配置',
     addConfig: '添加配置',
     editConfig: '编辑配置',
     back: '返回',
@@ -135,6 +136,11 @@ export default {
       deleteConfirm: '确定要删除此配置吗？',
       testSuccess: '连接测试成功！',
       testFailed: '连接测试失败'
+    },
+    globalSettings: {
+      title: '全局设置',
+      maxConcurrentThreads: '最大并行生成线程数',
+      maxConcurrentThreadsTip: '批量生成图片/视频时同时运行的最大任务数。数值越大速度越快，但可能触发API速率限制。'
     }
   },
   drama: {
@@ -380,10 +386,10 @@ export default {
     scenes: '场景',
     extractedCharacters: '提取的角色（本集）',
     extractedScenes: '提取的场景（本集）',
-    extractCharactersAndScenes: '提取角色和场景',
-    reExtract: '重新提取角色和场景',
+    extractCharactersAndScenes: '提取角色、场景和道具',
+    reExtract: '重新提取角色、场景和道具',
     nextStepGenerateImages: '下一步：生成图片',
-    extractWarning: '请先点击“提取角色和场景”按钮，完成提取后才能生成图片',
+    extractWarning: '请先点击“提取角色、场景和道具”按钮，完成提取后才能生成图片',
     characterImages: '角色图片',
     sceneImages: '场景图片',
     characterCount: '共 {count} 个角色需要生成图片',
@@ -401,7 +407,7 @@ export default {
     prevStep: '上一步',
     nextStepSplitShots: '下一步：拆分分镜',
     reExtractConfirmTitle: '重新提取确认',
-    reExtractConfirmMessage: '重新提取将覆盖已提取的角色和场景（包括已生成的图片），确定继续吗？',
+    reExtractConfirmMessage: '重新提取将覆盖已提取的角色、场景和道具（包括已生成的图片），确定继续吗？',
     startReExtracting: '开始重新提取，请稍候...',
     regenerateShots: '重新生成分镜',
     batchGenerateSelected: '批量生成选中场景',
@@ -516,12 +522,20 @@ export default {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     extractCancelled: '已取消提取',
-    charactersAndScenesExtractSuccess: '角色和场景提取成功！',
-    charactersAndScenesExtractFailed: '角色和场景提取失败',
+    charactersAndScenesExtractSuccess: '角色、场景和道具提取成功！',
+    charactersAndScenesExtractFailed: '角色、场景和道具提取失败',
     characterGenerationFailed: '角色生成失败',
     sceneExtractionFailed: '场景提取失败',
+    propExtractionFailed: '道具提取失败',
     characterGenerationTimeout: '角色生成超时',
-    sceneExtractionTimeout: '场景提取超时'
+    sceneExtractionTimeout: '场景提取超时',
+    propExtractionTimeout: '道具提取超时',
+    extractedProps: '提取的道具（本集）',
+    propCount: '共提取 {count} 个道具',
+    propImages: '道具图片',
+    propImageGenerating: '道具图片生成中，请稍候...',
+    propImageComplete: '道具图片生成完成！',
+    propImageStarted: '道具图片生成已启动'
   },
   professionalEditor: {
     duration: '时长',
@@ -712,6 +726,7 @@ export default {
     transitionType: '转场类型',
     transitionDuration: '转场时长',
     selectTransition: '选择转场效果',
+    addAllShotsToLibrary: '一键添加所有镜头到素材库',
     filter: {
       drama: '剧本',
       allDramas: '全部剧本',

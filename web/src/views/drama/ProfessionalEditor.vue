@@ -99,6 +99,17 @@
 
       <!-- 中间时间线编辑区域 -->
       <div class="timeline-area">
+        <div class="timeline-toolbar" v-if="storyboards.length > 0">
+          <el-button
+            type="success"
+            size="small"
+            :icon="FolderAdd"
+            :loading="addingAllShotsToLibrary"
+            @click="addAllShotsToMediaLibrary"
+          >
+            {{ $t('video.addAllShotsToLibrary') }}
+          </el-button>
+        </div>
         <VideoTimelineEditor
           ref="timelineEditorRef"
           v-if="storyboards.length > 0"
@@ -2154,6 +2165,7 @@ const showBatchDialog = ref(false);
 const showVideoPreview = ref(false);
 const previewVideo = ref<VideoGeneration | null>(null);
 const addingToAssets = ref<Set<number>>(new Set());
+const addingAllShotsToLibrary = ref(false);
 
 const openUrl = (url: string) => window.open(url, '_blank');
 
@@ -3281,6 +3293,74 @@ const addVideoToAssets = async (video: VideoGeneration) => {
     addingToAssets.value.delete(video.id);
   }
 };
+
+// 一键添加所有镜头的最新视频到素材库
+const addAllShotsToMediaLibrary = async () => {
+  if (storyboards.value.length === 0) {
+    ElMessage.warning("没有可用的镜头");
+    return;
+  }
+
+  addingAllShotsToLibrary.value = true;
+  let successCount = 0;
+  let skipCount = 0;
+  let failCount = 0;
+
+  try {
+    for (const storyboard of storyboards.value) {
+      try {
+        // 获取该镜头的所有已完成视频，按创建时间倒序
+        const result = await videoAPI.listVideos({
+          storyboard_id: storyboard.id.toString(),
+          status: "completed",
+          page: 1,
+          page_size: 1, // 只取最新的一个
+        });
+
+        const latestVideo = result.items?.[0];
+        if (!latestVideo || !latestVideo.video_url) {
+          skipCount++;
+          continue;
+        }
+
+        // 检查该镜头是否已存在素材，如果有则先删除旧的
+        const existingAsset = videoAssets.value.find(
+          (asset: any) => asset.storyboard_id === storyboard.id,
+        );
+        if (existingAsset) {
+          try {
+            await assetAPI.deleteAsset(existingAsset.id);
+          } catch (error) {
+            console.error("删除旧素材失败:", error);
+          }
+        }
+
+        // 导入最新视频
+        await assetAPI.importFromVideo(latestVideo.id);
+        successCount++;
+      } catch (error) {
+        console.error(`镜头 ${storyboard.storyboard_number} 导入失败:`, error);
+        failCount++;
+      }
+    }
+
+    // 重新加载素材库
+    await loadVideoAssets();
+
+    // 反馈结果
+    if (failCount === 0 && skipCount === 0) {
+      ElMessage.success(`已成功添加 ${successCount} 个镜头视频到素材库`);
+    } else {
+      ElMessage.info(
+        `完成: 成功 ${successCount}, 跳过 ${skipCount} (无视频), 失败 ${failCount}`,
+      );
+    }
+  } catch (error: any) {
+    ElMessage.error(error.message || "批量添加失败");
+  } finally {
+    addingAllShotsToLibrary.value = false;
+  }
+}
 
 // 删除视频
 const handleDeleteVideo = async (video: VideoGeneration) => {
@@ -5373,6 +5453,14 @@ onBeforeUnmount(() => {
       flex-direction: column;
       background: var(--bg-secondary);
       overflow: hidden;
+
+      .timeline-toolbar {
+        padding: 8px 16px;
+        background: var(--bg-card);
+        border-bottom: 1px solid var(--border-primary);
+        display: flex;
+        justify-content: flex-end;
+      }
 
       .empty-timeline {
         flex: 1;

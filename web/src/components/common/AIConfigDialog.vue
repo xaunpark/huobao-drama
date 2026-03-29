@@ -24,6 +24,29 @@
       </div>
     </template>
 
+    <!-- Global Settings / 全局设置 -->
+    <div class="global-settings-section">
+      <div class="global-settings-row">
+        <div class="setting-info">
+          <el-icon><Setting /></el-icon>
+          <span class="setting-name">{{ $t('aiConfig.globalSettings.maxConcurrentThreads') }}</span>
+          <el-tooltip :content="$t('aiConfig.globalSettings.maxConcurrentThreadsTip')" placement="top">
+            <el-icon class="info-icon"><InfoFilled /></el-icon>
+          </el-tooltip>
+        </div>
+        <div class="setting-value">
+          <el-input-number
+            v-model="maxConcurrentThreads"
+            :min="MIN_THREADS"
+            :max="MAX_THREADS"
+            :step="1"
+            size="small"
+            controls-position="right"
+          />
+        </div>
+      </div>
+    </div>
+
     <!-- Tabs -->
     <el-tabs
       v-model="activeTab"
@@ -256,8 +279,9 @@ import {
   type FormInstance,
   type FormRules,
 } from "element-plus";
-import { Plus, MagicStick } from "@element-plus/icons-vue";
+import { Plus, MagicStick, Setting, InfoFilled } from "@element-plus/icons-vue";
 import { aiAPI } from "@/api/ai";
+import { useAISettings } from "@/composables/useAISettings";
 import type {
   AIServiceConfig,
   AIServiceType,
@@ -292,6 +316,8 @@ const testing = ref(false);
 const quickSetupVisible = ref(false);
 const quickSetupApiKey = ref("");
 const quickSetupLoading = ref(false);
+
+const { maxConcurrentThreads, MIN_THREADS, MAX_THREADS } = useAISettings();
 
 const form = reactive<
   CreateAIConfigRequest & { is_active?: boolean; provider?: string }
@@ -918,6 +944,44 @@ watch(visible, (val) => {
 
 .config-tabs {
   margin: 0;
+}
+
+/* Global Settings Section */
+.global-settings-section {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: var(--bg-secondary, #f5f7fa);
+  border-radius: 8px;
+  border: 1px solid var(--border-primary, #e4e7ed);
+}
+
+.global-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.setting-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.setting-name {
+  font-weight: 500;
+}
+
+.info-icon {
+  font-size: 14px;
+  color: var(--text-muted, #909399);
+  cursor: help;
+}
+
+.setting-value {
+  flex-shrink: 0;
 }
 
 .form-tip {

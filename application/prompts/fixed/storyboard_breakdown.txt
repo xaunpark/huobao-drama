@@ -18,6 +18,7 @@
     "bgm_prompt": "Low tense strings, slow rhythm",
     "sound_effect": "Metallic clatter, dust swirling",
     "characters": [1],
+    "props": [1, 2],
     "is_primary": true
   }
 ]
@@ -26,8 +27,9 @@
 - If dialog exists: "CharacterName: Dialogue Content" or "(Monologue) Content" or "(VO) Voiceover text"
 - Empty string if no dialogue
 
-**Character and Background Requirements**:
+**Entity Requirements**:
 - characters array must contain only valid IDs (integers) from the Available Character List. Use empty array [] if no characters.
+- props array must contain only valid IDs (integers) from the Available Prop List. Use empty array [] if no props are used.
 - scene_id must correspond strictly to the Valid Scene ID from the Extracted Scene Backgrounds list (use null if none fits)
 
 **Duration Estimation Rules**:

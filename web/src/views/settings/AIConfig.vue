@@ -16,6 +16,34 @@
         </template>
       </PageHeader>
 
+      <!-- Global Settings / 全局设置 -->
+      <div class="global-settings-card">
+        <div class="global-settings-header">
+          <el-icon><Setting /></el-icon>
+          <span>{{ $t('aiConfig.globalSettings.title') }}</span>
+        </div>
+        <div class="global-settings-body">
+          <div class="setting-item">
+            <div class="setting-label">
+              <span class="label-text">{{ $t('aiConfig.globalSettings.maxConcurrentThreads') }}</span>
+              <span class="label-tip">{{ $t('aiConfig.globalSettings.maxConcurrentThreadsTip') }}</span>
+            </div>
+            <div class="setting-control">
+              <el-slider
+                v-model="maxConcurrentThreads"
+                :min="MIN_THREADS"
+                :max="MAX_THREADS"
+                :step="1"
+                show-input
+                :show-input-controls="true"
+                input-size="small"
+                style="max-width: 400px"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Tabs / 标签页 -->
       <div class="tabs-wrapper">
         <el-tabs
@@ -180,9 +208,10 @@ import {
   type FormInstance,
   type FormRules,
 } from "element-plus";
-import { Plus, ArrowLeft } from "@element-plus/icons-vue";
+import { Plus, ArrowLeft, Setting } from "@element-plus/icons-vue";
 import { aiAPI } from "@/api/ai";
 import { PageHeader } from "@/components/common";
+import { useAISettings } from "@/composables/useAISettings";
 import type {
   AIServiceConfig,
   AIServiceType,
@@ -202,6 +231,8 @@ const editingId = ref<number>();
 const formRef = ref<FormInstance>();
 const submitting = ref(false);
 const testing = ref(false);
+
+const { maxConcurrentThreads, MIN_THREADS, MAX_THREADS } = useAISettings();
 
 const form = reactive<
   CreateAIConfigRequest & { is_active?: boolean; provider?: string }
@@ -678,6 +709,65 @@ onMounted(() => {
   max-width: 1200px;
   margin: 0 auto;
 }
+
+/* ========================================
+   Global Settings Card / 全局设置卡片
+   ======================================== */
+.global-settings-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-3);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.global-settings-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 20px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+}
+
+.global-settings-body {
+  padding: 20px;
+}
+
+.setting-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.setting-label {
+  flex-shrink: 0;
+  min-width: 200px;
+}
+
+.setting-label .label-text {
+  display: block;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.setting-label .label-tip {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.setting-control {
+  flex: 1;
+  padding-top: 2px;
+}
+
 
 /* ========================================
    Tabs / 标签页 - 紧凑内边距

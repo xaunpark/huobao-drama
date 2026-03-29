@@ -54,6 +54,7 @@ type Storyboard struct {
 	BgmPrompt   string `json:"bgm_prompt"`   // 配乐提示词
 	SoundEffect string `json:"sound_effect"` // 音效描述
 	Characters  []uint `json:"characters"`   // 涉及的角色ID列表
+	Props       []uint `json:"props"`        // 涉及的道具ID列表
 	IsPrimary   bool   `json:"is_primary"`   // 是否主镜
 }
 
@@ -123,6 +124,22 @@ func (s *StoryboardService) GenerateStoryboard(episodeID string, model string, s
 		sceneList = fmt.Sprintf("[%s]", strings.Join(sceneInfoList, ", "))
 	}
 
+	// 获取该项目已提取的道具列表（项目级）
+	var props []models.Prop
+	if err := s.db.Where("drama_id = ?", episode.DramaID).Find(&props).Error; err != nil {
+		s.log.Warnw("Failed to get props", "error", err)
+	}
+
+	// 构建道具列表字符串（包含ID、名称）
+	propList := "无道具"
+	if len(props) > 0 {
+		var propInfoList []string
+		for _, p := range props {
+			propInfoList = append(propInfoList, fmt.Sprintf(`{"id": %d, "name": "%s"}`, p.ID, p.Name))
+		}
+		propList = fmt.Sprintf("[%s]", strings.Join(propInfoList, ", "))
+	}
+
 
 	// Auto-detect split mode: if script has timestamp patterns, use "preserve" mode
 	effectiveSplitMode := splitMode
@@ -152,11 +169,13 @@ func (s *StoryboardService) GenerateStoryboard(episodeID string, model string, s
 		"characters", characterList,
 		"scene_count", len(scenes),
 		"scenes", sceneList,
+		"prop_count", len(props),
+		"props", propList,
 		"split_mode", effectiveSplitMode)
 
 	// 启动后台goroutine处理AI调用和后续逻辑
 	dramaIDUint, _ := strconv.ParseUint(episode.DramaID, 10, 32)
-	go s.processStoryboardGeneration(task.ID, episodeID, uint(dramaIDUint), model, effectiveSplitMode, scriptContent, characterList, sceneList)
+	go s.processStoryboardGeneration(task.ID, episodeID, uint(dramaIDUint), model, effectiveSplitMode, scriptContent, characterList, sceneList, propList)
 
 	// 立即返回任务ID
 	return task.ID, nil
@@ -185,7 +204,7 @@ func detectTimestampPattern(script string) bool {
 }
 
 // processStoryboardGeneration 后台处理故事板生成
-func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID string, dramaID uint, model, splitMode, scriptContent, characterList, sceneList string) {
+func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID string, dramaID uint, model, splitMode, scriptContent, characterList, sceneList, propList string) {
 	// 更新任务状态为处理中
 	if err := s.taskService.UpdateTaskStatus(taskID, "processing", 10, "准备生成分镜头..."); err != nil {
 		s.log.Errorw("Failed to update task status", "error", err, "task_id", taskID)
@@ -216,6 +235,8 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID string
 	charConstraint := s.promptI18n.FormatUserPrompt("character_constraint")
 	sceneListLabel := s.promptI18n.FormatUserPrompt("scene_list_label")
 	sceneConstraint := s.promptI18n.FormatUserPrompt("scene_constraint")
+	propListLabel := s.promptI18n.FormatUserPrompt("prop_list_label")
+	propConstraint := s.promptI18n.FormatUserPrompt("prop_constraint")
 	formatInstructions := prompts.Get("storyboard_format_instructions.txt")
 
 	prompt := fmt.Sprintf(`%s
@@ -234,7 +255,11 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID string
 %s
 %s
 
-%s`, systemPrompt, scriptLabel, scriptContent, taskLabel, taskInstruction, charListLabel, characterList, charConstraint, sceneListLabel, sceneList, sceneConstraint, formatInstructions)
+%s
+%s
+%s
+
+%s`, systemPrompt, scriptLabel, scriptContent, taskLabel, taskInstruction, charListLabel, characterList, charConstraint, sceneListLabel, sceneList, sceneConstraint, propListLabel, propList, propConstraint, formatInstructions)
 
 	client, getErr := s.aiService.GetAIClientForModel("text", model)
 	if model != "" && getErr != nil {
@@ -349,8 +374,13 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID string
 }
 
 // generateImagePrompt 生成专门用于图片生成的提示词（首帧静态画面）
-func (s *StoryboardService) generateImagePrompt(sb Storyboard) string {
+func (s *StoryboardService) generateImagePrompt(sb Storyboard, propsDesc string) string {
 	var parts []string
+
+	// 0. 道具描述
+	if propsDesc != "" {
+		parts = append(parts, fmt.Sprintf("Props in scene: %s", propsDesc))
+	}
 
 	// 1. 完整的场景背景描述
 	if sb.Location != "" {
@@ -496,12 +526,17 @@ func extractCompositionType(shotType string) string {
 // NOTE: BGM is intentionally excluded — video generation AI produces visuals, not audio.
 // Including BGM can conflict with style DNA (e.g., styles that require ZERO music).
 // Sound effects are included as environmental context to help AI understand the scene's physics.
-func (s *StoryboardService) generateVideoPrompt(sb Storyboard) string {
+func (s *StoryboardService) generateVideoPrompt(sb Storyboard, propsDesc string) string {
 	var parts []string
 	videoRatio := "16:9"
 	// 1. 人物动作（核心 - 定义shot内容）
 	if sb.Action != "" {
 		parts = append(parts, fmt.Sprintf("Action: %s", sb.Action))
+	}
+
+	// 1.5. 道具描述
+	if propsDesc != "" {
+		parts = append(parts, fmt.Sprintf("Props: %s", propsDesc))
 	}
 
 	// 2. 结果（动作的最终视觉状态 - 紧跟Action以保持叙事连贯）
@@ -536,9 +571,28 @@ func (s *StoryboardService) generateVideoPrompt(sb Storyboard) string {
 		parts = append(parts, fmt.Sprintf("Atmosphere: %s", sb.Atmosphere))
 	}
 
-	// 7. 对话
+	// 7. 对话与口型约束
 	if sb.Dialogue != "" {
 		parts = append(parts, fmt.Sprintf("Dialogue: %s", sb.Dialogue))
+		
+		// 自动判断如果是旁白/独白，则禁止嘴部动作；如果是对话，则要求说话
+		dialogueLower := strings.ToLower(strings.TrimSpace(sb.Dialogue))
+		isVoiceover := strings.HasPrefix(dialogueLower, "(vo)") || 
+		   strings.HasPrefix(dialogueLower, "(monologue)") || 
+		   strings.Contains(dialogueLower, "voiceover") || 
+		   strings.HasPrefix(dialogueLower, "【旁白") || 
+		   strings.HasPrefix(dialogueLower, "[旁白") || 
+		   strings.HasPrefix(dialogueLower, "(narrator") ||
+		   strings.Contains(dialogueLower, "（旁白）")
+		
+		if isVoiceover {
+			parts = append(parts, "The character's mouth is strictly closed, silent expression, purely visual acting, no speaking, voiceover scene. --no talking, speaking, moving lips, open mouth, chatting")
+		} else {
+			parts = append(parts, "The character is actively speaking, lip-syncing naturally to the dialog, mouth moving")
+		}
+	} else {
+		// 如果完全没有对话，要求保持嘴部闭合
+		parts = append(parts, "The character's mouth is completely closed, silent scene. --no talking, speaking, moving lips")
 	}
 
 	// 8. 音效（作为环境物理上下文，帮助AI理解场景的物理特性）
@@ -639,9 +693,26 @@ func (s *StoryboardService) saveStoryboards(episodeID string, storyboards []Stor
 			description := fmt.Sprintf("【镜头类型】%s\n【运镜】%s\n【动作】%s\n【对话】%s\n【结果】%s\n【情绪】%s",
 				sb.ShotType, sb.Movement, sb.Action, sb.Dialogue, sb.Result, sb.Emotion)
 
+			// 取出道具名称和描述用于 Prompt 生成
+			var propDescriptions string
+			var loadedProps []models.Prop
+			if len(sb.Props) > 0 {
+				if err := tx.Where("id IN ?", sb.Props).Find(&loadedProps).Error; err == nil {
+					var names []string
+					for _, p := range loadedProps {
+						desc := p.Name
+						if p.Prompt != nil && *p.Prompt != "" {
+							desc += " (" + *p.Prompt + ")"
+						}
+						names = append(names, desc)
+					}
+					propDescriptions = strings.Join(names, ", ")
+				}
+			}
+
 			// 生成两种专用提示词
-			imagePrompt := s.generateImagePrompt(sb) // 专用于图片生成
-			videoPrompt := s.generateVideoPrompt(sb) // 专用于视频生成
+			imagePrompt := s.generateImagePrompt(sb, propDescriptions) // 专用于图片生成
+			videoPrompt := s.generateVideoPrompt(sb, propDescriptions) // 专用于视频生成
 
 			// 处理 dialogue 字段
 			var dialoguePtr *string
@@ -735,6 +806,18 @@ func (s *StoryboardService) saveStoryboards(episodeID string, storyboards []Stor
 					}
 				}
 			}
+
+			// 关联道具
+			if len(loadedProps) > 0 {
+				if err := tx.Model(&scene).Association("Props").Append(loadedProps); err != nil {
+					s.log.Warnw("Failed to associate props", "error", err, "shot_number", sb.ShotNumber)
+				} else {
+					s.log.Infow("Props associated successfully",
+						"shot_number", sb.ShotNumber,
+						"prop_ids", sb.Props,
+						"count", len(loadedProps))
+				}
+			}
 		}
 
 		s.log.Infow("Storyboards saved successfully", "episode_id", episodeID, "count", len(storyboards))
@@ -790,8 +873,8 @@ func (s *StoryboardService) CreateStoryboard(req *CreateStoryboardRequest) (*mod
 	}
 
 	// 生成提示词
-	imagePrompt := s.generateImagePrompt(sb)
-	videoPrompt := s.generateVideoPrompt(sb)
+	imagePrompt := s.generateImagePrompt(sb, "")
+	videoPrompt := s.generateVideoPrompt(sb, "")
 
 	// 构建 description
 	desc := ""

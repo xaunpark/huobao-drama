@@ -73,6 +73,7 @@ export default {
   },
   aiConfig: {
     title: 'AI Service Configuration',
+    subtitle: 'Manage AI service configurations',
     addConfig: 'Add Configuration',
     editConfig: 'Edit Configuration',
     back: 'Back',
@@ -117,6 +118,11 @@ export default {
       deleteConfirm: 'Are you sure to delete this configuration?',
       testSuccess: 'Connection test successful!',
       testFailed: 'Connection test failed'
+    },
+    globalSettings: {
+      title: 'Global Settings',
+      maxConcurrentThreads: 'Max Concurrent Generation Threads',
+      maxConcurrentThreadsTip: 'Maximum number of parallel tasks when batch generating images/videos. Higher values are faster but may trigger API rate limits.'
     }
   },
   drama: {
@@ -400,10 +406,10 @@ export default {
     scenes: 'Scenes',
     extractedCharacters: 'Extracted Characters (This Episode)',
     extractedScenes: 'Extracted Scenes (This Episode)',
-    extractCharactersAndScenes: 'Extract Characters and Scenes',
-    reExtract: 'Re-extract Characters and Scenes',
+    extractCharactersAndScenes: 'Extract Characters, Scenes & Props',
+    reExtract: 'Re-extract Characters, Scenes & Props',
     nextStepGenerateImages: 'Next Step: Generate Images',
-    extractWarning: 'Please click "Extract Characters and Scenes" first, then you can generate images after extraction is complete',
+    extractWarning: 'Please click "Extract Characters, Scenes & Props" first, then you can generate images after extraction is complete',
     characterImages: 'Character Images',
     sceneImages: 'Scene Images',
     characterCount: '{count} characters need to generate images',
@@ -421,7 +427,7 @@ export default {
     prevStep: 'Previous Step',
     nextStepSplitShots: 'Next Step: Split Shots',
     reExtractConfirmTitle: 'Re-extract Confirmation',
-    reExtractConfirmMessage: 'Re-extraction will overwrite extracted characters and scenes (including generated images). Continue?',
+    reExtractConfirmMessage: 'Re-extraction will overwrite extracted characters, scenes and props (including generated images). Continue?',
     startReExtracting: 'Starting re-extraction, please wait...',
     regenerateShots: 'Regenerate Shots',
     batchGenerateSelected: 'Batch Generate Selected Scenes',
@@ -505,7 +511,7 @@ export default {
     prevStep: 'Previous Step',
     nextStepSplitShots: 'Next Step: Split Shots',
     reExtractConfirmTitle: 'Re-extract Confirmation',
-    reExtractConfirmMessage: 'Re-extraction will overwrite extracted characters and scenes (including generated images). Continue?',
+    reExtractConfirmMessage: 'Re-extraction will overwrite extracted characters, scenes and props (including generated images). Continue?',
     startReExtracting: 'Starting re-extraction, please wait...',
     regenerateShots: 'Regenerate Shots',
     batchGenerateSelected: 'Batch Generate Selected Scenes',
@@ -613,12 +619,20 @@ export default {
     confirmButtonText: 'Confirm',
     cancelButtonText: 'Cancel',
     extractCancelled: 'Extraction cancelled',
-    charactersAndScenesExtractSuccess: 'Characters and scenes extracted successfully!',
-    charactersAndScenesExtractFailed: 'Failed to extract characters and scenes',
+    charactersAndScenesExtractSuccess: 'Characters, scenes and props extracted successfully!',
+    charactersAndScenesExtractFailed: 'Failed to extract characters, scenes and props',
     characterGenerationFailed: 'Failed to generate characters',
     sceneExtractionFailed: 'Failed to extract scenes',
+    propExtractionFailed: 'Failed to extract props',
     characterGenerationTimeout: 'Character generation timed out',
-    sceneExtractionTimeout: 'Scene extraction timed out'
+    sceneExtractionTimeout: 'Scene extraction timed out',
+    propExtractionTimeout: 'Prop extraction timed out',
+    extractedProps: 'Extracted Props (This Episode)',
+    propCount: '{count} props extracted',
+    propImages: 'Prop Images',
+    propImageGenerating: 'Prop image generating, please wait...',
+    propImageComplete: 'Prop image generated successfully!',
+    propImageStarted: 'Prop image generation started'
   },
   professionalEditor: {
     duration: 'Duration',
@@ -790,6 +804,7 @@ export default {
     transitionType: 'Transition Type',
     transitionDuration: 'Transition Duration',
     selectTransition: 'Select transition',
+    addAllShotsToLibrary: 'Add All Shots to Library',
     filter: {
       drama: 'Script',
       allDramas: 'All Scripts',
