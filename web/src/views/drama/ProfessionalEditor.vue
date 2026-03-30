@@ -1582,6 +1582,7 @@
                               <VideoPlay />
                             </el-icon>
                           </div>
+                          <div v-if="video.is_upscaled" class="hd-badge">HD</div>
                         </div>
                         <div v-else class="image-placeholder">
                           <el-icon :size="32">
@@ -1592,9 +1593,10 @@
                         <!-- 视频操作按钮 -->
                         <div class="video-actions">
                           <div
-                            v-if="video.status === 'completed'"
+                            v-if="video.status === 'completed' || video.status === 'upscaling'"
                             class="add-to-assets-button"
-                            @click.stop="addVideoToAssets(video)"
+                            @click.stop="video.status === 'completed' && addVideoToAssets(video)"
+                            :style="{ opacity: video.status === 'upscaling' ? 0.5 : 1, cursor: video.status === 'upscaling' ? 'not-allowed' : 'pointer' }"
                           >
                             <el-icon
                               :size="18"
@@ -1612,7 +1614,17 @@
                               <Loading />
                             </el-icon>
                           </div>
-                          <div v-else></div>
+                          <div
+                            v-if="(video.status === 'completed' && !video.is_upscaled) || video.status === 'upscaling'"
+                            class="upscale-video-button"
+                            title="提升画质 (Upscale)"
+                            @click.stop="video.status === 'completed' && handleUpscaleVideo(video)"
+                            :style="{ cursor: video.status === 'upscaling' ? 'not-allowed' : 'pointer' }"
+                          >
+                            <el-icon v-if="video.status === 'upscaling'" :size="18" color="var(--el-color-primary)" class="is-loading"><Loading /></el-icon>
+                            <el-icon v-else :size="18" color="var(--el-color-success)"><MagicStick /></el-icon>
+                          </div>
+                          <div v-if="video.status !== 'completed' && video.status !== 'upscaling'"></div>
                           <!-- 删除按钮 -->
                           <div
                             class="delete-video-button"
@@ -3362,6 +3374,41 @@ const addAllShotsToMediaLibrary = async () => {
   }
 }
 
+// Upscale 视频
+const handleUpscaleVideo = async (video: VideoGeneration) => {
+  if (!currentStoryboard.value) return;
+
+  try {
+    await ElMessageBox.confirm(
+      "确定要将此视频增强至 1080p 吗？ 此操作可能需要几分钟时间。",
+      "Upscale Video",
+      {
+        confirmButtonText: "确定 (Upscale)",
+        cancelButtonText: "取消",
+        type: "info",
+      }
+    );
+  } catch {
+    return;
+  }
+
+  try {
+    const oldStatus = video.status;
+    video.status = 'upscaling';
+    await videoAPI.upscaleVideo(video.id);
+    
+    ElMessage.success({
+      message: "已提交分辨率提升请求，正在后台处理中...",
+      duration: 3000
+    });
+    
+    startVideoPolling();
+  } catch (error: any) {
+    ElMessage.error(error.message || "Upscale 请求失败");
+    video.status = 'completed';
+  }
+};
+
 // 删除视频
 const handleDeleteVideo = async (video: VideoGeneration) => {
   if (!currentStoryboard.value) return;
@@ -3397,6 +3444,7 @@ const getStatusText = (status: string) => {
     processing: "生成中",
     completed: "已完成",
     failed: "失败",
+    upscaling: "提升画质中",
   };
   return statusTextMap[status] || status;
 };
@@ -5937,9 +5985,30 @@ onBeforeUnmount(() => {
             }
           }
 
+          .hd-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            z-index: 5;
+            pointer-events: none;
+          }
+
           &:hover .play-overlay {
             opacity: 1;
           }
+        }
+
+        &:hover .video-actions {
+          opacity: 1;
+          transform: translateY(0);
         }
 
         .video-actions {
@@ -5960,6 +6029,7 @@ onBeforeUnmount(() => {
             opacity 0.2s ease;
 
           .add-to-assets-button,
+          .upscale-video-button,
           .delete-video-button {
             width: 28px;
             height: 28px;

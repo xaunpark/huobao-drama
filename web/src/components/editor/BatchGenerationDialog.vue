@@ -47,12 +47,15 @@
           <el-button type="primary" :loading="isBatching" @click="startFullBatch">
             <el-icon><MagicStick /></el-icon> {{ $t('professionalEditor.batch.runAll') }}
           </el-button>
-          <el-button-group style="margin-left: 10px">
+          <el-button-group>
             <el-button :disabled="isBatching" @click="startStep('prompt')">{{ $t('professionalEditor.batch.onlyPrompt') }}</el-button>
             <el-button :disabled="isBatching" @click="startStep('image')">{{ $t('professionalEditor.batch.onlyImage') }}</el-button>
             <el-button :disabled="isBatching" @click="startStep('video')">{{ $t('professionalEditor.batch.onlyVideo') }}</el-button>
           </el-button-group>
-          <el-button type="danger" plain v-if="isBatching" @click="stopBatch" style="margin-left: 10px">
+          <el-button type="success" plain :disabled="isBatching" @click="startUpscaleAll">
+            <el-icon><MagicStick /></el-icon> Upscale All Videos
+          </el-button>
+          <el-button type="danger" plain v-if="isBatching" @click="stopBatch">
             {{ $t('professionalEditor.batch.stop') }}
           </el-button>
         </div>
@@ -125,7 +128,6 @@ import { videoAPI } from '@/api/video'
 import { taskAPI } from '@/api/task'
 import type { Storyboard } from '@/types/drama'
 import { useAISettings } from '@/composables/useAISettings'
-
 // Local mutable copy of storyboards that can be refreshed from DB
 const localStoryboards = ref<Storyboard[]>([])
 
@@ -203,24 +205,38 @@ const initTaskStates = async () => {
     }
     
     // Check video status from DB
-    let hasVideo = !!sb.video_url
-    if (!hasVideo) {
-      try {
-        const vidRes = await videoAPI.listVideos({ storyboard_id: String(sb.id) })
-        const completedVid = vidRes.items?.find((v: any) => v.status === 'completed')
-        if (completedVid) hasVideo = true
-      } catch { /* ignore */ }
+    let videoState = 'pending'
+    try {
+      const vidRes = await videoAPI.listVideos({ storyboard_id: String(sb.id) })
+      // Find latest relevant video
+      const completedVidHd = vidRes.items?.find((v: any) => v.status === 'completed' && v.is_upscaled)
+      const upscalingVid = vidRes.items?.find((v: any) => v.status === 'upscaling')
+      const completedVid = vidRes.items?.find((v: any) => v.status === 'completed')
+
+      if (completedVidHd) {
+        videoState = 'hd'
+      } else if (upscalingVid) {
+        videoState = 'upscaling'
+      } else if (completedVid) {
+        videoState = 'done'
+      } else if (sb.video_url) {
+        videoState = 'done' // fallback
+      }
+    } catch { 
+      if (sb.video_url) videoState = 'done'
     }
     
     let progress = 0
-    if (hasVideo) progress = 100
+    if (videoState === 'hd') progress = 100
+    else if (videoState === 'done') progress = 100
+    else if (videoState === 'upscaling') progress = 90
     else if (hasImage) progress = 60
     else if (hasPrompt) progress = 30
     
     taskStates[sb.id] = {
       prompt: hasPrompt ? 'done' : 'pending',
       image: hasImage ? 'done' : 'pending',
-      video: hasVideo ? 'done' : 'pending',
+      video: videoState,
       progress: progress
     }
   }
@@ -228,8 +244,9 @@ const initTaskStates = async () => {
 
 const getStatusTag = (id: string, type: string) => {
   const state = taskStates[id]?.[type]
-  if (state === 'loading') return ''
+  if (state === 'loading' || state === 'upscaling') return ''
   if (state === 'done') return 'success'
+  if (state === 'hd') return 'warning'
   if (state === 'error') return 'danger'
   return 'info'
 }
@@ -237,6 +254,8 @@ const getStatusTag = (id: string, type: string) => {
 const getStatusText = (id: string, type: string) => {
   const state = taskStates[id]?.[type]
 
+  if (state === 'upscaling') return 'Upscaling...'
+  if (state === 'hd') return 'HD'
   if (state === 'loading') return t('professionalEditor.batch.status.loading')
   if (state === 'done') return t('professionalEditor.batch.status.done')
   if (state === 'error') return t('professionalEditor.batch.status.failed')
@@ -247,7 +266,8 @@ const getProgress = (id: string) => taskStates[id]?.progress || 0
 const getProgressStatus = (id: string) => {
   const s = taskStates[id]
   if (s?.prompt === 'error' || s?.image === 'error' || s?.video === 'error') return 'exception'
-  if (s?.video === 'done') return 'success'
+  if (s?.video === 'done' || s?.video === 'hd') return 'success'
+  if (s?.video === 'upscaling') return 'warning'
   return undefined
 }
 
@@ -566,7 +586,7 @@ const startStep = async (step: string) => {
         }
       }
       else if (step === 'video') {
-         if (taskStates[sb.id]?.video !== 'done') {
+         if (taskStates[sb.id]?.video !== 'done' && taskStates[sb.id]?.video !== 'hd' && taskStates[sb.id]?.video !== 'upscaling') {
            const res = await imageAPI.listImages({ storyboard_id: Number(sb.id), frame_type: generationMode.value as any })
            const img = res.items?.find((i: any) => i.status === 'completed' && (i.image_url || i.local_path))
            if (img) await processVideo(sb, img)
@@ -587,6 +607,61 @@ const startStep = async (step: string) => {
   }
 }
 
+const startUpscaleAll = async () => {
+  if (isBatching.value) return
+  isBatching.value = true
+  shouldStop.value = false
+  
+  try {
+    ElMessage.info('Bắt đầu quy trình Upscale tất cả video đã hoàn thành...')
+    await initTaskStates()
+    
+    await runConcurrently(localStoryboards.value, maxConcurrentThreads.value, async (sb) => {
+      // Only process if the shot actually has a video
+      if (taskStates[sb.id]?.video === 'pending' || taskStates[sb.id]?.video === 'loading' || taskStates[sb.id]?.video === 'error') return
+      if (taskStates[sb.id]?.video === 'hd') return
+
+      try {
+        const vidRes = await videoAPI.listVideos({ storyboard_id: String(sb.id), page_size: 10 })
+        const targetVideo = vidRes.items?.find((v: any) => v.status === 'completed' && v.video_url && !v.is_upscaled)
+        const alreadyHd = vidRes.items?.find((v: any) => v.status === 'completed' && v.is_upscaled)
+
+        if (alreadyHd) {
+          taskStates[sb.id].video = 'hd'
+          return
+        }
+        
+        if (targetVideo) {
+          taskStates[sb.id].video = 'upscaling'
+          await videoAPI.upscaleVideo(targetVideo.id)
+          let isUpscaled = false
+          while (!isUpscaled && !shouldStop.value) {
+            await new Promise(r => setTimeout(r, 5000))
+            const check = await videoAPI.getVideo(targetVideo.id)
+            if (check.status === 'completed' && check.is_upscaled) {
+              isUpscaled = true
+            } else if (check.status === 'failed') {
+              throw new Error(check.error_msg || 'Upscaling failed')
+            }
+          }
+          taskStates[sb.id].video = 'hd'
+        } else {
+          taskStates[sb.id].video = 'done'
+        }
+      } catch (err: any) {
+        console.error(`Shot ${sb.storyboard_number} auto upscale failed:`, err)
+        taskStates[sb.id].video = 'error'
+      }
+    })
+    
+    if (!shouldStop.value) {
+      ElMessage.success('Upscale All hoàn tất!')
+    }
+  } finally {
+    isBatching.value = false
+    emit('completed')
+  }
+}
 
 watch(() => props.modelValue, (newVal) => {
   if (newVal) initTaskStates()
@@ -625,6 +700,8 @@ const storyboards = computed(() => {
 .action-row {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 .shot-progress-list {
   border: 1px solid var(--el-border-color-lighter);

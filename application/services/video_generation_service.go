@@ -412,9 +412,9 @@ func (s *VideoGenerationService) pollTaskStatus(videoGenID uint, taskID string, 
 		}
 
 		// CRITICAL FIX: Check if status was manually changed (e.g., cancelled by user)
-		// If status is no longer "processing", stop polling to avoid unnecessary API calls
+		// If status is no longer "processing" or "upscaling", stop polling to avoid unnecessary API calls
 		// This prevents polling when the task has been cancelled or failed externally
-		if videoGen.Status != models.VideoStatusProcessing {
+		if videoGen.Status != models.VideoStatusProcessing && videoGen.Status != models.VideoStatusUpscaling {
 			s.log.Infow("Video generation status changed, stopping poll", "id", videoGenID, "status", videoGen.Status)
 			return
 		}
@@ -536,6 +536,15 @@ func (s *VideoGenerationService) completeVideoGeneration(videoGenID uint, videoU
 		"video_url":  videoURL,
 		"local_path": localVideoPath,
 	}
+
+	// check if it was upscaling before setting to complete
+	var oldVideoGen models.VideoGeneration
+	if err := s.db.First(&oldVideoGen, videoGenID).Error; err == nil {
+		if oldVideoGen.Status == models.VideoStatusUpscaling {
+			updates["is_upscaled"] = true
+		}
+	}
+
 	// 只有当 duration 大于 0 时才保存，避免保存无效的 0 值
 	if duration != nil && *duration > 0 {
 		updates["duration"] = *duration
@@ -648,7 +657,7 @@ func (s *VideoGenerationService) RecoverPendingTasks() {
 	var pendingVideos []models.VideoGeneration
 	// Query for pending tasks with non-empty task_id
 	// Note: Using IS NOT NULL and != '' to ensure we only get valid task IDs
-	if err := s.db.Where("status = ? AND task_id IS NOT NULL AND task_id != ''", models.VideoStatusProcessing).Find(&pendingVideos).Error; err != nil {
+	if err := s.db.Where("status IN ? AND task_id IS NOT NULL AND task_id != ''", []models.VideoStatus{models.VideoStatusProcessing, models.VideoStatusUpscaling}).Find(&pendingVideos).Error; err != nil {
 		s.log.Errorw("Failed to load pending video tasks", "error", err)
 		return
 	}
@@ -773,6 +782,48 @@ func (s *VideoGenerationService) BatchGenerateVideosForEpisode(episodeID string)
 
 func (s *VideoGenerationService) DeleteVideoGeneration(id uint) error {
 	return s.db.Delete(&models.VideoGeneration{}, id).Error
+}
+
+func (s *VideoGenerationService) UpscaleVideo(videoGenID uint) error {
+	var videoGen models.VideoGeneration
+	if err := s.db.First(&videoGen, videoGenID).Error; err != nil {
+		return err
+	}
+
+	if videoGen.TaskID == nil || *videoGen.TaskID == "" {
+		return fmt.Errorf("视频没有TaskId，无法Upscale")
+	}
+
+	client, err := s.getVideoClient(videoGen.Provider, videoGen.Model)
+	if err != nil {
+		return err
+	}
+
+	type Upscaler interface {
+		UpscaleVideo(taskID string) error
+	}
+
+	upscaler, ok := client.(Upscaler)
+	if !ok {
+		return fmt.Errorf("当前服务商 %s 不支持Upscale操作", videoGen.Provider)
+	}
+
+	err = upscaler.UpscaleVideo(*videoGen.TaskID)
+	if err != nil {
+		return fmt.Errorf("调用Upscale接口失败: %v", err)
+	}
+
+	// Update database status to upscaling
+	if err := s.db.Model(&videoGen).Updates(map[string]interface{}{
+		"status": models.VideoStatusUpscaling,
+	}).Error; err != nil {
+		s.log.Warnw("更新状态失败", "error", err, "id", videoGenID)
+	}
+
+	// poll task status asynchronously
+	go s.pollTaskStatus(videoGenID, *videoGen.TaskID, videoGen.Provider, videoGen.Model)
+
+	return nil
 }
 
 // convertImageToBase64 将图片转换为base64格式

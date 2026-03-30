@@ -54,6 +54,8 @@ type VideoGeneration struct {
 
 	Width  *int `json:"width,omitempty"`
 	Height *int `json:"height,omitempty"`
+
+	IsUpscaled *bool `gorm:"default:false" json:"is_upscaled,omitempty"`
 }
 
 type VideoStatus string
@@ -63,6 +65,7 @@ const (
 	VideoStatusProcessing VideoStatus = "processing"
 	VideoStatusCompleted  VideoStatus = "completed"
 	VideoStatusFailed     VideoStatus = "failed"
+	VideoStatusUpscaling  VideoStatus = "upscaling"
 )
 
 type VideoProvider string

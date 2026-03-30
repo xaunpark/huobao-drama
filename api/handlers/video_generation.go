@@ -147,3 +147,20 @@ func (h *VideoGenerationHandler) DeleteVideoGeneration(c *gin.Context) {
 
 	response.Success(c, nil)
 }
+
+func (h *VideoGenerationHandler) UpscaleVideo(c *gin.Context) {
+	videoGenID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		response.BadRequest(c, "无效的ID")
+		return
+	}
+
+	err = h.videoService.UpscaleVideo(uint(videoGenID))
+	if err != nil {
+		h.log.Errorw("Failed to upscale video", "error", err)
+		response.InternalError(c, err.Error())
+		return
+	}
+
+	response.Success(c, gin.H{"status": "success", "message": "Upscale task submitted"})
+}

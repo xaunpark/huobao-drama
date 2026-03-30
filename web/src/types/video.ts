@@ -27,9 +27,10 @@ export interface VideoGeneration {
   created_at: string
   updated_at: string
   completed_at?: string
+  is_upscaled?: boolean
 }
 
-export type VideoStatus = 'pending' | 'processing' | 'completed' | 'failed'
+export type VideoStatus = 'pending' | 'processing' | 'upscaling' | 'completed' | 'failed'
 
 export type VideoProvider = 'runway' | 'pika' | 'doubao' | 'openai'
 

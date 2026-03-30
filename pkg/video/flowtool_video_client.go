@@ -338,3 +338,45 @@ func (c *FlowToolVideoClient) GetTaskStatus(taskID string) (*VideoResult, error)
 
 	return result, nil
 }
+
+// UpscaleVideo triggers the upscale process for a completed video in Flow-Tool.
+// It uses the same job ID and does not create a new one.
+func (c *FlowToolVideoClient) UpscaleVideo(taskID string) error {
+	endpoint := fmt.Sprintf("%s/v1/jobs/%s/upscale", c.BaseURL, taskID)
+	req, err := http.NewRequest("POST", endpoint, nil)
+	if err != nil {
+		return fmt.Errorf("create upscale request: %w", err)
+	}
+
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("send upscale request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("read upscale response: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		return fmt.Errorf("upscale API error (status %d): %s", resp.StatusCode, string(body))
+	}
+
+	var result struct {
+		Success bool   `json:"success"`
+		JobID   string `json:"job_id"`
+		Message string `json:"message"`
+		Error   string `json:"error"`
+	}
+
+	if err := json.Unmarshal(body, &result); err != nil {
+		return fmt.Errorf("parse upscale response: %w, body: %s", err, string(body))
+	}
+
+	if !result.Success {
+		return fmt.Errorf("upscale failed: %s", result.Error)
+	}
+
+	return nil
+}

@@ -40,5 +40,9 @@ export const videoAPI = {
 
   deleteVideo(id: number) {
     return request.delete(`/videos/${id}`)
+  },
+
+  upscaleVideo(videoGenId: number) {
+    return request.post<{ status: string; message: string }>(`/videos/${videoGenId}/upscale`)
   }
 }
