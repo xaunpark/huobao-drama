@@ -9,8 +9,9 @@ import (
 func (h *CharacterLibraryHandler) BatchGenerateCharacterImages(c *gin.Context) {
 
 	var req struct {
-		CharacterIDs []string `json:"character_ids" binding:"required,min=1"`
-		Model        string   `json:"model"`
+		CharacterIDs    []string `json:"character_ids" binding:"required,min=1"`
+		Model           string   `json:"model"`
+		ConcurrentLimit int      `json:"concurrent_limit"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -25,7 +26,10 @@ func (h *CharacterLibraryHandler) BatchGenerateCharacterImages(c *gin.Context) {
 	}
 
 	// 异步批量生成
-	go h.libraryService.BatchGenerateCharacterImages(req.CharacterIDs, h.imageService, req.Model)
+	if req.ConcurrentLimit <= 0 {
+		req.ConcurrentLimit = 4 // Default if not provided
+	}
+	go h.libraryService.BatchGenerateCharacterImages(req.CharacterIDs, h.imageService, req.Model, req.ConcurrentLimit)
 
 	response.Success(c, gin.H{
 		"message": "批量生成任务已提交",

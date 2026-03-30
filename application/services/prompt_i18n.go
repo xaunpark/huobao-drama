@@ -376,35 +376,15 @@ func (p *PromptI18n) GetVideoConstraintPrompt(referenceMode string) string {
 		return prompts.Get("video_constraint_rapid_cut.txt")
 	}
 
-	// 动作序列图（1x3横向条带）的约束提示词
-	actionSequencePrompts := map[string]string{
-		"zh": prompts.Get("video_constraint_prefixes.txt"),
-
-		"en": prompts.Get("video_constraint_prefixes.txt"),
-	}
-
-	// 通用约束提示词（单图、首尾帧、多图）
-	generalPrompts := map[string]string{
-		"zh": prompts.Get("video_constraint_prefixes.txt"),
-
-		"en": prompts.Get("video_constraint_prefixes.txt"),
-	}
-
-	lang := "zh"
-	if true || p.IsEnglish() {
-		lang = "en"
-	}
-
-	// 如果是动作序列模式，返回3-panel strip约束提示词
-	if referenceMode == "action_sequence" {
-		if prompt, ok := actionSequencePrompts[lang]; ok {
-			return prompt
-		}
-	}
-
-	// 其他模式返回通用约束提示词
-	if prompt, ok := generalPrompts[lang]; ok {
-		return prompt
+	switch referenceMode {
+	case "action_sequence":
+		return "[System Note] The provided reference image is a storyboard grid showing a continuous sequence of actions from left to right. Do not generate a split-screen video. Instead, generate a single-frame, smooth video that transitions sequentially through these exact key poses in chronological order."
+	case "first_frame_strict":
+		return "[System Note] The provided reference image is the strict starting frame. The video must begin EXACTLY with this visual state, character pose, and environment, then smoothly start the action described above."
+	case "last_frame_strict":
+		return "[System Note] The provided reference image is the final target frame. The video must end EXACTLY matching this visual state. Plan the pacing so the action resolves into this specific pose at the end of the video."
+	case "key_frame_style":
+		return "[System Note] The provided reference image is for character, lighting, and aesthetic reference only. You do not need to strictly start or end with this exact pose, but maintain the exact same identity, clothing, and scene logic while performing the requested action."
 	}
 
 	return ""

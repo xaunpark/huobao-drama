@@ -420,7 +420,7 @@ func (s *CharacterLibraryService) GenerateCharacterImage(characterID string, ima
 
 // waitAndUpdateCharacterImage 后台异步等待图片生成完成并更新角色image_url
 func (s *CharacterLibraryService) waitAndUpdateCharacterImage(characterID uint, imageGenID uint) {
-	maxAttempts := 60
+	maxAttempts := 360 // Tăng lên 360 lần (khoảng 30 phút) để Batch có đủ thời gian xếp hàng
 	pollInterval := 5 * time.Second
 
 	for i := 0; i < maxAttempts; i++ {
@@ -524,15 +524,20 @@ func (s *CharacterLibraryService) UpdateCharacter(characterID string, req *Updat
 }
 
 // BatchGenerateCharacterImages 批量生成角色图片（并发执行）
-func (s *CharacterLibraryService) BatchGenerateCharacterImages(characterIDs []string, imageService *ImageGenerationService, modelName string) {
+func (s *CharacterLibraryService) BatchGenerateCharacterImages(characterIDs []string, imageService *ImageGenerationService, modelName string, concurrentLimit int) {
 	s.log.Infow("Starting batch character image generation",
 		"count", len(characterIDs),
-		"model", modelName)
+		"model", modelName,
+		"concurrent_limit", concurrentLimit)
+
+	sem := make(chan struct{}, concurrentLimit)
 
 	// 使用 goroutine 并发生成所有角色图片
 	for _, characterID := range characterIDs {
+		sem <- struct{}{} // Acquire token
 		// 为每个角色启动单独的 goroutine
 		go func(charID string) {
+			defer func() { <-sem }() // Release token
 			imageGen, err := s.GenerateCharacterImage(charID, imageService, modelName, "", nil) // 批量生成暂不支持自定义风格和参考图片
 			if err != nil {
 				s.log.Errorw("Failed to generate character image in batch",

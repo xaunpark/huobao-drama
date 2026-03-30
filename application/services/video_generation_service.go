@@ -307,14 +307,22 @@ func (s *VideoGenerationService) ProcessVideoGeneration(videoGenID uint) {
 	// 如果是单图模式，需要检查图片是否为动作序列图
 	if referenceMode == "single" && videoGen.ImageGenID != nil {
 		var imageGen models.ImageGeneration
-		if err := s.db.First(&imageGen, *videoGen.ImageGenID).Error; err == nil {
-			// 如果图片的frame_type是action，使用动作序列约束提示词
-			if imageGen.FrameType != nil && *imageGen.FrameType == "action" {
+		if err := s.db.First(&imageGen, *videoGen.ImageGenID).Error; err == nil && imageGen.FrameType != nil {
+			if *imageGen.FrameType == "action" {
 				referenceMode = "action_sequence"
 				s.log.Infow("Detected action sequence image in single mode",
 					"id", videoGenID,
 					"image_gen_id", *videoGen.ImageGenID,
 					"frame_type", *imageGen.FrameType)
+			} else if *imageGen.FrameType == "first" {
+				referenceMode = "first_frame_strict"
+				s.log.Infow("Detected first frame image in single mode", "id", videoGenID)
+			} else if *imageGen.FrameType == "last" {
+				referenceMode = "last_frame_strict"
+				s.log.Infow("Detected last frame image in single mode", "id", videoGenID)
+			} else if *imageGen.FrameType == "key" {
+				referenceMode = "key_frame_style"
+				s.log.Infow("Detected key frame image in single mode", "id", videoGenID)
 			}
 		}
 	}

@@ -85,10 +85,11 @@ export const characterLibraryAPI = {
   },
 
   // 批量生成角色形象
-  batchGenerateCharacterImages(characterIds: string[], model?: string) {
+  batchGenerateCharacterImages(characterIds: string[], model?: string, concurrentLimit?: number) {
     return request.post<{ message: string; count: number }>('/characters/batch-generate-images', {
       character_ids: characterIds,
-      model
+      model,
+      concurrent_limit: concurrentLimit
     })
   },
 

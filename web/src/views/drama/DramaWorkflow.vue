@@ -726,6 +726,9 @@ import request from "@/utils/request";
 import type { Drama, DramaStatus } from "@/types/drama";
 import { AppHeader } from "@/components/common";
 import { getImageUrl, hasImage } from "@/utils/image";
+import { useAISettings } from "@/composables/useAISettings";
+
+const { maxConcurrentThreads } = useAISettings();
 
 const route = useRoute();
 const router = useRouter();
@@ -1332,6 +1335,8 @@ const batchGenerateCharacterImages = async () => {
   try {
     await characterLibraryAPI.batchGenerateCharacterImages(
       selectedCharacterIds.value.map((id) => String(id)),
+      undefined,
+      maxConcurrentThreads.value
     );
 
     ElMessage.success(

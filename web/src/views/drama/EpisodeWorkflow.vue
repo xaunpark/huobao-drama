@@ -1470,6 +1470,23 @@ import { propAPI } from "@/api/prop";
 import type { Drama } from "@/types/drama";
 import { AppHeader } from "@/components/common";
 import { getImageUrl, hasImage } from "@/utils/image";
+import { useAISettings } from "@/composables/useAISettings";
+
+const { maxConcurrentThreads } = useAISettings();
+
+const runConcurrently = async <T>(items: T[], limit: number, worker: (item: T) => Promise<void>) => {
+  const executing: Promise<void>[] = []
+  for (const item of items) {
+    const p = worker(item).finally(() => {
+      executing.splice(executing.indexOf(p), 1)
+    })
+    executing.push(p)
+    if (executing.length >= limit) {
+      await Promise.race(executing)
+    }
+  }
+  await Promise.all(executing)
+};
 
 const route = useRoute();
 const router = useRouter();
@@ -2175,13 +2192,17 @@ const batchGeneratePropImages = async () => {
 
   batchGeneratingProps.value = true;
   try {
-    const promises = selectedPropIds.value.map((propId) =>
-      generatePropImage(propId),
-    );
-    const results = await Promise.allSettled(promises);
+    let successCount = 0;
+    let failCount = 0;
 
-    const successCount = results.filter((r) => r.status === "fulfilled").length;
-    const failCount = results.filter((r) => r.status === "rejected").length;
+    await runConcurrently(selectedPropIds.value, maxConcurrentThreads.value, async (propId) => {
+      try {
+        await generatePropImage(propId);
+        successCount++;
+      } catch (err) {
+        failCount++;
+      }
+    });
 
     if (failCount === 0) {
       ElMessage.success(
@@ -2226,6 +2247,7 @@ const batchGenerateCharacterImages = async () => {
     await characterLibraryAPI.batchGenerateCharacterImages(
       selectedCharacterIds.value.map((id) => id.toString()),
       model,
+      maxConcurrentThreads.value
     );
 
     ElMessage.success($t("workflow.batchTaskSubmitted"));
@@ -2275,13 +2297,17 @@ const batchGenerateSceneImages = async () => {
 
   batchGeneratingScenes.value = true;
   try {
-    const promises = selectedSceneIds.value.map((sceneId) =>
-      generateSceneImage(sceneId.toString()),
-    );
-    const results = await Promise.allSettled(promises);
+    let successCount = 0;
+    let failCount = 0;
 
-    const successCount = results.filter((r) => r.status === "fulfilled").length;
-    const failCount = results.filter((r) => r.status === "rejected").length;
+    await runConcurrently(selectedSceneIds.value, maxConcurrentThreads.value, async (sceneId) => {
+      try {
+        await generateSceneImage(sceneId.toString());
+        successCount++;
+      } catch (err) {
+        failCount++;
+      }
+    });
 
     if (failCount === 0) {
       ElMessage.success(

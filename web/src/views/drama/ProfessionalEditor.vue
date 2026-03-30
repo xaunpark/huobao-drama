@@ -674,6 +674,19 @@
                     placeholder="编辑将要发送的视频提示词..."
                     resize="vertical"
                   />
+                  <!-- Hint for injected prompt instructions based on reference image -->
+                  <div class="prompt-hint-container" v-if="injectedPromptHint" style="margin-top: 8px;">
+                    <el-tooltip
+                      effect="dark"
+                      :content="injectedPromptHint.content"
+                      placement="bottom"
+                    >
+                      <span style="font-size: 13px; color: #409EFF; cursor: pointer; display: flex; align-items: center;">
+                        <el-icon style="margin-right: 4px;"><MagicStick /></el-icon>
+                        {{ injectedPromptHint.title }}
+                      </span>
+                    </el-tooltip>
+                  </div>
                 </div>
 
                 <!-- 视频参数设置 -->
@@ -2242,6 +2255,43 @@ const videoReferenceImages = ref<ImageGeneration[]>([]);
 const selectedVideoModel = ref<string>("");
 const selectedReferenceMode = ref<string>(""); // 参考图模式：single, first_last, multiple, none
 const currentVideoPrompt = ref<string>("");
+
+// Dynamic hint for injected prompt instructions based on reference image frame type
+const injectedPromptHint = computed(() => {
+  if (selectedReferenceMode.value === 'none' || selectedReferenceMode.value === 'multiple' || selectedImagesForVideo.value.length === 0) {
+    return null;
+  }
+  
+  const firstImageId = selectedImagesForVideo.value[0];
+  const image = videoReferenceImages.value.find(img => img.id === firstImageId);
+  
+  if (!image || !image.frame_type) return null;
+  
+  if (image.frame_type === 'action') {
+    return {
+      title: "✨ 动作序列规则已自动添加 (System Note)",
+      content: "The provided reference image is a storyboard grid showing a continuous sequence of actions from left to right. Do not generate a split-screen video. Instead, generate a single-frame, smooth video that transitions sequentially through these exact key poses in chronological order."
+    };
+  } else if (image.frame_type === 'first') {
+    return {
+      title: "✨ 首帧严格遵守规则已自动添加 (System Note)",
+      content: "The provided reference image is the strict starting frame. The video must begin EXACTLY with this visual state, character pose, and environment, then smoothly start the action described above."
+    };
+  } else if (image.frame_type === 'last') {
+    return {
+      title: "✨ 尾帧严格遵守规则已自动添加 (System Note)",
+      content: "The provided reference image is the final target frame. The video must end EXACTLY matching this visual state. Plan the pacing so the action resolves into this specific pose at the end of the video."
+    };
+  } else if (image.frame_type === 'key') {
+      return {
+      title: "✨ 关键帧风格参考规则已自动添加 (System Note)",
+      content: "The provided reference image is for character, lighting, and aesthetic reference only. You do not need to strictly start or end with this exact pose, but maintain the exact same identity, clothing, and scene logic while performing the requested action."
+    };
+  }
+  
+  return null;
+});
+
 const previewImageUrl = ref<string>(""); // 预览大图的URL
 const videoModelCapabilities = ref<VideoModelCapability[]>([]);
 let videoPollingTimer: any = null;
@@ -5488,6 +5538,7 @@ onBeforeUnmount(() => {
               text-overflow: ellipsis;
               display: -webkit-box;
               -webkit-line-clamp: 2;
+              line-clamp: 2;
               -webkit-box-orient: vertical;
             }
           }
