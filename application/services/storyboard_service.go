@@ -526,7 +526,7 @@ func extractCompositionType(shotType string) string {
 // NOTE: BGM is intentionally excluded — video generation AI produces visuals, not audio.
 // Including BGM can conflict with style DNA (e.g., styles that require ZERO music).
 // Sound effects are included as environmental context to help AI understand the scene's physics.
-func (s *StoryboardService) generateVideoPrompt(sb Storyboard, propsDesc string) string {
+func (s *StoryboardService) generateVideoPrompt(sb Storyboard) string {
 	var parts []string
 	videoRatio := "16:9"
 	// 1. 人物动作（核心 - 定义shot内容）
@@ -534,10 +534,7 @@ func (s *StoryboardService) generateVideoPrompt(sb Storyboard, propsDesc string)
 		parts = append(parts, fmt.Sprintf("Action: %s", sb.Action))
 	}
 
-	// 1.5. 道具描述
-	if propsDesc != "" {
-		parts = append(parts, fmt.Sprintf("Props: %s", propsDesc))
-	}
+
 
 	// 2. 结果（动作的最终视觉状态 - 紧跟Action以保持叙事连贯）
 	if sb.Result != "" {
@@ -712,7 +709,7 @@ func (s *StoryboardService) saveStoryboards(episodeID string, storyboards []Stor
 
 			// 生成两种专用提示词
 			imagePrompt := s.generateImagePrompt(sb, propDescriptions) // 专用于图片生成
-			videoPrompt := s.generateVideoPrompt(sb, propDescriptions) // 专用于视频生成
+			videoPrompt := s.generateVideoPrompt(sb) // 专用于视频生成
 
 			// 处理 dialogue 字段
 			var dialoguePtr *string
@@ -874,7 +871,7 @@ func (s *StoryboardService) CreateStoryboard(req *CreateStoryboardRequest) (*mod
 
 	// 生成提示词
 	imagePrompt := s.generateImagePrompt(sb, "")
-	videoPrompt := s.generateVideoPrompt(sb, "")
+	videoPrompt := s.generateVideoPrompt(sb)
 
 	// 构建 description
 	desc := ""

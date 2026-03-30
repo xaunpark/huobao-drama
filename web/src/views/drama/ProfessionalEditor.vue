@@ -2830,54 +2830,12 @@ watch(
       currentStoryboard.value.description ||
       "";
       
-    // 自动将剧本的预设风格（Style）添加到最前面，确保风格权重最高
-    const getVideoStylePrefix = async (styleCode: string): Promise<string> => {
-      // Priority 1: If drama has a template, try to use template's style_prompt
-      if (drama.value?.prompt_template_id) {
-        try {
-          const { promptTemplateAPI } = await import('@/api/prompt-template');
-          const tpl = await promptTemplateAPI.get(drama.value.prompt_template_id);
-          const tplData = tpl as any;
-          const prompts = tplData?.prompts || tplData?.data?.prompts;
-          if (prompts?.style_prompt && prompts.style_prompt.trim()) {
-            return `(Art Style: ${prompts.style_prompt.trim()}) - `;
-          }
-        } catch {
-          // Template load failed, fall through to default
-        }
-      }
-
-      // Priority 2: Custom style text
-      if (styleCode === 'custom') {
-        const customStyleDesc = drama.value?.custom_style || '';
-        return `(Art Style: ${customStyleDesc}) - `;
-      }
-
-      // Priority 3: Hardcoded style descriptions
-      const stylesMap: Record<string, string> = {
-        'ghibli': 'Studio Ghibli animation film style, breathtaking masterpiece scenery, highly detailed anime art, vivid colors, beautifully graded lighting',
-        'guoman': 'High quality Chinese 2D animation style, vivid wuxia/xianxia aesthetic, delicate linework, epic cinematic atmosphere',
-        'wasteland': 'Post-apocalyptic wasteland style, gritty and rusty textures, desolate environments, cinematic lighting, highly detailed survival aesthetic',
-        'nostalgia': 'Retro nostalgic aesthetic, vintage film look, muted warm colors, 90s classic anime feelings, cinematic lighting',
-        'pixel': 'High-quality 16-bit retro pixel art, detailed sprite animations, vibrant arcade game aesthetics, nostalgic masterpiece',
-        'voxel': 'Voxel art style, 3D blocky world aesthetic, high quality render, bright and pleasant lighting, minecraft style masterpiece',
-        'urban': 'Modern urban realistic photography, high-resolution 8k cinematic shot, city street lights, highly detailed life-like textures',
-        'guoman3d': 'High quality Chinese 3D animation style, unreal engine 5 render, highly detailed 3D models, smooth lighting, realistic shading, wuxia/xianxia aesthetic',
-        'chibi3d': 'Cute chibi 3D style, blind box toy aesthetic, smooth glossy textures, bright pastel lighting, octane render, disney quality'
-      };
-      const detailedStyle = stylesMap[styleCode] || `${styleCode} style, highly detailed cinematic masterpiece`;
-      return `(Art Style: ${detailedStyle}) - `;
-    };
-
-    if (drama.value?.style) {
-      const stylePrefix = await getVideoStylePrefix(drama.value.style);
-      if (!basePrompt.includes("(Art Style:")) {
-        // Handle migration from old 'Style: ghibli. ' prefix if present
-        if (basePrompt.startsWith("Style: " + drama.value.style + ". ")) {
-          basePrompt = basePrompt.substring(("Style: " + drama.value.style + ". ").length);
-        }
-        basePrompt = stylePrefix + basePrompt;
-      }
+    // The backend LLM already processes style instructions when generating prompts.
+    // We no longer manually concatenate the massive style prefix to prevent confusing 
+    // downstream diffusion models (Video generation AI) with excessive text.
+    if (drama.value?.style && basePrompt.startsWith("Style: " + drama.value.style + ". ")) {
+      // Clean up legacy prefix if it exists in DB
+      basePrompt = basePrompt.substring(("Style: " + drama.value.style + ". ").length);
     }
     
     currentVideoPrompt.value = basePrompt;
@@ -3249,6 +3207,16 @@ const generateFrameImage = async () => {
       storyboardCharacters.forEach((char: any) => {
         if (char.local_path) {
           referenceImages.push(char.local_path);
+        }
+      });
+    }
+
+    // 3. 添加当前镜头中使用的道具图片（使用 local_path）
+    const storyboardProps = currentStoryboardProps.value;
+    if (storyboardProps && storyboardProps.length > 0) {
+      storyboardProps.forEach((prop: any) => {
+        if (prop.local_path) {
+          referenceImages.push(prop.local_path);
         }
       });
     }

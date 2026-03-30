@@ -350,12 +350,10 @@ func (s *CharacterLibraryService) buildCharacterPrompt(character *models.Charact
 		return prompt
 	}
 
-	// Resolve effective style — respects template's style_prompt if available
-	effectiveStyle := s.promptI18n.ResolveEffectiveStylePublic(drama.ID, drama.Style, drama.CustomStyle)
-	if effectiveStyle != "" && effectiveStyle != "realistic" {
-		prompt += ", " + effectiveStyle
-	}
-
+	// The Appearance field (if AI-extracted) already incorporates the necessary character design semantics.
+	// We no longer manually concatenate the massive style prefix to prevent confusing 
+	// downstream diffusion models with excessive LLM-oriented instructional text.
+	
 	// Add special character sheet requirements
 	prompt += ", t-pose, character sheet, turn around character, white background, no text overlay"
 

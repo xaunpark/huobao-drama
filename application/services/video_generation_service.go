@@ -324,6 +324,17 @@ func (s *VideoGenerationService) ProcessVideoGeneration(videoGenID uint) {
 				referenceMode = "key_frame_style"
 				s.log.Infow("Detected key frame image in single mode", "id", videoGenID)
 			}
+
+			// 对于 flow-tool 提供商，如果是 action_sequence 或 key_frame_style，
+			// 我们希望将其作为参考图（R2V）发送，而不是起始帧（I2V_S）
+			if videoGen.Provider == "flow-tool" && (referenceMode == "action_sequence" || referenceMode == "key_frame_style") {
+				if imageURL != "" {
+					// 将单图 imageURL 转移到 ReferenceImageURLs 中以触发 R2V，并且清空 imageURL 防止触发 I2V_S
+					opts = append(opts, video.WithReferenceImages([]string{imageURL}))
+					imageURL = ""
+					s.log.Infow("Routed single image to R2V mode for flow-tool", "mode", referenceMode, "id", videoGenID)
+				}
+			}
 		}
 	}
 

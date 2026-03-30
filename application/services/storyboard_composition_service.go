@@ -43,6 +43,14 @@ type SceneBackgroundInfo struct {
 	Status    string  `json:"status"`
 }
 
+type ScenePropInfo struct {
+	ID        uint    `json:"id"`
+	Name      string  `json:"name"`
+	Type      *string `json:"type,omitempty"`
+	ImageURL  *string `json:"image_url,omitempty"`
+	LocalPath *string `json:"local_path,omitempty"`
+}
+
 type SceneCompositionInfo struct {
 	ID                    uint                 `json:"id"`
 	StoryboardNumber      int                  `json:"storyboard_number"`
@@ -63,6 +71,7 @@ type SceneCompositionInfo struct {
 	ImagePrompt           *string              `json:"image_prompt,omitempty"`
 	VideoPrompt           *string              `json:"video_prompt,omitempty"`
 	Characters            []SceneCharacterInfo `json:"characters"`
+	Props                 []ScenePropInfo      `json:"props"`
 	Background            *SceneBackgroundInfo `json:"background"`
 	SceneID               *uint                `json:"scene_id"`
 	ComposedImage         *string              `json:"composed_image,omitempty"`
@@ -118,6 +127,7 @@ func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string, vie
 
 	if err := query.
 		Preload("Characters").
+		Preload("Props").
 		Order("storyboard_number ASC").
 		Find(&storyboards).Error; err != nil {
 		return nil, fmt.Errorf("failed to load storyboards: %w", err)
@@ -250,6 +260,20 @@ func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string, vie
 					LocalPath: char.LocalPath,
 				}
 				storyboardInfo.Characters = append(storyboardInfo.Characters, storyboardChar)
+			}
+		}
+
+		// 直接使用关联的道具信息
+		if len(storyboard.Props) > 0 {
+			for _, prop := range storyboard.Props {
+				storyboardProp := ScenePropInfo{
+					ID:        prop.ID,
+					Name:      prop.Name,
+					Type:      prop.Type,
+					ImageURL:  prop.ImageURL,
+					LocalPath: prop.LocalPath,
+				}
+				storyboardInfo.Props = append(storyboardInfo.Props, storyboardProp)
 			}
 		}
 
@@ -411,13 +435,9 @@ func (s *StoryboardCompositionService) BuildSceneFullPrompt(sceneID uint) (strin
 		return prompt, nil
 	}
 
-	// Get effective style. For scenes, we use the same effectiveStyle to keep consistency.
-	if s.promptI18n != nil {
-		effectiveStyle := s.promptI18n.ResolveEffectiveStylePublic(drama.ID, drama.Style, drama.CustomStyle)
-		if effectiveStyle != "" && effectiveStyle != "realistic" {
-			prompt += ", " + effectiveStyle
-		}
-	}
+	// The Scene Prompt (if AI-extracted) already incorporates the necessary environmental design semantics.
+	// We no longer manually concatenate the massive style prefix to prevent confusing 
+	// downstream diffusion models with excessive LLM-oriented instructional text.
 
 	// Append background suffix
 	prompt += ", background only, no characters"
