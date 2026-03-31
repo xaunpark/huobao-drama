@@ -67,11 +67,6 @@ func (s *ScriptGenerationService) processCharacterGeneration(taskID string, req 
 	// 更新任务状态为处理中
 	s.taskService.UpdateTaskStatus(taskID, "processing", 0, "正在生成角色...")
 
-	count := req.Count
-	if count == 0 {
-		count = 5
-	}
-
 	// 获取 drama 的 style 信息
 	var drama models.Drama
 	if err := s.db.Where("id = ? ", req.DramaID).First(&drama).Error; err != nil {
@@ -87,7 +82,7 @@ func (s *ScriptGenerationService) processCharacterGeneration(taskID string, req 
 		outlineText = s.promptI18n.FormatUserPrompt("drama_info_template", drama.Title, drama.Description, drama.Genre)
 	}
 
-	userPrompt := s.promptI18n.FormatUserPrompt("character_request", outlineText, count)
+	userPrompt := s.promptI18n.FormatUserPrompt("character_request", outlineText)
 
 	fixedInstructions := fixed.Get("character_extraction")
 	userPrompt = userPrompt + "\n\n" + fixedInstructions
