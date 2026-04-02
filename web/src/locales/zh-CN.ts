@@ -545,6 +545,9 @@ export default {
     batch: {
       title: '批量任务工作站 (Batch Action Studio)',
       instructions: '系统将按照 [提取提示词] -> [生成格点图] -> [生成视频] 的顺序处理所有分镜。您可以选择执行全部，或只执行特定阶段。',
+      downloadAll: '下载所有视频 (Download All)',
+      downloadingZip: '正在准备压缩包...',
+      noVideosToDownload: '未找到可下载的已完成视频',
       imageModel: '图片模型:',
       videoModel: '视频模型:',
       generationMode: '生成模式:',
@@ -573,6 +576,21 @@ export default {
       completed: '批量任务处理完成',
       selectVideoModelFirst: '请先选择视频模型',
       lackActionImage: 'Shot {number} 缺乏有效的 Action 图片'
+    },
+    batchR2V: {
+      title: '参考图生成工作站 (Batch Reference Video)',
+      instructions: '系统将按照 [提取视频提示词] -> [聚合参考资产] -> [生成视频] 的顺序直接处理分镜。不经过中间生图步骤，确保镜头稳定性。',
+      runAll: '执行全流程 (R2V)',
+      onlyVideoPrompt: '仅提取视频提示词',
+      onlyVideo: '仅生成视频',
+      videoPrompt: '视频提示词',
+      referenceStatus: '参考资产',
+      status: {
+        ready: '已就绪',
+        partial: '部分缺失',
+        missing: '无资产'
+      },
+      assetPriority: '优先: 1 场景 + 2 角色/道具'
     }
   },
   storyboard: {

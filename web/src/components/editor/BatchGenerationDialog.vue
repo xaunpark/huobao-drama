@@ -55,6 +55,9 @@
           <el-button type="success" plain :disabled="isBatching" @click="startUpscaleAll">
             <el-icon><MagicStick /></el-icon> Upscale All Videos
           </el-button>
+          <el-button type="info" plain :loading="isDownloadingZip" @click="downloadAllVideos">
+             <el-icon><Download /></el-icon> {{ $t('professionalEditor.batch.downloadAll') }}
+          </el-button>
           <el-button type="danger" plain v-if="isBatching" @click="stopBatch">
             {{ $t('professionalEditor.batch.stop') }}
           </el-button>
@@ -118,14 +121,17 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from 'vue'
-import { MagicStick } from '@element-plus/icons-vue'
+import { MagicStick, Download } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import JSZip from 'jszip'
+import axios from 'axios'
 import { useI18n } from 'vue-i18n'
 import { dramaAPI } from '@/api/drama'
 import { generateFramePrompt } from '@/api/frame'
 import { imageAPI } from '@/api/image'
 import { videoAPI } from '@/api/video'
 import { taskAPI } from '@/api/task'
+import { getVideoUrl } from '@/utils/image'
 import type { Storyboard } from '@/types/drama'
 import { useAISettings } from '@/composables/useAISettings'
 // Local mutable copy of storyboards that can be refreshed from DB
@@ -152,6 +158,7 @@ const visible = computed({
 
 const selectedVideoModel = ref(props.defaultVideoModel || '')
 const isBatching = ref(false)
+const isDownloadingZip = ref(false)
 const shouldStop = ref(false)
 const generationMode = ref<'key'|'action'>('action')
 const { maxConcurrentThreads } = useAISettings()
@@ -624,6 +631,103 @@ const startUpscaleAll = async () => {
   } finally {
     isBatching.value = false
     emit('completed')
+  }
+}
+
+const downloadAllVideos = async () => {
+  if (isBatching.value) return
+  isDownloadingZip.value = true
+  
+  try {
+    // 1. Get all completed videos for this drama
+    const vidRes = await videoAPI.listVideos({ 
+      drama_id: props.dramaId.toString(), 
+      status: 'completed',
+      page_size: 1000 // Get all
+    })
+    
+    if (!vidRes.items || vidRes.items.length === 0) {
+      ElMessage.warning(t('professionalEditor.batch.noVideosToDownload'))
+      return
+    }
+
+    // 2. Map storyboard_id to its best video (prefer HD, then latest)
+    const bestVideos = new Map<number, any>()
+    vidRes.items.forEach((vid: any) => {
+      const sbId = vid.storyboard_id
+      if (!sbId) return
+      
+      const currentBest = bestVideos.get(sbId)
+      if (!currentBest) {
+        bestVideos.set(sbId, vid)
+      } else {
+        // Preference logic:
+        // 1. HD (upscaled) vs non-HD
+        if (vid.is_upscaled && !currentBest.is_upscaled) {
+          bestVideos.set(sbId, vid)
+        } else if (vid.is_upscaled === currentBest.is_upscaled) {
+          // Both same HD status, pick latest
+          if (new Date(vid.created_at) > new Date(currentBest.created_at)) {
+            bestVideos.set(sbId, vid)
+          }
+        }
+      }
+    })
+
+    if (bestVideos.size === 0) {
+      ElMessage.warning(t('professionalEditor.batch.noVideosToDownload'))
+      return
+    }
+
+    ElMessage.info(t('professionalEditor.batch.downloadingZip'))
+    
+    const zip = new JSZip()
+    // No subfolders for the videos themselves, as requested
+    
+    // 3. Download each video and add to zip
+    const downloadPromises = []
+    
+    for (const [sbId, vid] of bestVideos.entries()) {
+      const sb = props.storyboards.find(s => Number(s.id) === sbId)
+      const sbNum = sb ? String(sb.storyboard_number).padStart(3, '0') : String(sbId)
+      const fileName = `Shot_${sbNum}.mp4`
+      const url = getVideoUrl(vid)
+      
+      if (!url) continue
+      
+      // Use full URL for axios if needed, but getVideoUrl returns /static/ which is on same domain
+      const fullUrl = url.startsWith('http') ? url : `${window.location.origin}${url}`
+      
+      downloadPromises.push(
+        axios.get(fullUrl, { responseType: 'blob' })
+          .then(res => {
+            zip.file(fileName, res.data)
+          })
+          .catch(err => {
+            console.error(`Failed to download video for shot ${sbId}:`, err)
+          })
+      )
+    }
+    
+    await Promise.all(downloadPromises)
+    
+    // 4. Generate and download ZIP
+    const content = await zip.generateAsync({ type: 'blob' })
+    const zipUrl = URL.createObjectURL(content)
+    const link = document.createElement('a')
+    link.href = zipUrl
+    link.download = `drama_${props.dramaId}_videos.zip`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(zipUrl)
+    
+    ElMessage.success(t('professionalEditor.batch.completed'))
+  } catch (err: any) {
+    console.error('Download all failed:', err)
+    ElMessage.error(t('message.operationFailed'))
+  } finally {
+    isDownloadingZip.value = false
   }
 }
 

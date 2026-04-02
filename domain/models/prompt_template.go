@@ -39,6 +39,7 @@ type PromptTemplatePrompts struct {
 	ImageActionSequence string `json:"image_action_sequence,omitempty"`
 	VideoConstraint     string `json:"video_constraint,omitempty"`
 	StylePrompt         string `json:"style_prompt,omitempty"`
+	VideoExtraction     string `json:"video_extraction,omitempty"`
 }
 
 // PromptTypeToDefaultFile 将 prompt type key 映射到默认的 embed 文件名
@@ -55,4 +56,5 @@ var PromptTypeToDefaultFile = map[string]string{
 	"image_action_sequence": "image_action_sequence.txt",
 	"video_constraint":     "video_constraint_prefixes.txt",
 	"style_prompt":         "style_prompt.txt",
+	"video_extraction":     "video_extraction.txt",
 }

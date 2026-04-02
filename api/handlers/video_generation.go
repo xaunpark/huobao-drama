@@ -101,6 +101,7 @@ func (h *VideoGenerationHandler) ListVideoGenerations(c *gin.Context) {
 		}
 	}
 	status := c.Query("status")
+	generationMode := c.Query("generation_mode")
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "20"))
 
@@ -120,7 +121,7 @@ func (h *VideoGenerationHandler) ListVideoGenerations(c *gin.Context) {
 
 	// 计算offset：(page - 1) * pageSize
 	offset := (page - 1) * pageSize
-	videos, total, err := h.videoService.ListVideoGenerations(dramaIDUint, storyboardID, status, pageSize, offset)
+	videos, total, err := h.videoService.ListVideoGenerations(dramaIDUint, storyboardID, status, generationMode, pageSize, offset)
 
 	if err != nil {
 		h.log.Errorw("Failed to list videos", "error", err)

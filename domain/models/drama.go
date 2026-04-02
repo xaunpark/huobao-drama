@@ -107,6 +107,7 @@ type Storyboard struct {
 	Atmosphere       *string        `gorm:"type:text" json:"atmosphere"`
 	ImagePrompt      *string        `gorm:"type:text" json:"image_prompt"`
 	VideoPrompt      *string        `gorm:"type:text" json:"video_prompt"`
+	VideoPromptSource string        `gorm:"type:varchar(20);default:'auto'" json:"video_prompt_source"`
 	BgmPrompt        *string        `gorm:"type:text" json:"bgm_prompt"`
 	SoundEffect      *string        `gorm:"size:255" json:"sound_effect"`
 	Dialogue         *string        `gorm:"type:text" json:"dialogue"`

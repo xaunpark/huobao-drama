@@ -42,6 +42,7 @@ const (
 	FrameTypeLast   FrameType = "last"   // 尾帧
 	FrameTypePanel  FrameType = "panel"  // 分镜板（3格组合）
 	FrameTypeAction FrameType = "action" // 动作序列（5格）
+	FrameTypeVideo  FrameType = "video"  // 视频 prompt (R2V)
 )
 
 // GenerateFramePromptRequest 生成帧提示词请求
@@ -181,6 +182,21 @@ func (s *FramePromptService) processFramePromptGeneration(taskID string, req Gen
 		}
 		combinedPrompt := strings.Join(prompts, "\n---\n")
 		s.saveFramePrompt(req.StoryboardID, string(req.FrameType), combinedPrompt, "动作序列组合提示词", response.MultiFrame.Layout)
+	case FrameTypeVideo:
+		response.SingleFrame, err = s.generateVideoPrompt(episode.Drama.ID, storyboard, scene, dramaStyle, episode.Drama.CustomStyle, model)
+		if err != nil {
+			s.taskService.UpdateTaskStatus(taskID, "failed", 0, "AI生成视频提示词失败: "+err.Error())
+			return
+		}
+		// 保存视频提示词 (同步更新到 storyboard 表)
+		s.saveFramePrompt(req.StoryboardID, string(req.FrameType), response.SingleFrame.Prompt, response.SingleFrame.Description, "")
+		updates := map[string]interface{}{
+			"video_prompt":        response.SingleFrame.Prompt,
+			"video_prompt_source": "ai",
+		}
+		if err := s.db.Model(&models.Storyboard{}).Where("id = ?", req.StoryboardID).Updates(updates).Error; err != nil {
+			s.log.Warnw("Failed to update storyboard video_prompt", "error", err, "storyboard_id", req.StoryboardID)
+		}
 	default:
 		s.log.Errorw("Unsupported frame type during frame prompt generation", "frame_type", req.FrameType, "task_id", taskID)
 		s.taskService.UpdateTaskStatus(taskID, "failed", 0, "不支持的帧类型")
@@ -552,4 +568,43 @@ func (s *FramePromptService) buildFallbackPrompt(sb models.Storyboard, scene *mo
 
 	parts = append(parts, "anime style", suffix)
 	return strings.Join(parts, ", ")
+}
+
+// generateVideoPrompt 生成视频提示词 (R2V)
+func (s *FramePromptService) generateVideoPrompt(dramaID uint, sb models.Storyboard, scene *models.Scene, dramaStyle string, customStyle string, model string) (*SingleFramePrompt, error) {
+	// 构建上下文信息
+	contextInfo := s.buildStoryboardContext(sb, scene)
+
+	// 使用国际化提示词
+	dynamicPrompt := s.promptI18n.WithDramaVideoExtractionPrompt(dramaID, dramaStyle, customStyle)
+	systemPrompt := dynamicPrompt + "\n\n" + fixed.Get("image_generation")
+	userPrompt := s.promptI18n.FormatUserPrompt("frame_info", contextInfo)
+
+	// 调用AI生成
+	var aiResponse string
+	var err error
+	if model != "" {
+		client, getErr := s.aiService.GetAIClientForModel("text", model)
+		if getErr == nil {
+			aiResponse, err = client.GenerateText(userPrompt, systemPrompt)
+		} else {
+			aiResponse, err = s.aiService.GenerateText(userPrompt, systemPrompt)
+		}
+	} else {
+		aiResponse, err = s.aiService.GenerateText(userPrompt, systemPrompt)
+	}
+
+	if err != nil {
+		s.log.Warnw("AI video prompt generation failed", "error", err)
+		return nil, err
+	}
+
+	// 解析AI返回的JSON
+	result := s.parseFramePromptJSON(aiResponse)
+	if result == nil {
+		s.log.Warnw("Failed to parse AI video prompt JSON response", "storyboard_id", sb.ID, "response", aiResponse)
+		return nil, fmt.Errorf("解析AI结果失败")
+	}
+
+	return result, nil
 }

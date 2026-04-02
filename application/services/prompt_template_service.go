@@ -168,6 +168,7 @@ func (s *PromptTemplateService) GetDefaultPrompts() models.PromptTemplatePrompts
 		ImageActionSequence: prompts.Get("image_action_sequence.txt"),
 		VideoConstraint:     prompts.Get("video_constraint_prefixes.txt"),
 		StylePrompt:         prompts.Get("style_prompt.txt"),
+		VideoExtraction:     prompts.Get("video_extraction.txt"),
 	}
 }
 
@@ -275,6 +276,8 @@ func (s *PromptTemplateService) getPromptFromStruct(p models.PromptTemplatePromp
 		return p.VideoConstraint
 	case "style_prompt":
 		return p.StylePrompt
+	case "video_extraction":
+		return p.VideoExtraction
 	default:
 		return ""
 	}

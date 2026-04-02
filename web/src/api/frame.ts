@@ -1,7 +1,7 @@
 import request from '../utils/request'
 
 // 帧类型
-export type FrameType = 'first' | 'key' | 'last' | 'panel' | 'action'
+export type FrameType = 'first' | 'key' | 'last' | 'panel' | 'action' | 'video'
 
 // 单帧提示词
 export interface SingleFramePrompt {

@@ -28,6 +28,7 @@ export interface VideoGeneration {
   updated_at: string
   completed_at?: string
   is_upscaled?: boolean
+  generation_mode?: 'direct_r2v' | 'shot_i2v'
 }
 
 export type VideoStatus = 'pending' | 'processing' | 'upscaling' | 'completed' | 'failed'
@@ -54,6 +55,7 @@ export interface GenerateVideoRequest {
   first_frame_url?: string  // 首帧图片URL
   last_frame_url?: string   // 尾帧图片URL
   reference_image_urls?: string[]  // 多图参考模式
+  generation_mode?: 'direct_r2v' | 'shot_i2v'
 }
 
 export interface VideoGenerationListParams {
@@ -61,6 +63,7 @@ export interface VideoGenerationListParams {
   storyboard_id?: string
   scene_id?: string  // 已废弃，保留用于兼容
   status?: string  // 支持单个状态或逗号分隔的多个状态，如 "pending,processing"
+  generation_mode?: string
   page?: number
   page_size?: number
 }

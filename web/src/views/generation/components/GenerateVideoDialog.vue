@@ -32,7 +32,7 @@
             :value="image.id"
           >
             <div class="image-option">
-              <img v-if="image.image_url" :src="image.image_url" class="image-thumb" />
+              <img v-if="getImageUrl(image)" :src="getImageUrl(image)" class="image-thumb" />
               <span>{{ truncateText(image.prompt, 40) }}</span>
             </div>
           </el-option>
@@ -141,6 +141,7 @@ import { dramaAPI } from '@/api/drama'
 import type { Drama } from '@/types/drama'
 import type { ImageGeneration } from '@/types/image'
 import type { GenerateVideoRequest } from '@/types/video'
+import { getImageUrl } from '@/utils/image'
 
 interface Props {
   modelValue: boolean
@@ -249,8 +250,8 @@ const onImageChange = (imageGenId: number | undefined) => {
   }
   
   const image = images.value.find(img => img.id === imageGenId)
-  if (image && image.image_url) {
-    form.image_url = image.image_url
+  if (image) {
+    form.image_url = getImageUrl(image)
     form.prompt = image.prompt
   }
 }

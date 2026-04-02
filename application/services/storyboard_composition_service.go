@@ -70,6 +70,7 @@ type SceneCompositionInfo struct {
 	SoundEffect           *string              `json:"sound_effect,omitempty"`
 	ImagePrompt           *string              `json:"image_prompt,omitempty"`
 	VideoPrompt           *string              `json:"video_prompt,omitempty"`
+	VideoPromptSource     string               `json:"video_prompt_source,omitempty"`
 	Characters            []SceneCharacterInfo `json:"characters"`
 	Props                 []ScenePropInfo      `json:"props"`
 	Background            *SceneBackgroundInfo `json:"background"`
@@ -246,6 +247,7 @@ func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string, vie
 			SoundEffect:      storyboard.SoundEffect,
 			ImagePrompt:      storyboard.ImagePrompt,
 			VideoPrompt:      storyboard.VideoPrompt,
+			VideoPromptSource: storyboard.VideoPromptSource,
 			SceneID:          storyboard.SceneID,
 			IsProduction:     storyboard.IsProduction,
 		}

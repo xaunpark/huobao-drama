@@ -131,10 +131,18 @@ func (s *StoryboardService) UpdateStoryboard(storyboardID string, updates map[st
 		sb.Duration = storyboard.Duration
 	}
 
-	// 只重新生成video_prompt
-	videoPrompt := s.generateVideoPrompt(sb)
-
-	updateData["video_prompt"] = videoPrompt
+	// 只有在不是 AI 生成的情况下，才根据内容自动生成简单的 video_prompt
+	// 或者如果 updates 中明确传了新的 video_prompt，则使用那个（见上文）
+	if _, hasNewPrompt := updates["video_prompt"]; !hasNewPrompt {
+		if storyboard.VideoPromptSource != "ai" {
+			videoPrompt := s.generateVideoPrompt(sb)
+			updateData["video_prompt"] = videoPrompt
+			updateData["video_prompt_source"] = "auto"
+		}
+	} else {
+		// 如果手动传了，更新 source 为 manual
+		updateData["video_prompt_source"] = "manual"
+	}
 
 	// 更新数据库
 	if err := s.db.Model(&storyboard).Updates(updateData).Error; err != nil {

@@ -642,6 +642,9 @@ export default {
     batch: {
       title: 'Batch Action Studio',
       instructions: 'The system will process all shots in the sequence: [Extract Prompts] -> [Generate Grid Images] -> [Generate Video]. You can choose to run all phases or specific ones.',
+      downloadAll: 'Download All Videos',
+      downloadingZip: 'Preparing zip...',
+      noVideosToDownload: 'No completed videos found to download',
       imageModel: 'Image Model:',
       videoModel: 'Video Model:',
       generationMode: 'Generation Mode:',
@@ -670,6 +673,21 @@ export default {
       completed: 'Batch task completed',
       selectVideoModelFirst: 'Please select a video model first',
       lackActionImage: 'Shot {number} lacks a valid Action image'
+    },
+    batchR2V: {
+      title: 'Batch Reference Video Studio',
+      instructions: 'The system will process shots directly in the sequence: [Extract Video Prompts] -> [Aggregate Reference Assets] -> [Generate Video]. This skips intermediate image generation to ensure maximum consistency.',
+      runAll: 'Run R2V Pipeline',
+      onlyVideoPrompt: 'Extract Video Prompts Only',
+      onlyVideo: 'Generate Videos Only',
+      videoPrompt: 'Video Prompt',
+      referenceStatus: 'Ref Assets',
+      status: {
+        ready: 'Ready',
+        partial: 'Partial',
+        missing: 'None'
+      },
+      assetPriority: 'Priority: 1 Scene + 2 Characters/Props'
     }
   },
   storyboard: {

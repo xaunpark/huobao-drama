@@ -36,6 +36,9 @@
               <el-button text :icon="MagicStick" @click="showBatchDialog = true" :title="$t('professionalEditor.batch.title')">
                 {{ $t("common.batch") }}
               </el-button>
+              <el-button text :icon="VideoCamera" @click="showBatchR2VDialog = true" :title="$t('professionalEditor.batchR2V.title')">
+                R2V
+              </el-button>
               <el-button text :icon="Plus" @click="handleAddStoryboard" v-if="currentViewMode === 'editorial'">
                 {{ $t("storyboard.add") }}
               </el-button>
@@ -612,7 +615,7 @@
                           "
                           :initial-index="
                             generatedImages
-                              .filter((i) => i.image_url)
+                              .filter((i) => hasImage(i))
                               .findIndex((i) => i.id === img.id)
                           "
                           fit="cover"
@@ -914,7 +917,7 @@
                           v-for="img in videoReferenceImages.filter(
                             (i) =>
                               i.status === 'completed' &&
-                              i.image_url &&
+                              hasImage(i) &&
                               i.frame_type === 'first',
                           )"
                           :key="img.id"
@@ -1000,7 +1003,7 @@
                           v-for="img in videoReferenceImages.filter(
                             (i) =>
                               i.status === 'completed' &&
-                              i.image_url &&
+                              hasImage(i) &&
                               i.frame_type === 'key',
                           )"
                           :key="img.id"
@@ -1086,7 +1089,7 @@
                           v-for="img in videoReferenceImages.filter(
                             (i) =>
                               i.status === 'completed' &&
-                              i.image_url &&
+                              hasImage(i) &&
                               i.frame_type === 'last',
                           )"
                           :key="img.id"
@@ -1172,7 +1175,7 @@
                           v-for="img in videoReferenceImages.filter(
                             (i) =>
                               i.status === 'completed' &&
-                              i.image_url &&
+                              hasImage(i) &&
                               i.frame_type === 'panel',
                           )"
                           :key="img.id"
@@ -1254,7 +1257,7 @@
                           v-for="img in videoReferenceImages.filter(
                             (i) =>
                               i.status === 'completed' &&
-                              i.image_url &&
+                              hasImage(i) &&
                               i.frame_type === 'action',
                           )"
                           :key="img.id"
@@ -1391,7 +1394,7 @@
                           >
                             <img
                               v-if="firstFrameSlotImage"
-                              :src="firstFrameSlotImage.image_url"
+                              :src="getImageUrl(firstFrameSlotImage)"
                               alt=""
                               style="
                                 width: 100%;
@@ -1429,7 +1432,7 @@
                           >
                             <img
                               v-if="lastFrameSlotImage"
-                              :src="lastFrameSlotImage.image_url"
+                              :src="getImageUrl(lastFrameSlotImage)"
                               alt=""
                               style="
                                 width: 100%;
@@ -1505,7 +1508,7 @@
                         >
                           <img
                             v-if="selectedImageObjects[index - 1]"
-                            :src="selectedImageObjects[index - 1].image_url"
+                            :src="getImageUrl(selectedImageObjects[index - 1])"
                             alt=""
                             style="width: 100%; height: 100%; object-fit: cover"
                           />
@@ -1585,7 +1588,7 @@
                     >
                       <div class="image-item video-item">
                         <div
-                          v-if="video.video_url"
+                          v-if="hasVideo(video)"
                           class="video-thumbnail"
                           @click="playVideo(video)"
                         >
@@ -1873,9 +1876,9 @@
     >
       <div
         class="scene-image-preview"
-        v-if="currentStoryboard?.background?.image_url"
+        v-if="hasImage(currentStoryboard?.background)"
       >
-        <img :src="currentStoryboard.background.image_url" alt="场景" />
+        <img :src="getImageUrl(currentStoryboard.background)" alt="场景" />
       </div>
     </el-dialog>
 
@@ -2008,7 +2011,7 @@
     >
       <div class="video-preview-container" v-if="previewVideo">
         <video
-          v-if="previewVideo.video_url"
+          v-if="hasVideo(previewVideo)"
           :src="getVideoUrl(previewVideo)"
           controls
           autoplay
@@ -2047,9 +2050,9 @@
               >
             </div>
             <el-button
-              v-if="previewVideo.video_url"
+              v-if="hasVideo(previewVideo)"
               size="small"
-              @click="openUrl(previewVideo.video_url)"
+              @click="openUrl(getVideoUrl(previewVideo))"
             >
               {{ $t("professionalEditor.downloadVideo") }}
             </el-button>
@@ -2088,6 +2091,19 @@
     <!-- 批量生成对话框 -->
     <BatchGenerationDialog
       v-model="showBatchDialog"
+      :storyboards="storyboards"
+      :episode-id="episodeId"
+      :drama-id="dramaId"
+      :style="drama?.style || ''"
+      :custom-style="drama?.custom_style || ''"
+      :video-models="videoModelCapabilities"
+      :default-video-model="selectedVideoModel"
+      @completed="loadData"
+    />
+
+    <!-- R2V 批量参考图生成对话框 -->
+    <BatchReferenceVideoStudio
+      v-model="showBatchR2VDialog"
       :storyboards="storyboards"
       :episode-id="episodeId"
       :drama-id="dramaId"
@@ -2158,9 +2174,10 @@ import type { VideoMerge } from "@/api/videoMerge";
 import VideoTimelineEditor from "@/components/editor/VideoTimelineEditor.vue";
 import GridImageEditor from "@/components/editor/GridImageEditor.vue";
 import BatchGenerationDialog from "@/components/editor/BatchGenerationDialog.vue";
+import BatchReferenceVideoStudio from "@/components/editor/BatchReferenceVideoStudio.vue";
 import type { Drama, Episode, Storyboard } from "@/types/drama";
 import { AppHeader, ImageCropDialog } from "@/components/common";
-import { getImageUrl, hasImage, getVideoUrl } from "@/utils/image";
+import { getImageUrl, hasImage, getVideoUrl, hasVideo } from "@/utils/image";
 
 const route = useRoute();
 const router = useRouter();
@@ -2187,6 +2204,7 @@ const previewCharacter = ref<any>(null);
 const showSceneImagePreview = ref(false);
 const showSettings = ref(false);
 const showBatchDialog = ref(false);
+const showBatchR2VDialog = ref(false);
 const showVideoPreview = ref(false);
 const previewVideo = ref<VideoGeneration | null>(null);
 const addingToAssets = ref<Set<number>>(new Set());

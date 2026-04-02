@@ -110,7 +110,7 @@ func (c *VolcesArkClient) GenerateVideo(imageURL, prompt string, opts ...VideoOp
 
 	// 处理不同的图片模式
 	// 1. 组图模式（多个reference_image）
-	if len(options.ReferenceImageURLs) > 0 {
+	if len(options.ReferenceImageURLs) > 1 {
 		for _, refURL := range options.ReferenceImageURLs {
 			content = append(content, VolcesArkContent{
 				Type: "image_url",
@@ -120,6 +120,15 @@ func (c *VolcesArkClient) GenerateVideo(imageURL, prompt string, opts ...VideoOp
 				Role: "reference_image",
 			})
 		}
+	} else if len(options.ReferenceImageURLs) == 1 {
+		// 5. 只有一张图时（无论是由 single 还是 multiple 传入），不带 Role
+		// 这保持了与旧 workflow (I2V) 相同的 Request 结构，避免 404/400
+		content = append(content, VolcesArkContent{
+			Type: "image_url",
+			ImageURL: map[string]interface{}{
+				"url": options.ReferenceImageURLs[0],
+			},
+		})
 	} else if options.FirstFrameURL != "" && options.LastFrameURL != "" {
 		// 2. 首尾帧模式
 		content = append(content, VolcesArkContent{
@@ -137,13 +146,12 @@ func (c *VolcesArkClient) GenerateVideo(imageURL, prompt string, opts ...VideoOp
 			Role: "last_frame",
 		})
 	} else if imageURL != "" {
-		// 3. 单图模式（默认）
+		// 3. 单图模式
 		content = append(content, VolcesArkContent{
 			Type: "image_url",
 			ImageURL: map[string]interface{}{
 				"url": imageURL,
 			},
-			// 单图模式不需要role
 		})
 	} else if options.FirstFrameURL != "" {
 		// 4. 只有首帧

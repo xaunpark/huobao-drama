@@ -21,6 +21,7 @@ type VideoGeneration struct {
 	Provider string `gorm:"type:varchar(50);not null;index" json:"provider"`
 	Prompt   string `gorm:"type:text;not null" json:"prompt"`
 	Model    string `gorm:"type:varchar(100)" json:"model,omitempty"`
+	GenerationMode *string `gorm:"type:varchar(20);default:'shot_i2v'" json:"generation_mode,omitempty"` // direct_r2v, shot_i2v
 
 	ImageGenID *uint           `gorm:"index" json:"image_gen_id,omitempty"`
 	ImageGen   ImageGeneration `gorm:"foreignKey:ImageGenID" json:"image_gen,omitempty"`

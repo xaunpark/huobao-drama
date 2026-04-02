@@ -73,6 +73,7 @@ type GenerateVideoRequest struct {
 	MotionLevel  *int    `json:"motion_level"`
 	CameraMotion *string `json:"camera_motion"`
 	Seed         *int64  `json:"seed"`
+	GenerationMode string  `json:"generation_mode"` // r2v, i2v, t2v
 }
 
 func (s *VideoGenerationService) GenerateVideo(request *GenerateVideoRequest) (*models.VideoGeneration, error) {
@@ -115,6 +116,16 @@ func (s *VideoGenerationService) GenerateVideo(request *GenerateVideoRequest) (*
 		CameraMotion: request.CameraMotion,
 		Seed:         request.Seed,
 		Status:       models.VideoStatusPending,
+	}
+
+	if request.GenerationMode != "" {
+		videoGen.GenerationMode = &request.GenerationMode
+	} else if request.ReferenceMode == "multiple" {
+		r2vMode := "direct_r2v"
+		videoGen.GenerationMode = &r2vMode
+	} else {
+		defaultMode := "shot_i2v"
+		videoGen.GenerationMode = &defaultMode
 	}
 
 	// 根据参考图模式处理不同的参数
@@ -653,8 +664,8 @@ func (s *VideoGenerationService) getVideoClient(provider string, modelName strin
 		queryEndpoint = "/video/task/{taskId}"
 		return video.NewChatfireClient(baseURL, apiKey, model, endpoint, queryEndpoint), nil
 	case "doubao", "volcengine", "volces":
-		endpoint = "/contents/generations/tasks"
-		queryEndpoint = "/contents/generations/tasks/{taskId}"
+		endpoint = ""
+		queryEndpoint = ""
 		return video.NewVolcesArkClient(baseURL, apiKey, model, endpoint, queryEndpoint), nil
 	case "openai":
 		// OpenAI Sora 使用 /v1/videos 端点
@@ -706,7 +717,7 @@ func (s *VideoGenerationService) GetVideoGeneration(id uint) (*models.VideoGener
 	return &videoGen, nil
 }
 
-func (s *VideoGenerationService) ListVideoGenerations(dramaID *uint, storyboardID *uint, status string, limit int, offset int) ([]*models.VideoGeneration, int64, error) {
+func (s *VideoGenerationService) ListVideoGenerations(dramaID *uint, storyboardID *uint, status string, generationMode string, limit int, offset int) ([]*models.VideoGeneration, int64, error) {
 	var videos []*models.VideoGeneration
 	var total int64
 
@@ -720,6 +731,9 @@ func (s *VideoGenerationService) ListVideoGenerations(dramaID *uint, storyboardI
 	}
 	if status != "" {
 		query = query.Where("status = ?", status)
+	}
+	if generationMode != "" {
+		query = query.Where("generation_mode = ?", generationMode)
 	}
 
 	if err := query.Count(&total).Error; err != nil {

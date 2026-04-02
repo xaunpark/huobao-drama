@@ -167,6 +167,15 @@ func (p *PromptI18n) GetLastFramePrompt(style string) string {
 	return fmt.Sprintf(prompts.Get("image_last_frame.txt"), style, imageRatio)
 }
 
+// GetVideoExtractionPrompt 获取视频提取提示词
+func (p *PromptI18n) GetVideoExtractionPrompt(style string) string {
+	if true || p.IsEnglish() {
+		return fmt.Sprintf(prompts.Get("video_extraction.txt"), style)
+	}
+
+	return fmt.Sprintf(prompts.Get("video_extraction.txt"), style)
+}
+
 // GetOutlineGenerationPrompt 获取大纲生成提示词
 func (p *PromptI18n) GetOutlineGenerationPrompt() string {
 	if true || p.IsEnglish() {
@@ -523,6 +532,18 @@ func (p *PromptI18n) WithDramaVideoConstraintPrompt(dramaID uint, referenceMode 
 		return p.GetVideoConstraintPrompt(referenceMode)
 	}
 	return template
+}
+
+// WithDramaVideoExtractionPrompt resolves video extraction prompt for a specific drama
+func (p *PromptI18n) WithDramaVideoExtractionPrompt(dramaID uint, style string, customStyle string) string {
+	effectiveStyle := p.resolveEffectiveStyle(dramaID, style, customStyle)
+	template := p.resolvePrompt(dramaID, "video_extraction")
+	if strings.Contains(template, "%s") {
+		return fmt.Sprintf(template, effectiveStyle)
+	}
+	return formatPromptWithVars(template, map[string]string{
+		"{{STYLE}}": effectiveStyle,
+	})
 }
 
 // WithDramaRapidCutActionSequenceFramePrompt resolves rapid cut action sequence prompt for a specific drama

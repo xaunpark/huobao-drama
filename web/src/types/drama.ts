@@ -87,6 +87,7 @@ export interface Storyboard {
   atmosphere?: string
   image_prompt?: string
   video_prompt?: string
+  video_prompt_source?: 'auto' | 'ai'
   characters?: any
   image_url?: string
   video_url?: string
