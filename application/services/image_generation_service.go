@@ -322,13 +322,17 @@ func (s *ImageGenerationService) pollTaskStatus(imageGenID uint, client image.Im
 			continue
 		}
 
-		if result.Completed {
-			s.completeImageGeneration(imageGenID, result)
+		if result.Error != "" {
+			s.updateImageGenError(imageGenID, result.Error)
 			return
 		}
 
-		if result.Error != "" {
-			s.updateImageGenError(imageGenID, result.Error)
+		if result.Completed {
+			if result.ImageURL != "" {
+				s.completeImageGeneration(imageGenID, result)
+				return
+			}
+			s.updateImageGenError(imageGenID, "task completed but no image URL")
 			return
 		}
 	}
