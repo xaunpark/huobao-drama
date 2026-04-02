@@ -108,7 +108,7 @@ func (h *VideoGenerationHandler) ListVideoGenerations(c *gin.Context) {
 	if page < 1 {
 		page = 1
 	}
-	if pageSize < 1 || pageSize > 100 {
+	if pageSize < 1 || pageSize > 1000 {
 		pageSize = 20
 	}
 

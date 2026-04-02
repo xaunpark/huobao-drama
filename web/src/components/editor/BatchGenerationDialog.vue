@@ -639,21 +639,37 @@ const downloadAllVideos = async () => {
   isDownloadingZip.value = true
   
   try {
-    // 1. Get all completed videos for this drama
-    const vidRes = await videoAPI.listVideos({ 
-      drama_id: props.dramaId.toString(), 
-      status: 'completed',
-      page_size: 1000 // Get all
-    })
+    // 1. Get all completed videos for this drama (paging until all fetched)
+    const allCompletedVideos: any[] = []
+    let currentPage = 1
+    const pageSize = 100
     
-    if (!vidRes.items || vidRes.items.length === 0) {
+    while (true) {
+      const vidRes = await videoAPI.listVideos({ 
+        drama_id: props.dramaId.toString(), 
+        status: 'completed',
+        page: currentPage,
+        page_size: pageSize
+      })
+      
+      if (vidRes.items && vidRes.items.length > 0) {
+        allCompletedVideos.push(...vidRes.items)
+      }
+      
+      if (!vidRes.pagination || vidRes.items.length < pageSize || allCompletedVideos.length >= vidRes.pagination.total) {
+        break
+      }
+      currentPage++
+    }
+    
+    if (allCompletedVideos.length === 0) {
       ElMessage.warning(t('professionalEditor.batch.noVideosToDownload'))
       return
     }
 
     // 2. Map storyboard_id to its best video (prefer HD, then latest)
     const bestVideos = new Map<number, any>()
-    vidRes.items.forEach((vid: any) => {
+    allCompletedVideos.forEach((vid: any) => {
       const sbId = vid.storyboard_id
       if (!sbId) return
       
