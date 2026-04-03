@@ -218,13 +218,16 @@ const initTaskStates = async () => {
       // Find latest relevant video
       const completedVidHd = vidRes.items?.find((v: any) => v.status === 'completed' && v.is_upscaled)
       const upscalingVid = vidRes.items?.find((v: any) => v.status === 'upscaling')
-      const completedVid = vidRes.items?.find((v: any) => v.status === 'completed')
+      const completedVid = vidRes.items?.find((v: any) => v.status === 'completed' && !v.is_upscaled)
+      const failedWithBase = vidRes.items?.find((v: any) => (v.status === 'failed' || v.status === 'error') && (v.video_url || v.local_path))
 
       if (completedVidHd) {
         videoState = 'hd'
       } else if (upscalingVid) {
         videoState = 'upscaling'
       } else if (completedVid) {
+        videoState = 'done'
+      } else if (failedWithBase) {
         videoState = 'done'
       } else if (sb.video_url) {
         videoState = 'done' // fallback
@@ -588,17 +591,29 @@ const startUpscaleAll = async () => {
     await initTaskStates()
     
     await runConcurrently(localStoryboards.value, maxConcurrentThreads.value, async (sb) => {
-      // Only process if the shot actually has a video
-      if (taskStates[sb.id]?.video === 'pending' || taskStates[sb.id]?.video === 'loading' || taskStates[sb.id]?.video === 'error') return
+      // Process shots that have a base video (status 'done') or are already 'upscaling'
+      if (!['done', 'upscaling'].includes(taskStates[sb.id]?.video)) return
       if (taskStates[sb.id]?.video === 'hd') return
 
       try {
         const vidRes = await videoAPI.listVideos({ storyboard_id: String(sb.id), page_size: 10 })
-        const targetVideo = vidRes.items?.find((v: any) => v.status === 'completed' && v.video_url && !v.is_upscaled)
-        const alreadyHd = vidRes.items?.find((v: any) => v.status === 'completed' && v.is_upscaled)
+        const targetVideo = vidRes.items?.find((v: any) => (v.status === 'completed' && !v.is_upscaled) || (v.status === 'failed' && (v.video_url || v.local_path)))
+        const currentlyUpscaling = vidRes.items?.find((v: any) => v.status === 'upscaling')
 
-        if (alreadyHd) {
+        if (currentlyUpscaling) {
+          taskStates[sb.id].video = 'upscaling'
+          let isUpscaled = false
+          while (!isUpscaled && !shouldStop.value) {
+            await new Promise(r => setTimeout(r, 5000))
+            const check = await videoAPI.getVideo(currentlyUpscaling.id)
+            if (check.status === 'completed' && check.is_upscaled) {
+              isUpscaled = true
+            } else if (check.status === 'failed') {
+              throw new Error(check.error_msg || 'Upscaling failed')
+            }
+          }
           taskStates[sb.id].video = 'hd'
+          taskStates[sb.id].progress = 100
           return
         }
         
@@ -616,8 +631,16 @@ const startUpscaleAll = async () => {
             }
           }
           taskStates[sb.id].video = 'hd'
+          taskStates[sb.id].progress = 100
         } else {
-          taskStates[sb.id].video = 'done'
+          // Check if it already has an upscaled version we missed
+          const alreadyHd = vidRes.items?.find((v: any) => v.status === 'completed' && v.is_upscaled)
+          if (alreadyHd) {
+             taskStates[sb.id].video = 'hd'
+             taskStates[sb.id].progress = 100
+          } else {
+             taskStates[sb.id].video = 'done'
+          }
         }
       } catch (err: any) {
         console.error(`Shot ${sb.storyboard_number} auto upscale failed:`, err)
@@ -639,37 +662,38 @@ const downloadAllVideos = async () => {
   isDownloadingZip.value = true
   
   try {
-    // 1. Get all completed videos for this drama (paging until all fetched)
-    const allCompletedVideos: any[] = []
+    // 1. Get ALL videos for this drama (not just completed, to catch those that failed upscale but have base URL)
+    const allDramaVideos: any[] = []
     let currentPage = 1
     const pageSize = 100
     
     while (true) {
       const vidRes = await videoAPI.listVideos({ 
         drama_id: props.dramaId.toString(), 
-        status: 'completed',
         page: currentPage,
         page_size: pageSize
       })
       
       if (vidRes.items && vidRes.items.length > 0) {
-        allCompletedVideos.push(...vidRes.items)
+        allDramaVideos.push(...vidRes.items)
       }
       
-      if (!vidRes.pagination || vidRes.items.length < pageSize || allCompletedVideos.length >= vidRes.pagination.total) {
+      if (!vidRes.pagination || vidRes.items.length < pageSize || allDramaVideos.length >= vidRes.pagination.total) {
         break
       }
       currentPage++
     }
     
-    if (allCompletedVideos.length === 0) {
+    const usableVideos = allDramaVideos.filter(v => v.video_url || v.local_path)
+    
+    if (usableVideos.length === 0) {
       ElMessage.warning(t('professionalEditor.batch.noVideosToDownload'))
       return
     }
 
-    // 2. Map storyboard_id to its best video (prefer HD, then latest)
+    // 2. Map storyboard_id to its best video (prefer HD, then latest usable)
     const bestVideos = new Map<number, any>()
-    allCompletedVideos.forEach((vid: any) => {
+    usableVideos.forEach((vid: any) => {
       const sbId = vid.storyboard_id
       if (!sbId) return
       
@@ -682,7 +706,7 @@ const downloadAllVideos = async () => {
         if (vid.is_upscaled && !currentBest.is_upscaled) {
           bestVideos.set(sbId, vid)
         } else if (vid.is_upscaled === currentBest.is_upscaled) {
-          // Both same HD status, pick latest
+          // If both same HD status, pick latest
           if (new Date(vid.created_at) > new Date(currentBest.created_at)) {
             bestVideos.set(sbId, vid)
           }
@@ -690,7 +714,21 @@ const downloadAllVideos = async () => {
       }
     })
 
-    if (bestVideos.size === 0) {
+    // 3. Ensure we cover ALL storyboards if possible
+    const itemsToDownload: { fileName: string; url: string }[] = []
+    for (const sb of props.storyboards) {
+      const vid = bestVideos.get(Number(sb.id))
+      if (vid) {
+        const sbNum = String(sb.storyboard_number).padStart(3, '0')
+        const fileName = `Shot_${sbNum}.mp4`
+        const url = getVideoUrl(vid)
+        if (url) {
+          itemsToDownload.push({ fileName, url })
+        }
+      }
+    }
+
+    if (itemsToDownload.length === 0) {
       ElMessage.warning(t('professionalEditor.batch.noVideosToDownload'))
       return
     }
@@ -700,34 +738,21 @@ const downloadAllVideos = async () => {
     const zip = new JSZip()
     // No subfolders for the videos themselves, as requested
     
-    // 3. Download each video and add to zip
-    const downloadPromises = []
-    
-    for (const [sbId, vid] of bestVideos.entries()) {
-      const sb = props.storyboards.find(s => Number(s.id) === sbId)
-      const sbNum = sb ? String(sb.storyboard_number).padStart(3, '0') : String(sbId)
-      const fileName = `Shot_${sbNum}.mp4`
-      const url = getVideoUrl(vid)
-      
-      if (!url) continue
-      
-      // Use full URL for axios if needed, but getVideoUrl returns /static/ which is on same domain
-      const fullUrl = url.startsWith('http') ? url : `${window.location.origin}${url}`
-      
-      downloadPromises.push(
-        axios.get(fullUrl, { responseType: 'blob' })
-          .then(res => {
-            zip.file(fileName, res.data)
-          })
-          .catch(err => {
-            console.error(`Failed to download video for shot ${sbId}:`, err)
-          })
-      )
-    }
+    // 4. Download each video and add to zip
+    const downloadPromises = itemsToDownload.map(item => {
+      const fullUrl = item.url.startsWith('http') ? item.url : `${window.location.origin}${item.url}`
+      return axios.get(fullUrl, { responseType: 'blob' })
+        .then(res => {
+          zip.file(item.fileName, res.data)
+        })
+        .catch(err => {
+          console.error(`Failed to download ${item.fileName}:`, err)
+        })
+    })
     
     await Promise.all(downloadPromises)
     
-    // 4. Generate and download ZIP
+    // 5. Generate and download ZIP
     const content = await zip.generateAsync({ type: 'blob' })
     const zipUrl = URL.createObjectURL(content)
     const link = document.createElement('a')

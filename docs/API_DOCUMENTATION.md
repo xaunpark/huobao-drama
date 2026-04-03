@@ -53,6 +53,19 @@ POST /v1/settings/captcha-provider?provider=nanoai
 
 ---
 
+## Sticky Batch Routing (Quan trọng)
+
+Để hỗ trợ đa tài khoản (multi-profile), hệ thống sử dụng cơ chế **Sticky Routing**. Nếu bạn upload nhiều ảnh để tạo 1 video (như chế độ R2V), bạn **PHẢI** sử dụng chung một `batch_id` cho tất cả các yêu cầu để đảm bảo chúng được lưu trên cùng một tài khoản Google.
+
+**Quy trình chuẩn:**
+1. Tự sinh một mã `batch_id` duy nhất (ví dụ: UUID).
+2. Gửi `batch_id` này kèm theo trong **tất cả** các request `POST /v1/upload`.
+3. Gửi `batch_id` này kèm theo trong request `POST /v1/jobs`.
+
+Server sẽ đảm bảo chọn duy nhất 1 tài khoản cho toàn bộ lô (batch) này, tránh lỗi 404 "Not Found" do ảnh nằm ở tài khoản khác.
+
+---
+
 ## API Endpoints
 
 ### 1. Upload Image
@@ -64,7 +77,8 @@ Upload ảnh để lấy media_id trước khi tạo video/image.
 ```json
 {
   "image_data": "data:image/png;base64,iVBORw0KGgo...",
-  "mime_type": "image/png"
+  "mime_type": "image/png",
+  "batch_id": "uuid-batch-123" // Optional nhưng khuyên dùng cho batch jobs
 }
 ```
 
@@ -97,7 +111,8 @@ Tạo job video/image mới. Trả về `job_id` để polling status.
   "end_image_id": null,
   "webhook_url": "https://callback-domain.com/webhook",
   "settings": {},
-  "wait_for_result": false
+  "wait_for_result": false,
+  "batch_id": "uuid-batch-123" // Đảm bảo khớp với batch_id lúc upload ảnh
 }
 ```
 
@@ -115,6 +130,7 @@ Tạo job video/image mới. Trả về `job_id` để polling status.
 | `webhook_url` | string | ❌ | Địa chỉ webhook để nhận thông báo khi job hoàn thành |
 | `settings` | object | ❌ | Ghi đè các parameters tuỳ chỉnh nâng cao |
 | `wait_for_result` | bool | ❌ | Chờ kết quả (default: false) |
+| `batch_id` | string | ❌ | Mã định danh lô để đảm bảo "dính" vào cùng một profile |
 
 #### Response
 ```json
@@ -363,17 +379,33 @@ def upload_image(image_path: str) -> str:
     raise Exception(result.get("error"))
 
 def create_r2v_job(prompt: str, image_paths: list) -> str:
-    """Create R2V job with reference images"""
-    # Upload all images
-    media_ids = [upload_image(path) for path in image_paths[:8]]
+    """Create R2V job with reference images using Batch ID (Best Practice)"""
+    import uuid
+    batch_id = str(uuid.uuid4())
     
-    # Create job
+    # Upload all images with SAME batch_id
+    media_ids = []
+    for path in image_paths[:8]:
+        with open(path, 'rb') as f:
+            data = base64.b64encode(f.read()).decode()
+            
+        resp = requests.post(f"{API_BASE}/v1/upload", json={
+            "image_data": f"data:image/png;base64,{data}",
+            "mime_type": "image/png",
+            "batch_id": batch_id
+        })
+        res = resp.json()
+        if res.get("success"):
+            media_ids.append(res["media_id"])
+
+    # Create job with SAME batch_id
     resp = requests.post(f"{API_BASE}/v1/jobs", json={
         "prompt": prompt,
         "mode": "R2V",
         "quality": "fast",
         "ratio": "landscape",
-        "reference_image_ids": media_ids
+        "reference_image_ids": media_ids,
+        "batch_id": batch_id
     })
     return resp.json()["job_id"]
 
@@ -422,6 +454,22 @@ Khi sử dụng UI (`python main.py`), có thể embed ảnh trực tiếp trong
 ```
 [REF_IMG: C:/images/char.png] [REF_IMG: C:/images/bg.jpg] Character dancing in forest
 ```
+
+---
+
+## Technical Notes: Google Flow Image API
+
+Khi tích hợp với API nội bộ của Google (`flowMedia:batchGenerateImages`) cho việc sinh ảnh (I2I/T2I), tính toán payload có một số khác biệt cốt lõi kể từ bản cập nhật gần đây:
+
+**1. Schema Hỗ Trợ Nhiều Ảnh (Multi-Reference):**
+Để truyền nhiều ảnh tham chiếu (tối đa 8 ảnh) thông qua array `imageInputs`, bắt buộc payload phải thay đổi từ trường `"prompt": "..."` truyền thống sang `"structuredPrompt": {"parts": [{"text": "..."}]}`. Nếu vẫn dùng `prompt` thông thường mà `imageInputs` > 1, Google API sẽ lập tức trả về lỗi `HTTP 400: INVALID_ARGUMENT`.
+
+**2. Required Payload Keys:**
+- `"useNewMedia": true` (Root level)
+- `"mediaGenerationContext": {"batchId": "<uuid4>"}` (Khai báo UUID batch id ở root level payload)
+- Từng ảnh truyền vào `imageInputs` chỉ mang kiểu `"IMAGE_INPUT_TYPE_REFERENCE"` và `"name"` sẽ là UUID (assetId) hoặc raw schema từ `uploadUserImage` (vd `cbab2...` từ `mediaGenerationId`).
+
+(Hệ thống Flow Tool đằng sau `utils/direct_api.py` đã tự động handling và wrap schema mới này, client chỉ cần post vào `POST /v1/jobs` như thường lệ)
 
 ---
 
