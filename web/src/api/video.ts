@@ -44,5 +44,9 @@ export const videoAPI = {
 
   upscaleVideo(videoGenId: number) {
     return request.post<{ status: string; message: string }>(`/videos/${videoGenId}/upscale`)
+  },
+  
+  resetVideoStatus(videoGenId: number) {
+    return request.post<{ status: string; message: string }>(`/videos/${videoGenId}/reset-status`)
   }
 }

@@ -1685,7 +1685,8 @@ const togglePlay = () => {
 // 键盘快捷键
 const handleKeyPress = (event: KeyboardEvent) => {
   // 如果在输入框中，不处理快捷键
-  if ((event.target as HTMLElement).tagName === 'INPUT') return
+  const target = event.target as HTMLElement;
+  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return
 
   switch (event.code) {
     case 'Space':

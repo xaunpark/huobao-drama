@@ -859,6 +859,28 @@ func (s *VideoGenerationService) UpscaleVideo(videoGenID uint) error {
 	return nil
 }
 
+func (s *VideoGenerationService) ResetVideoStatus(videoGenID uint) error {
+	var videoGen models.VideoGeneration
+	if err := s.db.First(&videoGen, videoGenID).Error; err != nil {
+		return err
+	}
+
+	targetStatus := videoGen.Status
+	if videoGen.Status == models.VideoStatusUpscaling {
+		targetStatus = models.VideoStatusCompleted
+	} else if videoGen.Status == models.VideoStatusProcessing {
+		targetStatus = models.VideoStatusPending
+	} else {
+		return nil // Already in a stable state
+	}
+
+	err := s.db.Model(&videoGen).Update("status", targetStatus).Error
+	if err == nil {
+		s.log.Infow("Video status reset by user", "id", videoGenID, "from", videoGen.Status, "to", targetStatus)
+	}
+	return err
+}
+
 // convertImageToBase64 将图片转换为base64格式
 // 优先使用本地存储的图片，如果没有则使用URL
 func (s *VideoGenerationService) convertImageToBase64(imageURL string) (string, error) {

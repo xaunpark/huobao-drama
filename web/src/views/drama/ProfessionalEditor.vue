@@ -676,6 +676,12 @@
                     :rows="8"
                     placeholder="编辑将要发送的视频提示词..."
                     resize="vertical"
+                    @blur="() => {
+                      if (currentStoryboard) {
+                        currentStoryboard.video_prompt = currentVideoPrompt;
+                        saveStoryboardField('video_prompt');
+                      }
+                    }"
                   />
                   <!-- Hint for injected prompt instructions based on reference image -->
                   <div class="prompt-hint-container" v-if="injectedPromptHint" style="margin-top: 8px;">

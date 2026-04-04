@@ -190,6 +190,7 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 			videos.POST("/image/:image_gen_id", videoGenHandler.GenerateVideoFromImage)
 			videos.POST("/episode/:episode_id/batch", videoGenHandler.BatchGenerateForEpisode)
 			videos.POST("/:id/upscale", videoGenHandler.UpscaleVideo)
+			videos.POST("/:id/reset-status", videoGenHandler.ResetVideoStatus)
 		}
 
 		videoMerges := api.Group("/video-merges")

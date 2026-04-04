@@ -165,3 +165,19 @@ func (h *VideoGenerationHandler) UpscaleVideo(c *gin.Context) {
 
 	response.Success(c, gin.H{"status": "success", "message": "Upscale task submitted"})
 }
+func (h *VideoGenerationHandler) ResetVideoStatus(c *gin.Context) {
+	videoGenID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		response.BadRequest(c, "无效的ID")
+		return
+	}
+
+	err = h.videoService.ResetVideoStatus(uint(videoGenID))
+	if err != nil {
+		h.log.Errorw("Failed to reset video status", "error", err)
+		response.InternalError(c, err.Error())
+		return
+	}
+
+	response.Success(c, gin.H{"status": "success", "message": "Video status reset successful"})
+}

@@ -211,8 +211,8 @@ const initTaskStates = async () => {
       } catch { /* ignore */ }
     }
     
-    // Check video status from DB
     let videoState = 'pending'
+    let activeVideoId = null
     try {
       const vidRes = await videoAPI.listVideos({ storyboard_id: String(sb.id) })
       // Find latest relevant video
@@ -223,12 +223,16 @@ const initTaskStates = async () => {
 
       if (completedVidHd) {
         videoState = 'hd'
+        activeVideoId = completedVidHd.id
       } else if (upscalingVid) {
         videoState = 'upscaling'
+        activeVideoId = upscalingVid.id
       } else if (completedVid) {
         videoState = 'done'
+        activeVideoId = completedVid.id
       } else if (failedWithBase) {
         videoState = 'done'
+        activeVideoId = failedWithBase.id
       } else if (sb.video_url) {
         videoState = 'done' // fallback
       }
@@ -247,6 +251,7 @@ const initTaskStates = async () => {
       prompt: hasPrompt ? 'done' : 'pending',
       image: hasImage ? 'done' : 'pending',
       video: videoState,
+      videoId: activeVideoId,
       progress: progress
     }
   }
@@ -281,10 +286,36 @@ const getProgressStatus = (id: string) => {
   return undefined
 }
 
-const stopBatch = () => {
+const stopBatch = async () => {
   shouldStop.value = true
   isBatching.value = false
   ElMessage.warning(t('professionalEditor.batch.stopping'))
+  
+  // Also reset any currently 'upscaling' tasks to 'done' (Ready) in the database
+  // so they don't stay stuck when the user reopens the dialog.
+  for (const id in taskStates) {
+    if (taskStates[id].video === 'upscaling') {
+      try {
+        const vidID = taskStates[id].videoId
+        if (vidID) {
+          await videoAPI.resetVideoStatus(vidID)
+        } else {
+          // Fallback if videoId was not stored for some reason
+          const vidRes = await videoAPI.listVideos({ storyboard_id: id })
+          const upscalingVid = vidRes.items?.find((v: any) => v.status === 'upscaling')
+          if (upscalingVid) {
+            await videoAPI.resetVideoStatus(upscalingVid.id)
+          }
+        }
+        taskStates[id].video = 'done'
+      } catch (e) {
+        console.error('Failed to reset upscaling status during stop', e)
+        taskStates[id].video = 'done' // still set to done locally to unblock UI
+      }
+    } else if (taskStates[id].video === 'loading') {
+       taskStates[id].video = 'pending'
+    }
+  }
 }
 
 // 核心逻辑：提取提示词并保存
@@ -602,23 +633,25 @@ const startUpscaleAll = async () => {
 
         if (currentlyUpscaling) {
           taskStates[sb.id].video = 'upscaling'
+          taskStates[sb.id].videoId = currentlyUpscaling.id
           let isUpscaled = false
           while (!isUpscaled && !shouldStop.value) {
             await new Promise(r => setTimeout(r, 5000))
             const check = await videoAPI.getVideo(currentlyUpscaling.id)
             if (check.status === 'completed' && check.is_upscaled) {
               isUpscaled = true
+              taskStates[sb.id].video = 'hd'
+              taskStates[sb.id].progress = 100
             } else if (check.status === 'failed') {
               throw new Error(check.error_msg || 'Upscaling failed')
             }
           }
-          taskStates[sb.id].video = 'hd'
-          taskStates[sb.id].progress = 100
           return
         }
         
         if (targetVideo) {
           taskStates[sb.id].video = 'upscaling'
+          taskStates[sb.id].videoId = targetVideo.id
           await videoAPI.upscaleVideo(targetVideo.id)
           let isUpscaled = false
           while (!isUpscaled && !shouldStop.value) {
@@ -626,17 +659,18 @@ const startUpscaleAll = async () => {
             const check = await videoAPI.getVideo(targetVideo.id)
             if (check.status === 'completed' && check.is_upscaled) {
               isUpscaled = true
+              taskStates[sb.id].video = 'hd'
+              taskStates[sb.id].progress = 100
             } else if (check.status === 'failed') {
               throw new Error(check.error_msg || 'Upscaling failed')
             }
           }
-          taskStates[sb.id].video = 'hd'
-          taskStates[sb.id].progress = 100
         } else {
           // Check if it already has an upscaled version we missed
           const alreadyHd = vidRes.items?.find((v: any) => v.status === 'completed' && v.is_upscaled)
           if (alreadyHd) {
              taskStates[sb.id].video = 'hd'
+             taskStates[sb.id].videoId = alreadyHd.id
              taskStates[sb.id].progress = 100
           } else {
              taskStates[sb.id].video = 'done'
