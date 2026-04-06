@@ -20,6 +20,7 @@ export interface PromptTemplatePrompts {
   image_action_sequence?: string
   video_constraint?: string
   style_prompt?: string
+  visual_unit_breakdown?: string  // Voice-over AI Director shot planning
 }
 
 export interface CreatePromptTemplateRequest {
@@ -58,6 +59,7 @@ export const PROMPT_TYPE_GROUPS = [
     key: 'storyboard',
     types: [
       { key: 'storyboard_breakdown', label: 'Phân rã Storyboard' },
+      { key: 'visual_unit_breakdown', label: 'AI Director (Voice-over)' },
     ]
   },
   {

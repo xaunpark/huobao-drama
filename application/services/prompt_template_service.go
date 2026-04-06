@@ -169,6 +169,7 @@ func (s *PromptTemplateService) GetDefaultPrompts() models.PromptTemplatePrompts
 		VideoConstraint:     prompts.Get("video_constraint_prefixes.txt"),
 		StylePrompt:         prompts.Get("style_prompt.txt"),
 		VideoExtraction:     prompts.Get("video_extraction.txt"),
+		VisualUnitBreakdown: prompts.Get("storyboard_visual_unit.txt"),
 	}
 }
 
@@ -278,6 +279,8 @@ func (s *PromptTemplateService) getPromptFromStruct(p models.PromptTemplatePromp
 		return p.StylePrompt
 	case "video_extraction":
 		return p.VideoExtraction
+	case "visual_unit_breakdown":
+		return p.VisualUnitBreakdown
 	default:
 		return ""
 	}

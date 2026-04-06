@@ -744,6 +744,32 @@
                     </el-popover>
                   </template>
                 </el-table-column>
+                <!-- Voice-over: Script Segment column (conditional) -->
+                <el-table-column
+                  v-if="currentEpisode?.storyboards?.some(s => s.script_segment)"
+                  label="📝 Narrator"
+                  min-width="200"
+                  show-overflow-tooltip
+                >
+                  <template #default="{ row }">
+                    <span style="font-style: italic; font-size: 12px; color: var(--el-color-warning-light-3);">
+                      {{ row.script_segment || "-" }}
+                    </span>
+                  </template>
+                </el-table-column>
+                <!-- Voice-over: Audio Mode column (conditional) -->
+                <el-table-column
+                  v-if="currentEpisode?.storyboards?.some(s => s.audio_mode)"
+                  label="🎧 Audio"
+                  width="120"
+                >
+                  <template #default="{ row }">
+                    <el-tag v-if="row.audio_mode" size="small" :type="row.audio_mode === 'narrator_only' ? 'info' : 'danger'">
+                      {{ row.audio_mode === 'narrator_only' ? '🎙️' : '🗣️' }} {{ row.audio_mode }}
+                    </el-tag>
+                    <span v-else>-</span>
+                  </template>
+                </el-table-column>
                 <el-table-column
                   :label="$t('storyboard.table.duration')"
                   width="80"
@@ -788,17 +814,21 @@
                       <el-icon style="margin-right: 4px;"><ScaleToOriginal /></el-icon>
                       {{ $t('workflow.splitModeBreakdown') }}
                     </el-radio-button>
+                    <el-radio-button value="visual_unit">
+                      <el-icon style="margin-right: 4px;"><Headset /></el-icon>
+                      {{ $t('workflow.splitModeVisualUnit') }}
+                    </el-radio-button>
                   </el-radio-group>
                 </div>
                 <div v-if="shotSplitMode !== 'auto'" style="margin-bottom: 12px;">
                   <el-alert
-                    :type="shotSplitMode === 'preserve' ? 'success' : 'info'"
+                    :type="shotSplitMode === 'preserve' ? 'success' : shotSplitMode === 'visual_unit' ? 'warning' : 'info'"
                     :closable="false"
                     style="display: inline-block; max-width: 500px;"
                   >
                     <template #title>
                       <span style="font-size: 12px;">
-                        {{ shotSplitMode === 'preserve' ? $t('workflow.splitModePreserveTip') : $t('workflow.splitModeBreakdownTip') }}
+                        {{ shotSplitMode === 'preserve' ? $t('workflow.splitModePreserveTip') : shotSplitMode === 'visual_unit' ? $t('workflow.splitModeVisualUnitTip') : $t('workflow.splitModeBreakdownTip') }}
                       </span>
                     </template>
                   </el-alert>
@@ -931,6 +961,9 @@
                 </el-dropdown-item>
                 <el-dropdown-item command="breakdown">
                   <el-icon><ScaleToOriginal /></el-icon> {{ $t('workflow.splitModeBreakdown') }}
+                </el-dropdown-item>
+                <el-dropdown-item command="visual_unit">
+                  <el-icon><Headset /></el-icon> {{ $t('workflow.splitModeVisualUnit') }}
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>

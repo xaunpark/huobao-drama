@@ -1,6 +1,7 @@
 package services
 
 import (
+	"encoding/json"
 	"regexp"
 	"strconv"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/drama-generator/backend/pkg/logger"
 	"github.com/drama-generator/backend/pkg/utils"
 	"github.com/gin-gonic/gin"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -61,6 +63,43 @@ type Storyboard struct {
 type GenerateStoryboardResult struct {
 	Storyboards []Storyboard `json:"storyboards"`
 	Total       int          `json:"total"`
+}
+
+// VoiceoverShot — AI output struct for visual_unit mode (voice-over director)
+type VoiceoverShot struct {
+	ShotID            int      `json:"shot_id"`
+	ScriptSegment     string   `json:"script_segment"`
+	ScriptStartChar   int      `json:"script_start_char"`
+	ScriptEndChar     int      `json:"script_end_char"`
+	EstimatedDuration int      `json:"estimated_duration_sec"`
+	VisualType        string   `json:"visual_type"`
+	ShotRole          string   `json:"shot_role"`
+	VisualDescription string   `json:"visual_description"`
+	ReasonForShot     string   `json:"reason_for_shot"`
+	TriggeredRules    []string `json:"triggered_rules"`
+	Title             string   `json:"title"`
+	ShotType          string   `json:"shot_type"`
+	Angle             string   `json:"angle"`
+	Movement          string   `json:"movement"`
+	Location          string   `json:"location"`
+	Time              string   `json:"time"`
+	Atmosphere        string   `json:"atmosphere"`
+	// Audio strategy
+	AudioMode       string `json:"audio_mode"`
+	NarratorEnabled bool   `json:"narrator_enabled"`
+	NarratorDucking bool   `json:"narrator_ducking"`
+	DialogueType    string `json:"dialogue_type"`
+	DialogueText    string `json:"dialogue_text"`
+	AmbienceType    string `json:"ambience_type"`
+	AmbienceLevel   string `json:"ambience_level"`
+	MusicMood       string `json:"music_mood"`
+	MusicLevel      string `json:"music_level"`
+	SoundEffect     string `json:"sound_effect"`
+	BgmPrompt       string `json:"bgm_prompt"`
+	// References
+	Characters []uint `json:"characters"`
+	Props      []uint `json:"props"`
+	SceneID    *uint  `json:"scene_id"`
 }
 
 func (s *StoryboardService) GenerateStoryboard(episodeID string, model string, splitMode string) (string, error) {
@@ -212,6 +251,13 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID string
 	}
 
 	s.log.Infow("Processing storyboard generation", "task_id", taskID, "episode_id", episodeID, "split_mode", splitMode)
+
+	// Route to visual_unit mode if selected
+	if splitMode == "visual_unit" {
+		s.log.Infow("Using VISUAL_UNIT mode — AI Director voice-over shot planning", "task_id", taskID)
+		s.processVisualUnitGeneration(taskID, episodeID, dramaID, model, scriptContent, characterList, sceneList, propList)
+		return
+	}
 
 	// Choose system prompt based on split mode
 	var systemPrompt string
@@ -371,6 +417,911 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID string
 	}
 
 	s.log.Infow("Storyboard generation completed", "task_id", taskID, "episode_id", episodeID)
+}
+
+// ScriptSegmentInfo represents a parsed segment from marked script input
+type ScriptSegmentInfo struct {
+	Type      string // "narrator", "dialogue", "crowd", "sfx"
+	Character string // Character name (for dialogue/crowd)
+	Text      string // The actual text content
+	LineNum   int    // Original line number
+}
+
+// ShotBlock represents a user-defined shot with pre-grouped content (structured input)
+type ShotBlock struct {
+	ShotNumber int
+	Duration   int    // 0 if not specified by user
+	ShotType   string // "" if not specified
+	AudioMode  string // "" if not specified
+	Lines      []ScriptSegmentInfo
+	RawContent string // Original text between markers (for script_segment)
+}
+
+// shotHeaderPattern matches "// SHOT 01", "// SHOT 2 | 6s", "// SHOT 03 | 5s | CU | narrator_only"
+var shotHeaderPattern = regexp.MustCompile(
+	`^//\s*SHOT\s+(\d+)` +
+		`(?:\s*\|\s*(\d+)s)?` +
+		`(?:\s*\|\s*([\w-]+))?` +
+		`(?:\s*\|\s*(narrator_only|dialogue_dominant))?`,
+)
+
+// detectStructuredShots checks if script contains >= 3 "// SHOT" markers
+func detectStructuredShots(script string) bool {
+	re := regexp.MustCompile(`(?m)^//\s*SHOT\s+\d+`)
+	matches := re.FindAllString(script, -1)
+	return len(matches) >= 3
+}
+
+// parseStructuredShots splits script into ShotBlocks by "// SHOT" markers
+func parseStructuredShots(script string) []ShotBlock {
+	lines := strings.Split(script, "\n")
+	tagPattern := regexp.MustCompile(`^\s*\[([^\]]+)\]\s*(.*)$`)
+
+	var blocks []ShotBlock
+	var current *ShotBlock
+	var contentLines []string
+
+	flushBlock := func() {
+		if current == nil {
+			return
+		}
+		// Build RawContent from non-empty content lines
+		var rawParts []string
+		for _, cl := range contentLines {
+			if strings.TrimSpace(cl) != "" {
+				rawParts = append(rawParts, strings.TrimSpace(cl))
+			}
+		}
+		current.RawContent = strings.Join(rawParts, "\n")
+
+		// Parse segments within the block using tag detection
+		for i, cl := range contentLines {
+			trimmed := strings.TrimSpace(cl)
+			if trimmed == "" {
+				continue
+			}
+			// Skip markdown metadata (headers, tables, etc.) but NOT // SHOT lines
+			if isMarkdownMetadata(trimmed) {
+				continue
+			}
+
+			matches := tagPattern.FindStringSubmatch(trimmed)
+			if matches != nil {
+				tag := strings.TrimSpace(matches[1])
+				text := strings.TrimSpace(matches[2])
+				tagUpper := strings.ToUpper(tag)
+
+				seg := ScriptSegmentInfo{LineNum: i + 1, Text: text}
+				switch tagUpper {
+				case "CROWD":
+					seg.Type = "crowd"
+					seg.Character = "CROWD"
+				case "SFX":
+					seg.Type = "sfx"
+				case "BGM":
+					seg.Type = "bgm"
+				case "CAM", "CAMERA":
+					seg.Type = "camera"
+				case "VFX":
+					seg.Type = "vfx"
+				case "NOTE", "DIR":
+					seg.Type = "note"
+				case "NARRATOR":
+					seg.Type = "narrator"
+				default:
+					seg.Type = "dialogue"
+					seg.Character = tag
+				}
+				current.Lines = append(current.Lines, seg)
+			} else {
+				current.Lines = append(current.Lines, ScriptSegmentInfo{
+					Type:    "narrator",
+					Text:    trimmed,
+					LineNum: i + 1,
+				})
+			}
+		}
+
+		blocks = append(blocks, *current)
+	}
+
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+
+		if matches := shotHeaderPattern.FindStringSubmatch(trimmed); matches != nil {
+			// Flush previous block
+			flushBlock()
+
+			shotNum, _ := strconv.Atoi(matches[1])
+			dur := 0
+			if matches[2] != "" {
+				dur, _ = strconv.Atoi(matches[2])
+			}
+
+			current = &ShotBlock{
+				ShotNumber: shotNum,
+				Duration:   dur,
+				ShotType:   matches[3],
+				AudioMode:  matches[4],
+			}
+			contentLines = nil
+			continue
+		}
+
+		// Accumulate content lines for current block
+		if current != nil {
+			contentLines = append(contentLines, line)
+		}
+	}
+
+	// Flush last block
+	flushBlock()
+
+	return blocks
+}
+
+// buildStructuredAnalysis creates AI context text from parsed shot blocks
+func buildStructuredAnalysis(blocks []ShotBlock) string {
+	var sb strings.Builder
+	sb.WriteString("[Pre-Structured Script — ENRICH-ONLY Mode]\n")
+	sb.WriteString(fmt.Sprintf("This script contains %d pre-defined shots marked with // SHOT markers.\n", len(blocks)))
+	sb.WriteString("You MUST output EXACTLY this many shots. Do NOT split or merge any shot.\n\n")
+
+	sb.WriteString("Shot Summary:\n")
+	for _, b := range blocks {
+		durStr := "auto"
+		if b.Duration > 0 {
+			durStr = fmt.Sprintf("%ds", b.Duration)
+		}
+		typeStr := "auto"
+		if b.ShotType != "" {
+			typeStr = b.ShotType
+		}
+		modeStr := "auto"
+		if b.AudioMode != "" {
+			modeStr = b.AudioMode
+		}
+
+		dialogueCount := 0
+		sfxCount := 0
+		bgmCount := 0
+		camCount := 0
+		vfxCount := 0
+		noteCount := 0
+		for _, seg := range b.Lines {
+			switch seg.Type {
+			case "dialogue", "crowd":
+				dialogueCount++
+			case "sfx":
+				sfxCount++
+			case "bgm":
+				bgmCount++
+			case "camera":
+				camCount++
+			case "vfx":
+				vfxCount++
+			case "note":
+				noteCount++
+			}
+		}
+
+		// Build compact tag stats
+		var tagParts []string
+		if dialogueCount > 0 {
+			tagParts = append(tagParts, fmt.Sprintf("dlg=%d", dialogueCount))
+		}
+		if sfxCount > 0 {
+			tagParts = append(tagParts, fmt.Sprintf("sfx=%d", sfxCount))
+		}
+		if bgmCount > 0 {
+			tagParts = append(tagParts, fmt.Sprintf("bgm=%d", bgmCount))
+		}
+		if camCount > 0 {
+			tagParts = append(tagParts, fmt.Sprintf("cam=%d", camCount))
+		}
+		if vfxCount > 0 {
+			tagParts = append(tagParts, fmt.Sprintf("vfx=%d", vfxCount))
+		}
+		if noteCount > 0 {
+			tagParts = append(tagParts, fmt.Sprintf("note=%d", noteCount))
+		}
+		tagStr := ""
+		if len(tagParts) > 0 {
+			tagStr = ", tags: " + strings.Join(tagParts, " ")
+		}
+
+		sb.WriteString(fmt.Sprintf("- SHOT %d: duration=%s, type=%s, mode=%s%s\n",
+			b.ShotNumber, durStr, typeStr, modeStr, tagStr))
+	}
+
+	sb.WriteString("\nRULES FOR STRUCTURED INPUT:\n")
+	sb.WriteString("1. Output EXACTLY the shots listed above — same count, same order\n")
+	sb.WriteString("2. Each shot's script_segment = the FULL content between its // SHOT markers\n")
+	sb.WriteString("3. If duration was pre-specified (not 'auto'), use that exact value for estimated_duration_sec\n")
+	sb.WriteString("4. If shot_type was pre-specified (not 'auto'), use that exact value\n")
+	sb.WriteString("5. If audio_mode was pre-specified (not 'auto'), use that exact value\n")
+	sb.WriteString("6. For fields marked 'auto', infer the best value from shot content and [Tags]\n")
+	sb.WriteString("\nTAG MAPPING RULES:\n")
+	sb.WriteString("- Lines WITHOUT [tags] = NARRATOR → audio_mode='narrator_only'\n")
+	sb.WriteString("- [Character Name] = DIALOGUE → audio_mode='dialogue_dominant', use text as dialogue_text\n")
+	sb.WriteString("- [CROWD] = CROWD → audio_mode='dialogue_dominant', dialogue_type='crowd'\n")
+	sb.WriteString("- [SFX] text → put in sound_effect field. Does NOT change audio_mode\n")
+	sb.WriteString("- [BGM] text → put in bgm_prompt field. Does NOT change audio_mode\n")
+	sb.WriteString("- [CAM] text → use as camera movement/angle instruction for the shot\n")
+	sb.WriteString("- [VFX] text → append to visual_description as visual effects instruction\n")
+	sb.WriteString("- [NOTE] text → use as director's note, incorporate into visual_description or reason_for_shot\n")
+	sb.WriteString("- Do NOT invent dialogue that isn't in the script\n")
+
+	return sb.String()
+}
+
+// parseMarkedScript detects [Character], [CROWD], [SFX] tags in the script
+// and returns a structured analysis string to inject into the AI prompt.
+// If no tags are found, returns empty string (pure narrator mode — backward compatible).
+// Automatically strips markdown metadata (headers, tables, shot annotations, etc.)
+func parseMarkedScript(script string) (segments []ScriptSegmentInfo, analysisText string) {
+	lines := strings.Split(script, "\n")
+	tagPattern := regexp.MustCompile(`^\s*\[([^\]]+)\]\s*(.*)$`)
+
+	// First pass: check if any REAL script tags exist (skip metadata lines)
+	hasAnyTag := false
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if trimmed == "" || isMarkdownMetadata(trimmed) {
+			continue
+		}
+		if tagPattern.MatchString(trimmed) {
+			hasAnyTag = true
+			break
+		}
+	}
+
+	// No tags found — pure narrator script, backward compatible
+	if !hasAnyTag {
+		return nil, ""
+	}
+
+	// Second pass: parse segments, skipping metadata
+	inCodeBlock := false
+	for i, line := range lines {
+		trimmed := strings.TrimSpace(line)
+
+		// Track code block state (``` ... ```)
+		if strings.HasPrefix(trimmed, "```") {
+			inCodeBlock = !inCodeBlock
+			continue
+		}
+		if inCodeBlock {
+			continue
+		}
+
+		// Skip empty lines and markdown metadata
+		if trimmed == "" || isMarkdownMetadata(trimmed) {
+			continue
+		}
+
+		matches := tagPattern.FindStringSubmatch(trimmed)
+		if matches != nil {
+			tag := strings.TrimSpace(matches[1])
+			text := strings.TrimSpace(matches[2])
+			tagUpper := strings.ToUpper(tag)
+
+			seg := ScriptSegmentInfo{LineNum: i + 1, Text: text}
+			switch tagUpper {
+			case "CROWD":
+				seg.Type = "crowd"
+				seg.Character = "CROWD"
+			case "SFX":
+				seg.Type = "sfx"
+				seg.Character = ""
+			case "BGM":
+				seg.Type = "bgm"
+				seg.Character = ""
+			case "CAM", "CAMERA":
+				seg.Type = "camera"
+				seg.Character = ""
+			case "VFX":
+				seg.Type = "vfx"
+				seg.Character = ""
+			case "NOTE", "DIR":
+				seg.Type = "note"
+				seg.Character = ""
+			case "NARRATOR":
+				seg.Type = "narrator"
+				seg.Character = ""
+			default:
+				seg.Type = "dialogue"
+				seg.Character = tag
+			}
+			segments = append(segments, seg)
+		} else {
+			// No tag = narrator line
+			segments = append(segments, ScriptSegmentInfo{
+				Type:    "narrator",
+				Text:    trimmed,
+				LineNum: i + 1,
+			})
+		}
+	}
+
+	// Build analysis text
+	var sb strings.Builder
+	sb.WriteString("[Pre-Marked Script Analysis]\n")
+	sb.WriteString("This script contains EXPLICIT dialogue markers. You MUST respect them:\n\n")
+
+	narratorCount := 0
+	dialogueCount := 0
+	crowdCount := 0
+	sfxCount := 0
+	charNames := make(map[string]bool)
+
+	for _, seg := range segments {
+		switch seg.Type {
+		case "narrator":
+			narratorCount++
+		case "dialogue":
+			dialogueCount++
+			charNames[seg.Character] = true
+		case "crowd":
+			crowdCount++
+		case "sfx":
+			sfxCount++
+		}
+	}
+
+	sb.WriteString(fmt.Sprintf("- Total narrator segments: %d\n", narratorCount))
+	sb.WriteString(fmt.Sprintf("- Total dialogue segments: %d\n", dialogueCount))
+	sb.WriteString(fmt.Sprintf("- Total crowd segments: %d\n", crowdCount))
+	sb.WriteString(fmt.Sprintf("- Total SFX cues: %d\n", sfxCount))
+
+	if len(charNames) > 0 {
+		names := make([]string, 0, len(charNames))
+		for name := range charNames {
+			names = append(names, name)
+		}
+		sb.WriteString(fmt.Sprintf("- Speaking characters: %s\n", strings.Join(names, ", ")))
+	}
+
+	sb.WriteString("\nRULES FOR MARKED SCRIPTS:\n")
+	sb.WriteString("1. Lines WITHOUT [tags] are NARRATOR — set audio_mode to 'narrator_only'\n")
+	sb.WriteString("2. Lines with [Character Name] are DIALOGUE — set audio_mode to 'dialogue_dominant', dialogue_text = the text, narrator_enabled = false\n")
+	sb.WriteString("3. Lines with [CROWD] are CROWD — set audio_mode to 'dialogue_dominant', dialogue_type = 'crowd', narrator_ducking = true\n")
+	sb.WriteString("4. Lines with [SFX] are sound effect cues — include in sound_effect field\n")
+	sb.WriteString("5. DO NOT invent or add dialogue that isn't in the script\n")
+	sb.WriteString("6. DO NOT move dialogue to a different position in the story\n")
+	sb.WriteString("7. A dialogue line CAN be its own shot, or combined with adjacent narrator if very short\n")
+	sb.WriteString("8. The script_segment field must include the ORIGINAL text WITH the [tag] markers\n")
+
+	return segments, sb.String()
+}
+
+// isMarkdownMetadata returns true for lines that are markdown formatting/metadata
+// and should be SKIPPED when parsing a marked script.
+// This allows users to paste full production documents with structure maps,
+// shot annotations, timing tables, etc. without manual cleanup.
+func isMarkdownMetadata(line string) bool {
+	// Markdown headers: # Title, ## Section, ### Subsection
+	if strings.HasPrefix(line, "#") {
+		return true
+	}
+
+	// Horizontal rules: ---, ***, ___
+	stripped := strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(line, " ", ""), "\t", ""), "\r", "")
+	if len(stripped) >= 3 {
+		allDash := true
+		allStar := true
+		allUnder := true
+		for _, ch := range stripped {
+			if ch != '-' {
+				allDash = false
+			}
+			if ch != '*' {
+				allStar = false
+			}
+			if ch != '_' {
+				allUnder = false
+			}
+		}
+		if allDash || allStar || allUnder {
+			return true
+		}
+	}
+
+	// Markdown table rows: | Column | Column |
+	if strings.HasPrefix(line, "|") && strings.Count(line, "|") >= 2 {
+		return true
+	}
+
+	// Bold shot annotations: **// SHOT 01 | 00:00–00:06 | 6s | BRAND IDENT**
+	if strings.HasPrefix(line, "**//") || strings.HasPrefix(line, "**/ /") {
+		return true
+	}
+
+	// Non-bold shot comment lines: // SHOT 01 ...
+	// EXCEPT: preserve "// SHOT XX" markers used for structured input
+	if strings.HasPrefix(line, "//") {
+		if shotHeaderPattern.MatchString(line) {
+			return false // This is a structural shot marker, NOT metadata
+		}
+		return true
+	}
+
+	// Lines starting with ** that contain metadata keywords (not dialogue)
+	if strings.HasPrefix(line, "**") && strings.HasSuffix(line, "**") {
+		lower := strings.ToLower(line)
+		metaKeywords := []string{"kênh:", "format:", "thời lượng", "cú pháp:", "channel:", "duration:", "syntax:"}
+		for _, kw := range metaKeywords {
+			if strings.Contains(lower, kw) {
+				return true
+			}
+		}
+	}
+
+	// Lines that are pure bold formatting with metadata patterns: **Kênh:** ..., **Format:** ...
+	if strings.HasPrefix(line, "**") && strings.Contains(line, ":**") {
+		return true
+	}
+
+	return false
+}
+
+// processVisualUnitGeneration handles the visual_unit split mode (AI Director for voice-over videos)
+func (s *StoryboardService) processVisualUnitGeneration(taskID, episodeID string, dramaID uint, model, scriptContent, characterList, sceneList, propList string) {
+	// Detect structured shot markers (// SHOT XX)
+	isStructured := detectStructuredShots(scriptContent)
+	var structuredBlocks []ShotBlock
+
+	var systemPrompt string
+	var scriptAnalysis string
+
+	if isStructured {
+		// === STRUCTURED MODE: User pre-defined shot boundaries ===
+		structuredBlocks = parseStructuredShots(scriptContent)
+		s.log.Infow("Detected structured shot markers (// SHOT), using ENRICH-ONLY mode",
+			"task_id", taskID, "episode_id", episodeID, "shot_count", len(structuredBlocks))
+
+		// Try custom template first, fallback to structured prompt
+		customPrompt := s.promptI18n.WithDramaVisualUnitSystemPrompt(dramaID)
+		defaultPrompt := prompts.Get("storyboard_visual_unit.txt")
+		if customPrompt != defaultPrompt {
+			// User has a custom template — use it (it should handle structured mode)
+			systemPrompt = customPrompt
+		} else {
+			// No custom template — use dedicated structured prompt
+			systemPrompt = prompts.Get("storyboard_visual_unit_structured.txt")
+		}
+
+		scriptAnalysis = buildStructuredAnalysis(structuredBlocks)
+	} else {
+		// === FREE-FORM MODE (unchanged behavior) ===
+		systemPrompt = s.promptI18n.WithDramaVisualUnitSystemPrompt(dramaID)
+		_, scriptAnalysis = parseMarkedScript(scriptContent)
+	}
+
+	scriptLabel := s.promptI18n.FormatUserPrompt("script_content_label")
+	charListLabel := s.promptI18n.FormatUserPrompt("character_list_label")
+	charConstraint := s.promptI18n.FormatUserPrompt("character_constraint")
+	sceneListLabel := s.promptI18n.FormatUserPrompt("scene_list_label")
+	sceneConstraint := s.promptI18n.FormatUserPrompt("scene_constraint")
+	propListLabel := s.promptI18n.FormatUserPrompt("prop_list_label")
+	propConstraint := s.promptI18n.FormatUserPrompt("prop_constraint")
+	formatInstructions := prompts.Get("storyboard_visual_unit_format.txt")
+
+	var prompt string
+	if scriptAnalysis != "" {
+		// Has analysis (structured or marked script) — inject between script and format
+		logMsg := "Detected marked script with dialogue tags"
+		if isStructured {
+			logMsg = "Using structured shot analysis for ENRICH-ONLY mode"
+		}
+		s.log.Infow(logMsg, "task_id", taskID, "episode_id", episodeID)
+
+		prompt = fmt.Sprintf(`%s
+
+%s
+%s
+
+%s
+
+%s
+%s
+%s
+
+%s
+%s
+%s
+
+%s
+%s
+%s
+
+%s`,
+			systemPrompt,
+			scriptLabel, scriptContent,
+			scriptAnalysis,
+			charListLabel, characterList, charConstraint,
+			sceneListLabel, sceneList, sceneConstraint,
+			propListLabel, propList, propConstraint,
+			formatInstructions)
+	} else {
+		// Pure narrator script — original flow
+		prompt = fmt.Sprintf(`%s
+
+%s
+%s
+
+%s
+%s
+%s
+
+%s
+%s
+%s
+
+%s
+%s
+%s
+
+%s`,
+			systemPrompt,
+			scriptLabel, scriptContent,
+			charListLabel, characterList, charConstraint,
+			sceneListLabel, sceneList, sceneConstraint,
+			propListLabel, propList, propConstraint,
+			formatInstructions)
+	}
+
+	client, getErr := s.aiService.GetAIClientForModel("text", model)
+	if model != "" && getErr != nil {
+		s.log.Warnw("Failed to get client for specified model, using default", "model", model, "error", getErr, "task_id", taskID)
+	}
+
+	var text string
+	var err error
+	if model != "" && getErr == nil {
+		text, err = client.GenerateText(prompt, "")
+	} else {
+		text, err = s.aiService.GenerateText(prompt, "")
+	}
+
+	if err != nil {
+		s.log.Errorw("Failed to generate visual unit storyboard", "error", err, "task_id", taskID)
+		if updateErr := s.taskService.UpdateTaskError(taskID, fmt.Errorf("Visual unit generation failed: %w", err)); updateErr != nil {
+			s.log.Errorw("Failed to update task error", "error", updateErr, "task_id", taskID)
+		}
+		return
+	}
+
+	// Parse AI output as VoiceoverShot array
+	var shots []VoiceoverShot
+	if err := utils.SafeParseAIJSON(text, &shots); err != nil {
+		s.log.Errorw("Failed to parse visual unit JSON", "error", err, "response", text[:min(500, len(text))], "task_id", taskID)
+		if updateErr := s.taskService.UpdateTaskError(taskID, fmt.Errorf("Failed to parse visual unit result: %w", err)); updateErr != nil {
+			s.log.Errorw("Failed to update task error", "error", updateErr, "task_id", taskID)
+		}
+		return
+	}
+
+	// Re-number shots sequentially
+	for i := range shots {
+		shots[i].ShotID = i + 1
+	}
+
+	// Post-validation for structured mode: warn if shot count mismatches
+	if isStructured && len(structuredBlocks) > 0 {
+		expected := len(structuredBlocks)
+		actual := len(shots)
+		if actual != expected {
+			s.log.Warnw("Structured mode: AI output count mismatch — expected from // SHOT markers",
+				"expected", expected, "actual", actual, "task_id", taskID)
+		}
+
+		// Wire user-specified metadata from ShotBlocks into AI output
+		for i := range shots {
+			if i >= len(structuredBlocks) {
+				break
+			}
+			block := structuredBlocks[i]
+
+			// Override with user-specified values if provided
+			if block.Duration > 0 {
+				shots[i].EstimatedDuration = block.Duration
+			}
+			if block.ShotType != "" {
+				shots[i].ShotType = block.ShotType
+			}
+			if block.AudioMode != "" {
+				shots[i].AudioMode = block.AudioMode
+			}
+
+			// Use block RawContent as script_segment if AI didn't capture it correctly
+			if block.RawContent != "" && (shots[i].ScriptSegment == "" || shots[i].ScriptSegment == "null") {
+				shots[i].ScriptSegment = block.RawContent
+			}
+
+			// Wire expanded tags from parsed lines into shot fields
+			for _, seg := range block.Lines {
+				switch seg.Type {
+				case "sfx":
+					if seg.Text != "" {
+						if shots[i].SoundEffect == "" {
+							shots[i].SoundEffect = seg.Text
+						} else {
+							shots[i].SoundEffect += "; " + seg.Text
+						}
+					}
+				case "bgm":
+					if seg.Text != "" {
+						shots[i].BgmPrompt = seg.Text
+					}
+				case "camera":
+					if seg.Text != "" {
+						// Camera tag overrides movement field
+						shots[i].Movement = seg.Text
+					}
+				case "vfx":
+					if seg.Text != "" {
+						// Append VFX instructions to visual description
+						if shots[i].VisualDescription != "" {
+							shots[i].VisualDescription += " [VFX: " + seg.Text + "]"
+						} else {
+							shots[i].VisualDescription = "[VFX: " + seg.Text + "]"
+						}
+					}
+				case "note":
+					if seg.Text != "" {
+						// Append director's note to reason_for_shot
+						if shots[i].ReasonForShot != "" {
+							shots[i].ReasonForShot += " | Director note: " + seg.Text
+						} else {
+							shots[i].ReasonForShot = "Director note: " + seg.Text
+						}
+					}
+				case "dialogue":
+					// Override dialogue_text with user-specified dialogue
+					if seg.Text != "" {
+						if shots[i].DialogueText == "" {
+							shots[i].DialogueText = seg.Text
+						} else {
+							shots[i].DialogueText += "\n" + seg.Text
+						}
+					}
+				case "crowd":
+					if seg.Text != "" {
+						shots[i].DialogueText = seg.Text
+						shots[i].DialogueType = "crowd"
+					}
+				}
+			}
+		}
+	}
+
+	if err := s.taskService.UpdateTaskStatus(taskID, "processing", 50, "Visual unit shots generated, parsing data..."); err != nil {
+		s.log.Errorw("Failed to update task status", "error", err, "task_id", taskID)
+		return
+	}
+
+	// Calculate total duration
+	totalDuration := 0
+	for _, shot := range shots {
+		totalDuration += shot.EstimatedDuration
+	}
+
+	s.log.Infow("Visual unit storyboard generated",
+		"task_id", taskID,
+		"episode_id", episodeID,
+		"count", len(shots),
+		"total_duration_seconds", totalDuration)
+
+	if err := s.taskService.UpdateTaskStatus(taskID, "processing", 70, "Saving visual unit shots..."); err != nil {
+		s.log.Errorw("Failed to update task status", "error", err, "task_id", taskID)
+		return
+	}
+
+	// Save to database
+	if err := s.saveVoiceoverShots(episodeID, shots); err != nil {
+		s.log.Errorw("Failed to save voiceover shots", "error", err, "task_id", taskID)
+		if updateErr := s.taskService.UpdateTaskError(taskID, fmt.Errorf("Failed to save shots: %w", err)); updateErr != nil {
+			s.log.Errorw("Failed to update task error", "error", updateErr, "task_id", taskID)
+		}
+		return
+	}
+
+	if err := s.taskService.UpdateTaskStatus(taskID, "processing", 90, "Updating episode duration..."); err != nil {
+		s.log.Errorw("Failed to update task status", "error", err, "task_id", taskID)
+		return
+	}
+
+	// Update episode duration
+	durationMinutes := (totalDuration + 59) / 60
+	if err := s.db.Model(&models.Episode{}).Where("id = ?", episodeID).Update("duration", durationMinutes).Error; err != nil {
+		s.log.Errorw("Failed to update episode duration", "error", err, "task_id", taskID)
+	}
+
+	// Update task result
+	resultData := gin.H{
+		"storyboards":      shots,
+		"total":            len(shots),
+		"total_duration":   totalDuration,
+		"duration_minutes": durationMinutes,
+		"mode":             "visual_unit",
+	}
+
+	if err := s.taskService.UpdateTaskResult(taskID, resultData); err != nil {
+		s.log.Errorw("Failed to update task result", "error", err, "task_id", taskID)
+		return
+	}
+
+	s.log.Infow("Visual unit storyboard generation completed", "task_id", taskID, "episode_id", episodeID)
+}
+
+// saveVoiceoverShots maps VoiceoverShot[] to models.Storyboard and saves to DB
+func (s *StoryboardService) saveVoiceoverShots(episodeID string, shots []VoiceoverShot) error {
+	epID, err := strconv.ParseUint(episodeID, 10, 32)
+	if err != nil {
+		return fmt.Errorf("invalid episode ID: %s", episodeID)
+	}
+
+	if len(shots) == 0 {
+		return fmt.Errorf("AI returned 0 shots, refusing to save")
+	}
+
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		// Verify episode exists
+		var episode models.Episode
+		if err := tx.First(&episode, epID).Error; err != nil {
+			return fmt.Errorf("episode not found: %s", episodeID)
+		}
+
+		// Clear existing image generation references
+		var storyboardIDs []uint
+		if err := tx.Model(&models.Storyboard{}).
+			Where("episode_id = ?", uint(epID)).
+			Pluck("id", &storyboardIDs).Error; err != nil {
+			return err
+		}
+
+		if len(storyboardIDs) > 0 {
+			if err := tx.Model(&models.ImageGeneration{}).
+				Where("storyboard_id IN ?", storyboardIDs).
+				Update("storyboard_id", nil).Error; err != nil {
+				return err
+			}
+		}
+
+		// Delete existing storyboards for this episode
+		if result := tx.Where("episode_id = ?", uint(epID)).Delete(&models.Storyboard{}); result.Error != nil {
+			return result.Error
+		}
+
+		// Save each voiceover shot as a Storyboard
+		for _, shot := range shots {
+			// Build visual description as the Description field
+			description := shot.VisualDescription
+
+			// Generate image/video prompts from VoiceoverShot fields using existing helpers
+			sbForPrompt := Storyboard{
+				ShotNumber:  shot.ShotID,
+				Title:       shot.Title,
+				ShotType:    shot.ShotType,
+				Angle:       shot.Angle,
+				Movement:    shot.Movement,
+				Location:    shot.Location,
+				Time:        shot.Time,
+				Atmosphere:  shot.Atmosphere,
+				Action:      shot.VisualDescription, // Use visual description as action for prompts
+				Dialogue:    shot.DialogueText,
+				SoundEffect: shot.SoundEffect,
+				Duration:    shot.EstimatedDuration,
+			}
+
+			// Load props for prompt generation
+			var propDescriptions string
+			var loadedProps []models.Prop
+			if len(shot.Props) > 0 {
+				if err := tx.Where("id IN ?", shot.Props).Find(&loadedProps).Error; err == nil {
+					var names []string
+					for _, p := range loadedProps {
+						desc := p.Name
+						if p.Prompt != nil && *p.Prompt != "" {
+							desc += " (" + *p.Prompt + ")"
+						}
+						names = append(names, desc)
+					}
+					propDescriptions = strings.Join(names, ", ")
+				}
+			}
+
+			imagePrompt := s.generateImagePrompt(sbForPrompt, propDescriptions)
+			videoPrompt := s.generateVideoPrompt(sbForPrompt)
+
+			// Convert string fields to pointers (nil if empty)
+			strPtr := func(v string) *string {
+				if v == "" {
+					return nil
+				}
+				return &v
+			}
+			intPtr := func(v int) *int {
+				return &v
+			}
+			boolPtr := func(v bool) *bool {
+				return &v
+			}
+
+			// Convert triggered_rules to JSON
+			var splitRulesJSON datatypes.JSON
+			if len(shot.TriggeredRules) > 0 {
+				if data, err := json.Marshal(shot.TriggeredRules); err == nil {
+					splitRulesJSON = datatypes.JSON(data)
+				}
+			}
+
+			storyboard := models.Storyboard{
+				EpisodeID:        uint(epID),
+				SceneID:          shot.SceneID,
+				StoryboardNumber: shot.ShotID,
+				Title:            strPtr(shot.Title),
+				Location:         strPtr(shot.Location),
+				Time:             strPtr(shot.Time),
+				ShotType:         strPtr(shot.ShotType),
+				Angle:            strPtr(shot.Angle),
+				Movement:         strPtr(shot.Movement),
+				Description:      &description,
+				Action:           strPtr(shot.VisualDescription),
+				Atmosphere:       strPtr(shot.Atmosphere),
+				Dialogue:         strPtr(shot.DialogueText),
+				ImagePrompt:      &imagePrompt,
+				VideoPrompt:      &videoPrompt,
+				VideoPromptSource: "auto",
+				BgmPrompt:        strPtr(shot.BgmPrompt),
+				SoundEffect:      strPtr(shot.SoundEffect),
+				Duration:         shot.EstimatedDuration,
+				// Voice-over Director fields
+				ScriptSegment:   strPtr(shot.ScriptSegment),
+				ScriptStartChar: intPtr(shot.ScriptStartChar),
+				ScriptEndChar:   intPtr(shot.ScriptEndChar),
+				ShotReason:      strPtr(shot.ReasonForShot),
+				SplitRules:      splitRulesJSON,
+				VisualType:      strPtr(shot.VisualType),
+				ShotRole:        strPtr(shot.ShotRole),
+				// Audio Strategy fields
+				AudioMode:       strPtr(shot.AudioMode),
+				NarratorEnabled: boolPtr(shot.NarratorEnabled),
+				NarratorDucking: boolPtr(shot.NarratorDucking),
+				DialogueType:    strPtr(shot.DialogueType),
+				AmbienceType:    strPtr(shot.AmbienceType),
+				AmbienceLevel:   strPtr(shot.AmbienceLevel),
+				MusicMood:       strPtr(shot.MusicMood),
+				MusicLevel:      strPtr(shot.MusicLevel),
+			}
+
+			if err := tx.Create(&storyboard).Error; err != nil {
+				s.log.Errorw("Failed to create voiceover shot", "error", err, "shot_id", shot.ShotID)
+				return err
+			}
+
+			// Associate characters
+			if len(shot.Characters) > 0 {
+				var characters []models.Character
+				if err := tx.Where("id IN ?", shot.Characters).Find(&characters).Error; err == nil && len(characters) > 0 {
+					if err := tx.Model(&storyboard).Association("Characters").Append(characters); err != nil {
+						s.log.Warnw("Failed to associate characters", "error", err, "shot_id", shot.ShotID)
+					}
+				}
+			}
+
+			// Associate props
+			if len(loadedProps) > 0 {
+				if err := tx.Model(&storyboard).Association("Props").Append(loadedProps); err != nil {
+					s.log.Warnw("Failed to associate props", "error", err, "shot_id", shot.ShotID)
+				}
+			}
+		}
+
+		s.log.Infow("Voiceover shots saved successfully", "episode_id", episodeID, "count", len(shots))
+		return nil
+	})
 }
 
 // generateImagePrompt 生成专门用于图片生成的提示词（首帧静态画面）

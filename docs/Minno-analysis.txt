@@ -1,0 +1,521 @@
+Chào bạn, tôi là chuyên gia phân tích ngôn ngữ hình ảnh. Dựa trên DNA thị giác của kênh **Minno - Laugh and Grow Bible for Kids**, tôi xin cung cấp bản phân tích chi tiết để bạn có thể tái tạo phong cách này bằng các công cụ AI (như Midjourney v6, DALL-E 3, hoặc Stable Diffusion).
+
+---
+
+## 1. KỸ THUẬT TẠO HÌNH ẢNH (Image Production Method)
+- **Phân loại chính xác:** **2D Animation / Digital Illustration**. Đây là phong cách minh họa kỹ thuật số hiện đại, được tối ưu hóa cho chuyển động (cut-out animation).
+- **Mức độ photorealistic:** **1/10**. Hoàn toàn stylized, không có yếu tố thực tế.
+- **AI artifacts:** N/A (Vì đây là sản phẩm đồ họa vector/digital painting thuần túy).
+- **Animation/Movement:** Real motion (nhân vật di chuyển theo khớp, có biểu cảm miệng đồng bộ tiếng nói).
+- **Face-cam:** 0%. Toàn bộ là không gian hoạt hình.
+
+## 2. MÀU SẮC CHÍNH XÁC (Exact Color Science)
+
+### 2a. Bảng màu Shadow/Dark zones:
+- **Màu shadow chính (hex):** `#3D2B56` (Tím đậm cho bóng tối ban đêm) hoặc `#7B5E4A` (Nâu ấm cho bóng đổ ban ngày).
+- **Blacks:** Bị lift nhẹ (giá trị IRE khoảng 5-10). Không bao giờ dùng màu đen tuyệt đối (#000000), thường là xanh đen hoặc nâu đậm.
+
+### 2b. Bảng màu Highlight/Bright zones:
+- **Màu highlight chính (hex):** `#FFF9C4` (Vàng kem nhạt) hoặc `#FFFFFF`.
+- **Glow/Bloom:** Có xuất hiện quanh nguồn sáng thần thánh hoặc mặt trời. Bán kính bloom lớn nhưng cường độ nhẹ (soft glow).
+- **Roll-off:** Mềm, chuyển sắc giữa sáng và tối thông qua các dải gradient mượt mà.
+
+### 2c. Bảng màu Midtone:
+- **Skin tones:** Warm tan (`#E8BE96`) hoặc Peachy (`#F5CBA7`).
+- **Dominant midtone surfaces:** Cỏ xanh dương xỉ (`#7CB342`), Đất sa mạc vàng cam (`#FFB74D`).
+
+### 2d. Bảng màu Accent / Brand Colors:
+- **Consistent brand palette:** Sử dụng các màu nguyên bản (Primary colors) nhưng được làm dịu lại (pastelized). Màu tím Minno (`#5E35B1`) xuất hiện trong logo và UI.
+
+### 2e. Tỷ lệ màu trong frame:
+- **Tỷ lệ:** 10% Shadow | 60% Midtone | 30% Highlight.
+- **Tổng thể:** **High-key (Sáng sủa)**. Phim tạo cảm giác an toàn, vui tươi cho trẻ em.
+- **Color grading:** Warm & Vibrant.
+
+## 3. ÁNH SÁNG CHÍNH XÁC (Exact Lighting)
+
+### 3a. Setup ánh sáng chủ đạo:
+- **Nguồn sáng:** Kết hợp ánh sáng môi trường (Ambient) và Key light rõ rệt từ phía trên (Mặt trời/Chúa).
+- **Key light:** Thường hướng 45 độ từ trên xuống. Ánh sáng **Very Soft**.
+- **Fill light:** Rất cao. Vùng tối luôn nhìn rõ chi tiết, độ tương phản thấp.
+- **Rim light:** Xuất hiện ở viền tóc/vai nhân vật để tách biệt với nền, thường là màu trắng hoặc vàng nhạt.
+
+### 3b. Biến thể ánh sáng:
+- **Outdoor (Day):** Ánh sáng tràn ngập, bóng đổ ngắn, màu sắc rực rỡ.
+- **Miracle/God's Voice:** Ánh sáng từ tâm (Radial), có các tia sáng (God rays) biểu tượng.
+
+### 3c. Hiệu ứng đặc biệt:
+- **Volumetric light:** Mạnh khi có yếu tố tâm linh.
+- **Atmospheric perspective:** Rất rõ. Các ngọn núi ở xa được vẽ đơn giản hóa và chuyển sang tông màu xanh lơ nhạt để tạo chiều sâu.
+
+## 4. TEXTURE & CHẤT LIỆU (Visual Surface Quality)
+
+### 4a. Tổng thể chất lượng:
+- **Resolution:** 1080p clean.
+- **Sharpness:** Clean nhưng không sắc lẹm. Các cạnh được xử lý khử răng cưa (anti-aliasing) cực tốt.
+
+### 4b. Các bề mặt chính:
+- **Da người:** Phẳng hoàn toàn, không lỗ chân lông (1/10 detail).
+- **Vải vóc:** Texture thô nhẹ như giấy hoặc vải lanh (subtle grain).
+- **Cỏ/Cây:** Được vẽ theo cụm, dạng vector phẳng.
+- **Bầu trời:** Thường là gradient chuyển màu đơn giản.
+
+## 5. FILM GRAIN & POST-PROCESSING
+- **Film grain:** 1/10 (Gần như không có, trừ khi là texture giấy được overlay rất nhẹ).
+- **Vignette:** Không có ở cảnh thường, chỉ xuất hiện ở cảnh hồi tưởng (flashback).
+- **Chromatic aberration:** 0% (Hoạt hình sạch).
+- **Depth of field:** Deep focus (Hầu như mọi thứ đều rõ nét từ tiền cảnh đến hậu cảnh).
+
+## 6. SO SÁNH VỚI CÁC STYLE QUEN THUỘC
+- **Show tương đương:** *VeggieTales in the House (2D)*, *Superbook (vùng 2D)*, *StoryBots*.
+- **Style nghệ thuật:** *Modern Vector Illustration*, *Paper-cut style digital art*.
+
+---
+
+## 7. SAMPLE PROMPT RECONSTRUCTION
+
+### Frame 1: Cảnh sinh hoạt sa mạc (Sunny Day)
+{
+  "frame_description": "Cảnh dân Israel dựng lều trong sa mạc, ánh nắng rực rỡ.",
+  "full_prompt": "A clean 2D digital illustration in the style of Minno Laugh and Grow Bible, showing a friendly biblical settlement in a vast desert. Stylized rounded tents with simple fabric textures. The characters are cute with large dot eyes and tan skin, wearing simple colorful robes. Bright sunny lighting with soft ambient occlusion shadows. Saturated color palette of golden sand, bright blue sky, and vibrant clothing. Minimalist vector art style, flat design elements, high-quality digital painting, children's book aesthetic, soft gradients, wide shot, high-key lighting, joyful atmosphere --ar 16:9 --v 6.0",
+  "negative_prompt": "photorealistic, 3d render, gritty, dark, high contrast, blurry, messy lines, complex textures, complex shading, sharp edges, distorted faces",
+  "recommended_model": "Midjourney v6",
+  "recommended_settings": {"cfg_scale": 7, "steps": 30, "sampler": "Euler a"}
+}
+
+### Frame 2: Tiếng gọi của Chúa (Divine Interaction)
+{
+  "frame_description": "Nhân vật nhìn lên bầu trời nơi có luồng sáng thần thánh tỏa xuống.",
+  "full_prompt": "A spiritual scene from a 2D animated bible story for children. A small, stylized character with rounded features looks up in awe at a radial burst of divine golden light coming from the clouds. Volumetric god rays, soft bloom effect around the light source. The background consists of simplified purple mountains and a soft teal sky. Minimalist vector illustration style, clean lines, flat colors with subtle gradients, ethereal and peaceful mood, glowing highlights, soft rim lighting on the character's silhouette --ar 16:9 --style raw",
+  "negative_prompt": "scary, dark, realistic, 3d cgi, grainy, sketch, jagged lines, dull colors, heavy shadows",
+  "recommended_model": "DALL-E 3",
+  "recommended_settings": {"cfg_scale": 6, "steps": 25, "sampler": "DPM++ 2M Karras"}
+}
+
+### Frame 3: Cảnh đêm tĩnh lặng (Nighttime/Reflection)
+{
+  "frame_description": "Nhân vật ngồi bên đống lửa dưới bầu trời sao.",
+  "full_prompt": "A nighttime 2D digital vector illustration, a cozy biblical scene. A cute character sitting by a stylized campfire with simple orange glow. The night sky is deep navy blue with large bright white dots as stars. Soft purple shadows on the desert floor. Saturated but dark color science. Flat illustration style, clean shapes, minimal detail, high-key night scene, warm campfire highlight on character face, children's animated show visual DNA, calm and cozy atmosphere --ar 16:9 --niji 6",
+  "negative_prompt": "pitch black, scary, realistic, photography, messy, rough texture, oil painting, high detail",
+  "recommended_model": "Midjourney (Niji 6 mode)",
+  "recommended_settings": {"cfg_scale": 8, "steps": 35, "sampler": "DPM++ SDE"}
+}
+
+
+Chào bạn, với tư cách là Đạo diễn hình ảnh (DP), tôi đã thực hiện phân tích ngôn ngữ hình ảnh cho video từ kênh **Minno - Laugh and Grow Bible for Kids**.
+
+Đây là một sản phẩm **Hoạt hình 2D (Cut-out Animation)**, vì vậy ngôn ngữ điện ảnh ở đây được điều khiển hoàn toàn bởi "Camera ảo" trong môi trường đồ họa. Phong cách này được tối ưu hóa cho đối tượng trẻ em: rõ ràng, trực diện và giàu cảm xúc.
+
+---
+
+## 1. THỐNG KÊ CỠ CẢNH (Shot Size Distribution)
+
+Cơ cấu cỡ cảnh của Minno tập trung vào việc kể chuyện rõ ràng và biểu cảm nhân vật.
+
+| Cỡ cảnh | Số lần ước tính | % tổng | Dùng khi nào (context) |
+|----------|--------|--------|------------------------|
+| **Extreme Wide Shot (EWS)** | 5 | 10% | Thiết lập bối cảnh lớn (sa mạc, thành phố Jericho, chiến trường). |
+| **Wide Shot (WS)** | 12 | 25% | Trình bày nhóm nhân vật (Samuel và các con của Jesse) hoặc nhân vật trong môi trường (David chăn cừu). |
+| **Medium Shot (MS)** | 18 | 35% | Cỡ cảnh chủ đạo cho narration và hội thoại giữa 2-3 nhân vật. |
+| **Medium Close-Up (MCU)** | 8 | 15% | Nhấn mạnh biểu cảm khi nhân vật nói các câu quan trọng hoặc phản ứng "Wow/Oh". |
+| **Close-Up (CU)** | 5 | 10% | Cận cảnh gương mặt để thấy rõ cảm xúc (David tự tin, Goliath giận dữ). |
+| **Text/Title Card** | 3 | 5% | Hiển thị tên chương (Aposta-Cycles) hoặc tên nhân vật trên bảng hiệu. |
+
+---
+
+## 2. THỐNG KÊ GÓC MÁY (Camera Angle)
+
+Vì là hoạt hình giáo dục, góc máy được giữ ở mức đơn giản để trẻ em dễ nắm bắt nội dung.
+
+| Góc máy | Số lần | % | Dùng khi nào |
+|---------|--------|---|-------------|
+| **Eye-level** | 40 | 85% | Góc máy ngang tầm mắt, tạo cảm giác thân thiện, kể chuyện khách quan. |
+| **Low angle** | 5 | 10% | Nhìn lên Goliath (tạo cảm giác to lớn, đe dọa) hoặc khi nói về Chúa (uy nghiêm). |
+| **High angle** | 2 | 5% | Nhìn xuống David từ góc độ của Goliath để thấy sự chênh lệch kích thước. |
+
+---
+
+## 3. CHUYỂN ĐỘNG CAMERA (Camera Movement)
+
+**Phương pháp chính:** Ảnh tĩnh/Vector + Chuyển động Camera kỹ thuật số (Animation camera). Không có chuyển động vật lý (handheld/gimbal).
+
+| Loại chuyển động | Tần suất | Tốc độ | Mô tả chi tiết |
+|-------------------|----------|--------|-----------------|
+| **Static (Tĩnh)** | Rất cao | - | Giữ khung hình cố định để nhân vật cử động bên trong. |
+| **Digital Zoom In** | Trung bình | Chậm | Thu hẹp khung hình từ WS sang MS để người xem tập trung vào nhân vật chính. |
+| **Pan left/right** | Thấp | Vừa | Camera trượt ngang theo bước chân nhân vật (David đi ra chiến trường). |
+| **Parallax** | Luôn có | Tùy layer | Các lớp mây, núi ở xa di chuyển chậm hơn layer nhân vật ở gần để tạo chiều sâu không gian (depth). |
+
+- **Thời gian TB mỗi shot:** 4 - 6 giây.
+- **Transitions:** Chủ yếu là **Hard Cut** (cắt thẳng). Đôi khi dùng **Swipe** (trượt ngang) hoặc hiệu ứng chuyển trang sách để phân đoạn câu chuyện.
+
+---
+
+## 4. QUY LUẬT BỐ CỤC (Composition Rules)
+
+1.  **Central Placement (Chủ thể ở giữa):** Narrator (người kể chuyện) hoặc nhân vật chính khi đang thuyết trình thường được đặt chính giữa khung hình để thu hút sự chú ý tuyệt đối.
+2.  **Depth Layers (Phân lớp chiều sâu):** Luôn có 3 lớp rõ rệt: **Foreground** (tiền cảnh - bụi cây, mỏm đá mờ), **Middleground** (trung cảnh - nhân vật chính, nhà cửa), **Background** (hậu cảnh - núi, bầu trời, mặt trời).
+3.  **Rule of Thirds (Quy tắc 1/3):** Dùng trong các cảnh đối thoại. Samuel đứng ở đường mạnh bên trái, các con của Jesse xuất hiện ở bên phải.
+4.  **Negative Space (Không gian âm):** Thường để trống một khoảng lớn bầu trời ở phía trên đầu nhân vật để chèn Text Overlay (tên nhân vật) hoặc bong bóng suy nghĩ.
+5.  **Biblical Signage (Biển báo):** Một pattern đặc trưng của Minno là đặt tên nhân vật/địa danh lên các bảng hiệu gỗ/neon ngay trong khung hình như một phần của bố cục.
+
+---
+
+## 5. NHỊP ĐỘ HÌNH ẢNH (Visual Pacing)
+
+- **Nhịp độ:** Vừa phải, mang tính giáo dục.
+- **Sự thay đổi:** Nhịp cắt cảnh nhanh hơn trong đoạn Samuel kiểm tra 7 người con (mỗi người 1 shot nhanh để tạo tính hài hước và nhịp điệu dồn dập). Nhịp chậm lại ở các đoạn David cầu nguyện hoặc suy ngẫm (shot kéo dài 7-8 giây).
+- **Điểm nhấn:** Mỗi khi có một phép màu hoặc sự kiện quan trọng, camera sẽ thực hiện một cú **Quick Zoom In** vào biểu cảm kinh ngạc của nhân vật.
+
+---
+
+## 6. MẪU CẮT CẢNH (Editing Patterns)
+
+- **Establishing → Detail:** Luôn bắt đầu bằng một cảnh thành phố hoặc sa mạc rộng lớn (EWS), sau đó cắt thẳng vào cảnh MS nơi nhân vật đang đứng.
+- **Pose-Reaction-Narration:** Nhân vật thực hiện một hành động (Pose) → Nhân vật khác phản ứng (Reaction) → Narrator giải thích.
+- **Cycle Montage:** Trong tập "Aposta-Cycles", video sử dụng vòng lặp hình ảnh: *Hạnh phúc → Thờ thần tượng → Gặp nạn → Cầu cứu → Được cứu*. Các cảnh này được biên tập lặp lại với cùng một bố cục để nhấn mạnh tính chu kỳ.
+- **J-cut:** Giọng của Narrator thường xuất hiện khoảng 0.5 giây trước khi hình ảnh cắt sang cảnh mới để dẫn dắt sự chú ý.
+
+**Tổng kết từ DP:** Minno sử dụng ngôn ngữ hình ảnh "sạch sẽ", tránh các chuyển động camera phức tạp để không làm trẻ em xao nhãng khỏi thông điệp cốt lõi của câu chuyện Kinh Thánh. Sự tương phản giữa David (nhỏ bé, tươi sáng) và Goliath (to lớn, tối tăm) được thể hiện triệt để qua cỡ cảnh và góc máy.
+
+
+Chào bạn, với tư cách là nhà phân tích ngôn ngữ học, tôi đã thực hiện nghiên cứu chi tiết về phong cách kể chuyện của kênh **Minno - Laugh and Grow Bible for Kids**.
+
+Đây là một phong cách kể chuyện **Story-driven narrative** kết hợp giáo dục, được thiết kế đặc biệt để giữ chân trẻ em thông qua việc đan xen giữa một Narrator thông thái và các nhân vật trẻ em đóng vai trò "khán giả đại diện".
+
+---
+
+## 1. CẤU TRÚC VĨ MÔ (Macro Structure)
+
+- **Thể loại:** Story-driven narrative / Educational (Kể chuyện Kinh Thánh cho trẻ em).
+- **Mở đầu:** Luôn bắt đầu bằng nhạc hiệu (Intro) sôi động, sau đó là một lời dẫn nhập cực nhanh để thiết lập bối cảnh hoặc vấn đề.
+- **Cold Open:** Không có cold open dài, video đi thẳng vào tiêu đề tập phim.
+- **Các phần:** 
+    1. Thiết lập bối cảnh lịch sử/địa lý.
+    2. Xuất hiện vấn đề/xung đột (Conflict).
+    3. Diễn biến câu chuyện với các đoạn ngắt để giải thích thuật ngữ.
+    4. Cao trào (Climax).
+    5. Bài học rút ra (Moral/Spiritual lesson).
+- **Kết thúc:** Tóm tắt ngắn gọn và kêu gọi hành động (CTA) thông qua QR Code để nhận quà tặng.
+
+**Sơ đồ cấu trúc đặc trưng (Tập David):**
+```
+00:00-00:08 → Intro Minno & Tiêu đề tập phim.
+00:08-00:30 → Giới thiệu bối cảnh: Vua Saul không nghe lời Chúa.
+00:30-01:40 → Diễn biến: Samuel đi tìm vua mới (Đoạn này dùng cấu trúc lặp lại để tạo sự hài hước).
+01:40-02:40 → Nút thắt: David xuất hiện và được xức dầu (Giải thích thuật ngữ "Anointing").
+02:40-05:00 → Cao trào: Trận chiến với Goliath (Đan xen lời kể và đối thoại kịch tính).
+05:00-05:25 → Kết luận & Bài học về lòng tin.
+```
+
+---
+
+## 2. PHONG CÁCH NGÔN NGỮ (Linguistic Style)
+
+### 2a. Ngôi kể / Phong cách nói:
+- **Ngôi kể:** Sử dụng **Ngôi thứ ba khách quan** (Omniscient Narrator) nhưng Narrator thường xuyên thực hiện **Direct Address** (nói trực tiếp với nhân vật và khán giả).
+- **Voice:** "The Energetic Storyteller" - Giọng nam trung, ấm áp nhưng có biên độ biểu cảm cực lớn (hyper-inflection). Narrator đóng vai trò như một người ông đang kể chuyện cho cháu.
+
+### 2b. Vocabulary & Sentence Pattern:
+- **Độ dài câu:** Rất ngắn (trung bình 6-10 từ). Sử dụng các câu đơn để trẻ dễ hiểu.
+- **Từ vựng:** Phổ thông, vui nhộn nhưng giữ nguyên các danh từ riêng kịch tính (Goliath, Philistines).
+- **Humor:** Sử dụng **Silly Names** và **Exaggeration** (Sự phóng đại). VD: Cách Narrator đọc tên các bộ tộc "-ites" trong tập Aposta-Cycles theo nhịp điệu hài hước.
+
+### 2c. Rhetorical Devices (Thủ pháp tu từ):
+- **Direct Address:** Narrator hỏi nhân vật: "Do you know what that means, Ellie?"
+- **Repetition (Anaphora):** "Over and over and over again" (Dùng để nhấn mạnh vòng lặp sa ngã của dân Israel).
+- **Onomatopoeia (Từ tượng thanh):** "Whoosh", "Boom", "Gulp".
+- **Juxtaposition (Đối lập):** "Huge giant" vs "Small boy".
+
+### 2d. Transition Phrases (Cụm từ chuyển ý):
+- **Chuyển phần mới:** "Meanwhile...", "And so...", "Now, many years before this..."
+- **Chuyển sang hồi hộp:** "But then...", "Suddenly...", "Wait for it..."
+- **Giải thích context:** "You see...", "In those days...", "That meant..."
+- **Twist/Bất ngờ:** "Except... they didn't!", "And guess what happened next?"
+- **Kết luận/Reflection:** "And that is why...", "So, remember..."
+
+---
+
+## 3. NHỊP ĐỘ KỂ (Narration Pacing)
+
+- **Tốc độ:** Khoảng 140-160 từ/phút (Vừa phải cho trẻ em).
+- **Pattern:** Nói cực nhanh ở các đoạn liệt kê hài hước → Dừng nghỉ (Silence) 1-2 giây để nhân vật phản ứng "Uh-oh" → Nói chậm, nhấn mạnh ở câu chốt bài học.
+- **Tỷ lệ:** 70% Narration, 20% Dialogue, 10% Silence/SFX.
+
+---
+
+## 4. CẢM XÚC & TONE (Emotional Arc)
+
+- **Tone:** Playful (Vui nhộn) và Inspirational (Truyền cảm hứng).
+- **Arc:** 
+    - Đầu video: Curiosity (Tò mò) - Level 3.
+    - Giữa video: Humor/Silliness (Hài hước) - Level 5.
+    - Cao trào: Tension (Căng thẳng) - Level 4.
+    - Cuối video: Resolution/Peace (An tâm) - Level 2.
+
+---
+
+## 5. SO SÁNH VỚI CÁC KÊNH KHÁC
+
+| Khía cạnh | Minno - Laugh and Grow | VeggieTales | Superbook |
+|-----------|------------------------|-------------|-----------|
+| Tone | Playful/Grandfatherly | Slapstick/Musical | Dramatic/Action |
+| Pacing | Fast/Snappy | Moderate | Slow/Cinematic |
+| Detail level | Simplified for toddlers | Character-driven | Accurate History |
+
+---
+
+## 6. SAMPLE SCRIPT RECREATION
+**Topic: Noah's Ark (Phong cách Minno)**
+
+**Narrator:** Now, the world had become a very... messy place. People were ignoring God. Over, and over, and over again! 
+
+**Kid Character (Ellie):** Wait, like... they forgot to brush their teeth?
+
+**Narrator:** (Chuckles) Even messier than that, Ellie! They were being mean to each other. But there was one man who still listened to God. His name was... Noah! 
+
+**Noah:** (Voice-over) "I'm listening!"
+
+**Narrator:** God told Noah to build a boat. But not just a regular boat. A HUGE, ginormous, super-sized boat called an Ark! Do you know why?
+
+**Kid Character (Oliver):** To go on a vacation?
+
+**Narrator:** Not quite, Oliver. A big rain was coming. A flood! So Noah started building. *Hammer, hammer, saw, saw.* And then... guess who showed up?
+
+**Kid Character:** The neighbors?
+
+**Narrator:** The animals! Two by two! Lions, tigers, and even... stinky skunks! *Phew!* 
+
+**Narrator (Lower tone, serious):** You see, Noah trusted God even when the sky was blue. And that’s a big deal! Because when the first drop of rain went *plop*... Noah was ready.
+
+---
+**Key rules for AI writing:**
+1. Luôn dùng "Over and over" khi nói về thói quen.
+2. Ngắt đoạn bằng câu hỏi từ trẻ em.
+3. Dùng từ tượng thanh cho hành động.
+4. Narrator phải vừa kể vừa tương tác với nhân vật trong kịch bản.
+
+
+Chào bạn, với tư cách là Giám đốc Nghệ thuật (Art Director), tôi đã phân tích "DNA thiết kế" của kênh **Minno - Laugh and Grow Bible for Kids**. 
+
+Đây là một phong cách **2D Vector Illustration** hiện đại, được tối ưu hóa cho giáo dục trẻ em với các đường nét bo tròn, màu sắc rực rỡ và bố cục cực kỳ rõ ràng. Dưới đây là bản phân tích chi tiết phục vụ việc tái tạo bằng AI.
+
+---
+
+## 1. CON NGƯỜI / NHÂN VẬT (People & Characters)
+
+### 1a. Phong cách thể hiện con người:
+- **Thể loại:** 100% **2D Digital Illustration / Animation**. Không có người thật.
+- **Stylization:** Rất cao. Nhân vật có tỉ lệ đầu to (chibi-style), cơ thể hình khối đơn giản (hình trụ, hình chữ nhật bo góc).
+- **Đặc điểm khuôn mặt:** Mắt là hai chấm đen lớn (không có tròng trắng rõ rệt trừ khi ngạc nhiên), không có mũi, miệng rất linh hoạt và to khi nói.
+
+### 1b. Trang phục & Ngoại hình:
+
+**Nhóm 1: Các nhân vật Kinh Thánh (David, Samuel, Saul)**
+- **Trang phục:** Áo choàng (tunics) và khăn trùm đầu (headscarves) bằng vải lanh đơn giản. Màu sắc rực rỡ (đỏ, xanh dương, vàng cam).
+- **Chi tiết:** Không có nếp gấp vải phức tạp, chỉ có các đường kẻ đơn giản để phân lớp vải. Giày sandal tối giản.
+- **Ngoại hình:** Râu của các nhân vật nam được vẽ thành một khối màu đặc (flat block), không có sợi lẻ.
+
+**Nhóm 2: Các nhân vật trẻ em hiện đại (Ellie, Oliver - Khán giả)**
+- **Trang phục:** Quần áo hiện đại, áo hoodie hoặc áo thun sọc. Màu sắc tươi sáng như tím Minno, vàng kem.
+- **Ngoại hình:** Tóc được vẽ thành các mảng lớn (clumps), bo tròn mượt mà.
+
+### 1c. Biểu cảm & Body Language:
+- **Biểu cảm:** Cực kỳ sống động (Hyper-expressive). Khi vui miệng mở rất to chiếm 1/2 khuôn mặt. Khi sợ hãi, lông mày nhướng cao và mắt mở to có tròng trắng.
+- **Gestures:** Chuyển động kiểu "Bouncy" (nhún nhảy). Tay chân thường không có khớp khuỷu rõ rệt (kiểu noodle arms).
+
+---
+
+## 2. BỐI CẢNH & MÔI TRƯỜNG (Settings & Environments)
+
+### 2a. Bối cảnh chính (Primary Setting):
+- **Loại không gian:** Sa mạc Kinh Thánh hoặc đồng cỏ xanh.
+- **Kiến trúc:** Nhà đá vôi màu trắng/be với cửa vòm đặc trưng vùng Trung Đông. Các tòa tháp có lỗ châu mai đơn giản hóa. Tường thành Jericho được vẽ với các vết nứt mang tính biểu tượng.
+- **Ánh sáng:** **High-key (Sáng rực rỡ)**. Nguồn sáng chính là mặt trời hoặc luồng sáng thần thánh tỏa ra từ đám mây (Radial light).
+- **Background:** Được phân lớp rõ rệt (Foreground: bụi cây mờ nhẹ -> MG: nhân vật -> BG: núi tím/xanh lơ và bầu trời gradient).
+
+### 2b. Tính nhất quán:
+- Môi trường luôn có một lớp **texture giấy mịn** overlay phía trên để tạo cảm giác ấm áp như sách truyện. Màu sắc hậu cảnh thường dùng các tông màu pastel hoặc muted (dịu lại) để nhân vật nổi bật.
+
+---
+
+## 3. ĐỒ VẬT & ĐẠO CỤ (Objects & Props)
+- **Cây cối:** Cây cọ hoặc cây bụi được vẽ theo cụm tròn, không có lá lẻ.
+- **Đạo cụ đặc biệt:** Slingshot của David, các bức tượng thần (Idols) màu vàng bóng loáng nhưng có hình dáng hài hước (như con cua hoặc con bò mập).
+- **Mức độ chi tiết:** 4/10. Tập trung vào hình khối tổng thể (Shape language) hơn là texture bề mặt.
+
+---
+
+## 4. TYPOGRAPHY & ĐỒ HỌA ON-SCREEN
+- **Text:** Các bảng hiệu (signs) xuất hiện trực tiếp trong môi trường (như biển báo Jebusites, Hittites).
+- **Font:** Friendly Sans-serif, nét dày, các góc bo tròn (VD: font tương tự *Bubblegum Sans* hoặc *Fredoka One*).
+- **Animation:** Text thường "Pop-in" hoặc rung nhẹ khi Narrator nhấn mạnh.
+- **Logo:** Logo Minno luôn xuất hiện ở đầu video với animation dạng bouncy sinh động.
+
+---
+
+## 5. OUTPUT: IMAGE GENERATION REFERENCE SHEET
+
+```json
+{
+  "content_type": "Children's 2D Bible Animation / Vector Illustration",
+  "style_keywords": [
+    "2D flat design",
+    "children's book aesthetic",
+    "vector art",
+    "clean bold outlines",
+    "rounded shapes",
+    "bouncy character design",
+    "vibrant pastel colors",
+    "biblical settlement",
+    "simplified geometry"
+  ],
+  "negative_keywords": [
+    "3D render",
+    "photorealistic",
+    "gritty",
+    "dark lighting",
+    "complex textures",
+    "rough edges",
+    "anatomical detail",
+    "monochrome",
+    "cinematic lighting"
+  ],
+  "color_palette": {
+    "shadow_primary": "#5C4033",
+    "shadow_secondary": "#4B0082",
+    "highlight_warm": "#FFFACD",
+    "highlight_cool": "#E0F7FA",
+    "accent_primary": "#5E35B1",
+    "accent_secondary": "#FFB300",
+    "brand_colors": ["#5E35B1", "#FFFFFF"],
+    "dominant_midtones": ["#8BC34A", "#FFCC80", "#64B5F6"]
+  },
+  "lighting_setup": {
+    "primary_method": "High-key ambient lighting",
+    "key_fill_ratio": "1:1 (Flat shading with soft ambient occlusion)",
+    "light_sources": ["Golden hour sun", "Divine radial burst"],
+    "mood": "Joyful, safe, educational"
+  },
+  "texture_detail_level": "3/10",
+  "film_grain_intensity": "1/10",
+  "realism_level": "1/10",
+  "production_value": "9/10"
+}
+```
+
+**Lời khuyên cho việc Prompt AI:** 
+Hãy sử dụng cụm từ *"Flat 2D vector illustration, rounded character style, clean lines, children's biblical storybook aesthetic, high saturation"* để đạt kết quả gần nhất với Minno. Tránh các từ khóa liên quan đến "Shading" hay "Reflection" để giữ đúng phong cách thiết kế phẳng.
+
+
+Chào bạn, với tư cách là chuyên gia Post-production và Motion Graphics, tôi đã thực hiện phân tích kỹ thuật cho video từ kênh **Minno - Laugh and Grow Bible for Kids**. 
+
+Đây là một ví dụ điển hình của kỹ thuật **2D Cut-out Animation (Hoạt hình cắt giấy kỹ thuật số)**, một phương pháp sản xuất hiệu quả nhưng đòi hỏi sự tinh tế trong việc tạo nhịp điệu (timing) và biểu cảm nhân vật.
+
+---
+
+## 1. PHƯƠNG PHÁP SẢN XUẤT VIDEO (Video Production Method)
+- **Phương pháp chính:** **2D Digital Animation (Rigged/Cut-out style)**. Các nhân vật được chia thành từng bộ phận (đầu, thân, tay, chân) và gắn xương (rigging) để di chuyển.
+- **Tỷ lệ:** 100% Hoạt hình 2D.
+- **Phần mềm dự đoán:** Adobe Animate (Flash), Toon Boom Harmony hoặc Adobe After Effects (kết hợp các plugin như Duik Ángela để rigging).
+
+---
+
+## 2. CÁC KIỂU CHUYỂN ĐỘNG (Motion Types)
+
+### 2a. Camera Movement (Giả lập kỹ thuật số):
+- **Tốc độ:** Chậm và mượt (Smooth).
+- **Zoom:** Thường dùng **Digital Zoom In** (từ 100% lên 120%) để nhấn mạnh biểu cảm nhân vật. 
+- **Easing:** Sử dụng **Ease-in-out** rất rõ rệt. Camera không bao giờ dừng đột ngột mà luôn có độ trôi nhẹ (damping).
+- **Thời gian move:** Trung bình 4-5 giây cho một cú máy zoom/pan.
+
+### 2b. Subject Movement:
+- **Nhân vật:** **Full Motion Stylized**. Chuyển động tuân theo nguyên tắc "Squash and Stretch" (Co và Giãn). Khi nhân vật nhảy lên, họ sẽ nén lại trước khi bật cao.
+- **Text/Graphics:** Animated. Các bảng tên nhân vật thường "Pop-in" kèm hiệu ứng rung (overshoot/bounce).
+
+### 2c. Parallax / Depth Effects:
+- **Sử dụng Parallax:** Có, rất đặc trưng.
+- **Số lớp:** Thường là 4 layers: 
+    1. Foreground (mờ - bụi cây).
+    2. Character layer (trọng tâm).
+    3. Mid-ground (nhà cửa, cây cối).
+    4. Background (núi, bầu trời).
+
+### 2d. Particle & Atmospheric Effects:
+- **Dust Clouds (Mây bụi):** Xuất hiện khi nhân vật chạy hoặc Goliath ngã xuống. Đây là các shape vector tròn đơn giản được animate opacity.
+- **Sparkles (Lấp lánh):** Xuất hiện quanh các đồ vật bằng vàng hoặc khi có phép màu.
+- **Divine Glow:** Hiệu ứng tỏa sáng từ tâm (Radial blur/glow) khi Narrator nói về Chúa.
+
+---
+
+## 3. TRANSITIONS (Chuyển cảnh)
+
+| Loại | Tần suất | Duration (ms) | Dùng khi nào |
+|------|----------|---------------|-------------|
+| **Hard cut** | Rất cao | - | Chuyển giữa các cỡ cảnh (Wide -> Medium) trong cùng bối cảnh. |
+| **Swipe (Trượt)** | Trung bình | 500ms | Chuyển sang một bối cảnh hoàn toàn mới hoặc bước sang chương tiếp theo. |
+| **Iris Wipe** | Thấp | 800ms | Kết thúc tập phim (vòng tròn khép lại vào nhân vật). |
+| **Pop Transition** | Trung bình | 200ms | Khi một nhân vật hoặc đồ vật bất ngờ xuất hiện. |
+
+---
+
+## 4. NHẠC & ÂM THANH (Audio Design)
+
+### 4a. Nhạc nền:
+- **Thể loại:** Orchestral-Pop (Giao hưởng nhẹ nhàng, vui nhộn).
+- **Instruments:** Xylophone, sáo (Flute), guitar acoustic và trống nhẹ.
+- **Mood:** Luôn tích cực và tràn đầy năng lượng. Nhạc thay đổi tông (key) khi chuyển sang cảnh buồn hoặc kịch tính (Goliath xuất hiện).
+
+### 4b. Sound Effects (SFX):
+- **Loại:** **Cartoon SFX**. Tiếng "boing" khi nhảy, "whoosh" khi xoay người, "slide whistle" khi nhân vật ngã.
+- **Sync:** SFX được sync chính xác đến từng frame chuyển động (Frame-accurate).
+
+### 4c. Voice:
+- **Chất lượng:** Professional Studio VO. Giọng Narrator và nhân vật được tách biệt hoàn toàn về tần số (EQ). Giọng nhân vật thường có độ vang (reverb) nhẹ để khớp với môi trường ngoài trời.
+
+---
+
+## 5. TIMELINE BREAKDOWN (Ví dụ 30s đầu tập David)
+
+| Thời gian | Duration | Nội dung | Cỡ cảnh | Camera move | Transition vào | FX/Overlay |
+|-----------|----------|----------|---------|-------------|----------------|------------|
+| 00:00 | 8s | Intro Minno Logo | MS | Static | Fade in | Bouncy logo |
+| 00:08 | 7s | Vua Saul ngồi trên ngai | WS | Slow Zoom In | Hard cut | Lighting rays |
+| 00:15 | 10s | Samuel đi tìm vua mới | LS | Pan Right | Swipe | Dust particles |
+| 00:25 | 5s | Bảng tên "JESSE" | MCU | Static | Pop-in | Text animation |
+
+---
+
+## 6. VIDEO GENERATION / RECREATION PARAMETERS
+
+### AI Video Prompt Examples (Phong cách Minno)
+
+```json
+{
+  "shot_description": "David facing Goliath in the valley",
+  "video_prompt": "A 2D cut-out animation style video. A small shepherd boy with brown hair stands bravely on the left, holding a simple slingshot. On the right, a giant warrior with golden armor looming over him. Style is flat vector illustration with bold outlines. Bouncy character idle motion. Foreground has soft-focus desert bushes. Background shows simplified purple mountains under a bright blue sky. Slow digital zoom-in on the boy's determined face. High saturation, children's storybook aesthetic.",
+  "duration": "5s",
+  "camera_motion": "Slow digital zoom-in",
+  "style_keywords": ["2D cut-out animation", "flat vector", "vibrant colors", "children's show"]
+}
+```
+
+```json
+{
+  "shot_description": "God's voice speaking from the clouds",
+  "video_prompt": "2D animated scene of fluffy white clouds in a teal sky. A massive burst of golden radial light beams emanates from behind the clouds. Stylized white sparkles floating downward like snow. The clouds have a subtle 'squash and stretch' floating motion. Parallax effect with mountains in the far distance moving slower. Minimalist and clean vector art style. High-key lighting, ethereal divine atmosphere.",
+  "duration": "4s",
+  "camera_motion": "Static with internal motion",
+  "style_keywords": ["God rays", "divine light", "vector particles", "smooth easing"]
+}
+```
+
+```json
+{
+  "shot_description": "Characters celebrating victory",
+  "video_prompt": "A group of cute, stylized biblical characters jumping and cheering in a sunny town square. Characters have simple rounded shapes and expressive wide mouths. High-energy 'bouncy' animation. Colorful confetti particles falling from the top. Soft texture overlay like watercolor paper. Bright sunny color palette. Camera pans slowly across the joyful crowd. 2D puppet rigging style.",
+  "duration": "6s",
+  "camera_motion": "Horizontal Pan Right",
+  "style_keywords": ["crowd animation", "joyful mood", "confetti particles", "paper texture"]
+}
+```

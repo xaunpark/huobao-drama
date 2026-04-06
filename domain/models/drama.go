@@ -120,6 +120,23 @@ type Storyboard struct {
 	IsProduction  bool           `gorm:"default:false" json:"is_production"`             // true = production shot (rapid cut result)
 	PacingMode    *string        `gorm:"size:20" json:"pacing_mode"`                     // "standard" | "rapid_cut"
 	SourceShotIDs datatypes.JSON `gorm:"type:json" json:"source_shot_ids"`               // [1,2,3] — IDs of original editorial shots merged
+	// Voice-over Director fields
+	ScriptSegment  *string        `gorm:"type:text" json:"script_segment"`               // Narrator script segment this shot illustrates
+	ScriptStartChar *int          `json:"script_start_char"`                             // Start char position in original script
+	ScriptEndChar  *int           `json:"script_end_char"`                               // End char position in original script
+	ShotReason     *string        `gorm:"type:text" json:"shot_reason"`                  // Why this shot was created (AI director reasoning)
+	SplitRules     datatypes.JSON `gorm:"type:json" json:"split_rules"`                  // ["action_change", "scene_change", ...] triggered rules
+	VisualType     *string        `gorm:"size:20" json:"visual_type"`                    // literal | symbolic | mixed
+	ShotRole       *string        `gorm:"size:30" json:"shot_role"`                      // establishing | action | detail | emotional | symbolic | transition | closing
+	// Audio Strategy fields
+	AudioMode       *string       `gorm:"size:30" json:"audio_mode"`                     // narrator_only | dialogue_dominant
+	NarratorEnabled *bool         `json:"narrator_enabled"`                              // narrator ON/OFF for this shot
+	NarratorDucking *bool         `json:"narrator_ducking"`                              // narrator volume ducked?
+	DialogueType    *string       `gorm:"size:30" json:"dialogue_type"`                  // none | reaction | soft_line | quote | full_dialogue
+	AmbienceType    *string       `gorm:"size:50" json:"ambience_type"`                  // desert_wind | crowd | rain | ...
+	AmbienceLevel   *string       `gorm:"size:10" json:"ambience_level"`                 // low | medium | high
+	MusicMood       *string       `gorm:"size:50" json:"music_mood"`                     // epic | tension | serene | ...
+	MusicLevel      *string       `gorm:"size:10" json:"music_level"`                    // low | medium | high
 	CreatedAt        time.Time      `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt        time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
 	DeletedAt        gorm.DeletedAt `gorm:"index" json:"-"`

@@ -410,6 +410,11 @@ func (p *PromptI18n) WithDramaStoryboardSystemPrompt(dramaID uint) string {
 	return p.resolvePrompt(dramaID, "storyboard_breakdown")
 }
 
+// WithDramaVisualUnitSystemPrompt resolves visual unit (voice-over director) system prompt
+func (p *PromptI18n) WithDramaVisualUnitSystemPrompt(dramaID uint) string {
+	return p.resolvePrompt(dramaID, "visual_unit_breakdown")
+}
+
 // WithDramaSceneExtractionPrompt resolves scene extraction prompt for a specific drama
 func (p *PromptI18n) WithDramaSceneExtractionPrompt(dramaID uint, style string, customStyle string) string {
 	imageRatio := "16:9"

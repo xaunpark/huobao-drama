@@ -40,6 +40,7 @@ type PromptTemplatePrompts struct {
 	VideoConstraint     string `json:"video_constraint,omitempty"`
 	StylePrompt         string `json:"style_prompt,omitempty"`
 	VideoExtraction     string `json:"video_extraction,omitempty"`
+	VisualUnitBreakdown string `json:"visual_unit_breakdown,omitempty"` // Voice-over AI Director shot planning
 }
 
 // PromptTypeToDefaultFile 将 prompt type key 映射到默认的 embed 文件名
@@ -55,6 +56,7 @@ var PromptTypeToDefaultFile = map[string]string{
 	"image_last_frame":     "image_last_frame.txt",
 	"image_action_sequence": "image_action_sequence.txt",
 	"video_constraint":     "video_constraint_prefixes.txt",
-	"style_prompt":         "style_prompt.txt",
-	"video_extraction":     "video_extraction.txt",
+	"style_prompt":            "style_prompt.txt",
+	"video_extraction":        "video_extraction.txt",
+	"visual_unit_breakdown":   "storyboard_visual_unit.txt",
 }

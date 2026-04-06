@@ -95,6 +95,20 @@
               <div class="shot-action" v-if="shot.action">
                 {{ shot.action }}
               </div>
+              <!-- Voice-over: Script segment preview -->
+              <div class="shot-script-segment" v-if="shot.script_segment">
+                <el-icon :size="12" style="margin-right: 4px; color: var(--el-color-warning);"><Headset /></el-icon>
+                <span>{{ shot.script_segment.length > 60 ? shot.script_segment.substring(0, 60) + '...' : shot.script_segment }}</span>
+              </div>
+              <!-- Voice-over: Audio mode + Shot role badges -->
+              <div class="shot-vo-badges" v-if="shot.audio_mode || shot.shot_role">
+                <el-tag v-if="shot.audio_mode" size="small" :type="shot.audio_mode === 'narrator_only' ? 'info' : 'danger'" style="margin-right: 4px;">
+                  {{ shot.audio_mode === 'narrator_only' ? '🎙️ Narrator' : '🗣️ Dialogue' }}
+                </el-tag>
+                <el-tag v-if="shot.shot_role" size="small" type="success">
+                  {{ shot.shot_role }}
+                </el-tag>
+              </div>
             </div>
           </div>
         </div>
@@ -283,6 +297,69 @@
                     class="cast-empty"
                   >
                     {{ $t("editor.noProps") }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Voice-over Director metadata (conditionally shown) -->
+              <div class="voiceover-section" v-if="currentStoryboard.script_segment || currentStoryboard.audio_mode">
+                <div class="section-label" style="display: flex; align-items: center; gap: 6px;">
+                  <el-icon><Headset /></el-icon>
+                  Voice-over Director
+                </div>
+
+                <!-- Script Segment -->
+                <div class="vo-field" v-if="currentStoryboard.script_segment">
+                  <label>📝 Narrator Script</label>
+                  <div class="vo-script-segment">
+                    {{ currentStoryboard.script_segment }}
+                  </div>
+                </div>
+
+                <!-- Audio Mode -->
+                <div class="vo-field" v-if="currentStoryboard.audio_mode">
+                  <label>🎧 Audio Mode</label>
+                  <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+                    <el-tag :type="currentStoryboard.audio_mode === 'narrator_only' ? 'info' : 'danger'" size="default">
+                      {{ currentStoryboard.audio_mode === 'narrator_only' ? '🎙️ Narrator Only' : '🗣️ Dialogue Dominant' }}
+                    </el-tag>
+                    <el-tag v-if="currentStoryboard.narrator_enabled === false" type="danger" size="small">Narrator OFF</el-tag>
+                    <el-tag v-if="currentStoryboard.narrator_ducking" type="warning" size="small">Ducking</el-tag>
+                    <el-tag v-if="currentStoryboard.dialogue_type && currentStoryboard.dialogue_type !== 'none'" size="small">
+                      💬 {{ currentStoryboard.dialogue_type }}
+                    </el-tag>
+                  </div>
+                </div>
+
+                <!-- Shot Role + Visual Type -->
+                <div class="vo-field" v-if="currentStoryboard.shot_role || currentStoryboard.visual_type">
+                  <label>🎬 Shot Info</label>
+                  <div style="display: flex; gap: 6px;">
+                    <el-tag v-if="currentStoryboard.shot_role" type="success" size="small">{{ currentStoryboard.shot_role }}</el-tag>
+                    <el-tag v-if="currentStoryboard.visual_type" type="primary" size="small">{{ currentStoryboard.visual_type }}</el-tag>
+                  </div>
+                </div>
+
+                <!-- Ambience + Music -->
+                <div class="vo-field" v-if="currentStoryboard.ambience_type || currentStoryboard.music_mood">
+                  <label>🌊 Ambience & Music</label>
+                  <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    <el-tag v-if="currentStoryboard.ambience_type" size="small" type="info">🌿 {{ currentStoryboard.ambience_type }} ({{ currentStoryboard.ambience_level || 'low' }})</el-tag>
+                    <el-tag v-if="currentStoryboard.music_mood" size="small" type="info">🎵 {{ currentStoryboard.music_mood }} ({{ currentStoryboard.music_level || 'low' }})</el-tag>
+                  </div>
+                </div>
+
+                <!-- Shot Reason -->
+                <div class="vo-field" v-if="currentStoryboard.shot_reason">
+                  <label>💡 Shot Reason</label>
+                  <div class="vo-reason">{{ currentStoryboard.shot_reason }}</div>
+                </div>
+
+                <!-- Split Rules -->
+                <div class="vo-field" v-if="currentStoryboard.split_rules && currentStoryboard.split_rules.length > 0">
+                  <label>📏 Triggered Rules</label>
+                  <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                    <el-tag v-for="rule in currentStoryboard.split_rules" :key="rule" size="small" type="warning">{{ rule }}</el-tag>
                   </div>
                 </div>
               </div>
@@ -6863,5 +6940,64 @@ onBeforeUnmount(() => {
   max-width: 100%;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Voice-over Director styles */
+.shot-script-segment {
+  display: flex;
+  align-items: flex-start;
+  font-size: 11px;
+  color: var(--el-color-warning);
+  margin-top: 4px;
+  line-height: 1.4;
+  font-style: italic;
+  opacity: 0.85;
+}
+
+.shot-vo-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.voiceover-section {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(245, 158, 11, 0.06);
+  border: 1px solid rgba(245, 158, 11, 0.15);
+  border-radius: 8px;
+}
+
+.vo-field {
+  margin-top: 10px;
+}
+
+.vo-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.vo-script-segment {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.15);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border-left: 3px solid var(--el-color-warning);
+  font-style: italic;
+}
+
+.vo-reason {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  background: rgba(0, 0, 0, 0.08);
+  padding: 6px 10px;
+  border-radius: 6px;
 }
 </style>

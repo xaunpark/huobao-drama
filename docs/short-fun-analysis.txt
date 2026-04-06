@@ -1,0 +1,509 @@
+Dưới đây là phân tích Visual DNA chi tiết của video dựa trên các frame hình ảnh:
+
+## 1. KỸ THUẬT TẠO HÌNH ẢNH
+- **Phương pháp:** Quay thật (live-action footage).
+- **Camera:** Smartphone cao cấp (iPhone/Samsung Flagship) với ống kính Wide-angle (góc rộng) hoặc Ultra-wide. Sensor size ~1/1.3 inch.
+- **AI-generated:** N/A (Video thực tế). Model đề xuất nếu tái tạo: Flux.1 hoặc Midjourney v6.1.
+- **Mức độ photorealistic:** 10/10.
+- **AI artifacts:** Không có.
+- **Chuyển động:** Real motion, tốc độ cao (fast-forward hoặc high-speed eating).
+- **Face-cam:** Không tách biệt, gương mặt người tham gia là một phần của bố cục chính (chiếm ~15% diện tích).
+
+## 2. MÀU SẮC CHÍNH XÁC (Exact Color Science)
+
+### 2a. Bảng màu Shadow:
+- Shadow chính: `#1A0F0A` (Nâu đen đậm).
+- Shadow phụ: `#3D2B1F` (Nâu gỗ tối).
+- Blacks: Lift nhẹ (~5-10 IRE) để giữ chi tiết vùng tối trên lông chó Pitbull.
+
+### 2b. Bảng màu Highlight:
+- Highlight chính: `#FFF9E3` (Trắng ấm từ đèn trần).
+- Glow/Bloom: Xuất hiện rõ trên mặt sàn gỗ bóng. Bán kính bloom trung bình.
+- Clipping: Roll-off mềm, không bị cháy sáng gắt.
+
+### 2c. Bảng màu Midtone:
+- Skin tones: `#D2A679` (Warm beige).
+- Surfaces: `#8B4513` (Nâu gỗ sàn nhà), `#A0522D` (Màu sườn nướng).
+
+### 2d. Tỷ lệ màu:
+- Shadow: 30% | Midtone: 50% | Highlight: 20%.
+- Tổng thể: Trung tính thiên ấm (Warm). Vibrant và Saturation cao để thực phẩm trông hấp dẫn.
+
+## 3. ÁNH SÁNG CHÍNH XÁC (Exact Lighting)
+
+### 3a. Setup ánh sáng:
+- Loại: Nhân tạo (Indoor/Kitchen lighting).
+- Key light: Đèn trần trực diện từ trên xuống, tạo bóng đổ ngắn ngay dưới vật thể.
+- Fill light: Ánh sáng môi trường phản xạ từ tường trắng, tỷ lệ 3:1.
+- Rim light: Không rõ rệt.
+
+### 3b. Biến thể ánh sáng:
+- Indoor/Kitchen: Độ tương phản cao, tập trung vào độ bóng (specular highlights) của thực phẩm.
+
+### 3c. Hiệu ứng:
+- Phản xạ (Reflection): Rất mạnh trên mặt sàn gỗ, tạo hiệu ứng soi gương cho hàng thức ăn.
+- Shadows: Hard edge nhưng mờ dần do nguồn sáng rộng.
+
+## 4. TEXTURE & CHẤT LIỆU
+
+### 4a. Tổng thể:
+- Resolution: 4K (Ultra HD).
+- Sharpness: Razor sharp, tập trung vào kết cấu bề mặt thực phẩm.
+
+### 4b. Bề mặt chính:
+- Sườn nướng (Ribs): Độ chi tiết 10/10, bóng dầu, kết cấu thịt cháy cạnh.
+- Bánh mì: Bề mặt khô, mịn, có rắc mè chi tiết.
+- Lông chó: Ngắn, bóng mượt (Pitbull) và xơ (Chihuahua).
+- Sàn gỗ: Vân gỗ tự nhiên, lớp phủ bóng (glossy).
+
+### 4c. Con người:
+- Skin: Thấy rõ lỗ chân lông, mồ hôi và nếp nhăn khi biểu cảm.
+
+## 5. FILM GRAIN & POST-PROCESSING
+- Film grain: Không có (Digital clean).
+- Chromatic aberration: Thấy nhẹ ở các cạnh frame do ống kính góc rộng.
+- Vignette: Không có.
+- Lens distortion: Barrel distortion mạnh (biến dạng thùng) làm các vật thể gần camera trông to và dài ra.
+- Depth of field: Deep focus (toàn bộ hàng thức ăn từ gần đến xa đều khá rõ).
+
+## 6. SO SÁNH VỚI CÁC STYLE QUEN THUỘC
+- Phim/Show: *Man v. Food* (phong cách thi ăn), *The Bear* (chi tiết thực phẩm).
+- YouTube: *Matt Stonie*, *Nikocado Avocado* (thời kỳ đầu), các kênh ASMR Mukbang góc rộng.
+
+## 7. SAMPLE PROMPT RECONSTRUCTION
+
+### Frame 1: Cận cảnh vạch xuất phát
+{
+  "frame_description": "Low-angle POV of a food competition between a Pitbull, a Chihuahua, and a man, lined up behind long rows of ribs, tacos, and buns on a glossy floor.",
+  "full_prompt": "Ultra-low angle wide-angle POV shot on a glossy hardwood kitchen floor. Three competitors side-by-side: a muscular black Pitbull in the center, a tiny tan Chihuahua on the left, and a Caucasian man on the right, all with heads near the floor ready to eat. In front of them are three long, straight parallel lines of food stretching into the distance: glazed BBQ ribs in the center, beef tacos on the left, and golden sliders on the right. High specular highlights on the meat glaze. Intense expressions. Hyper-realistic, 8k, cinematic lighting, warm color grading, floor reflections, deep depth of field, barrel distortion lens effect.",
+  "negative_prompt": "cartoon, illustration, blurry, distorted faces, missing limbs, low resolution, desaturated, top-down view.",
+  "recommended_model": "Flux.1 (Dev) or Midjourney v6.1",
+  "recommended_settings": {"cfg_scale": 3.5, "steps": 30, "sampler": "Euler"}
+}
+
+### Frame 2: Cảnh đang ăn hỗn loạn
+{
+  "frame_description": "Motion blur shot of the man and dogs aggressively eating the food lines at high speed.",
+  "full_prompt": "Action shot, low-angle perspective. A man and two dogs (Pitbull and Chihuahua) aggressively devouring long rows of food on a reflective wooden floor. Motion blur on the heads and falling food particles. Ribs, tacos, and buns being scattered. Messy, energetic atmosphere. Warm indoor kitchen lighting, vibrant colors, realistic textures of meat and bread, intense facial expressions, wide-angle lens distortion, high contrast, 8k resolution.",
+  "negative_prompt": "static, calm, clean, organized, plastic food, dull colors, cinematic slow motion.",
+  "recommended_model": "Stable Diffusion 3.5 or Flux.1",
+  "recommended_settings": {"cfg_scale": 5, "steps": 40, "sampler": "DPM++ 2M Karras"}
+}
+
+### Frame 3: Cận cảnh thực phẩm và gương mặt người
+{
+  "frame_description": "Extreme close-up of the man's face next to a row of sliders with high detail.",
+  "full_prompt": "Extreme close-up, ground-level wide-angle shot. Focus on a Caucasian man's face mid-eat, mouth open, intense focus. Next to him is a line of perfectly rendered golden-brown sliders with sesame seeds. Sharp focus on bread texture and glistening grease. In the background, the blurred silhouette of a large black dog. Reflective floor creating a mirror effect. Hyper-detailed skin pores, warm ambient lighting, 8k, photorealistic, macro food photography style.",
+  "negative_prompt": "blurry food, stylized, fake texture, dark, cold lighting, low detail.",
+  "recommended_model": "Midjourney v6.1",
+  "recommended_settings": {"cfg_scale": 7, "steps": 25, "sampler": "Default"}
+}
+
+Chào bạn, với tư cách là một Đạo diễn hình ảnh (DP), tôi đã phân tích kỹ thuật quay và ngôn ngữ hình ảnh của video này. Đây là một ví dụ điển hình của phong cách quay "Social Media Food Race" (Cuộc đua ăn uống trên mạng xã hội) với những đặc trưng hình ảnh cực kỳ nhất quán.
+
+Dưới đây là phân tích chi tiết:
+
+## 1. THỐNG KÊ CỠ CẢNH (Shot Size Distribution)
+Video này sử dụng cấu trúc **Long Take** (cú quay dài), không thực hiện cắt cảnh giữa chừng để duy trì tính chân thực của cuộc đua.
+
+| Cỡ cảnh | Số lần | % tổng | Dùng khi nào (context) |
+|----------|--------|--------|------------------------|
+| **Wide Shot (WS)** | 1 | 100% | Toàn bộ thời lượng video. Cần bao quát cả 3 làn thức ăn và 3 đối thủ (Chihuahua, Pitbull, Người). |
+
+*Giải thích:* Video không dùng các cỡ cảnh khác vì mục tiêu là tạo ra một "sân vận động" thu nhỏ trên sàn nhà, nơi khán giả có thể quan sát sự tiến triển của cả 3 "vận động viên" cùng lúc.
+
+## 2. THỐNG KÊ GÓC MÁY (Camera Angle)
+Góc máy là yếu tố quan trọng nhất tạo nên sự kịch tính của video này.
+
+| Góc máy | Số lần | % | Dùng khi nào |
+|---------|--------|---|-------------|
+| **Worm's eye (Sát đất)** | 1 | 100% | Camera đặt trực tiếp trên sàn gỗ. Góc nhìn này làm cho các hàng thức ăn trông dài vô tận và các đối thủ trông khổng lồ, uy lực hơn. |
+
+*Giải thích:* Góc máy cực thấp (sát sàn) tạo ra sự kết nối trực tiếp giữa người xem và "đường đua". Nó biến mặt sàn gỗ thành một đường băng, tăng cường hiệu ứng chiều sâu.
+
+## 3. CHUYỂN ĐỘNG CAMERA (Camera Movement)
+- **Phương pháp chính:** Quay thật trên tripod thấp hoặc đặt máy trực tiếp dưới sàn (Static).
+
+| Loại chuyển động | Tần suất | Tốc độ | Mô tả chi tiết |
+|-------------------|----------|--------|-----------------|
+| **Static (Tĩnh)** | 100% | - | Camera hoàn toàn đứng yên từ đầu đến cuối. |
+
+- **Thời gian trung bình mỗi shot:** Toàn bộ video (thường từ 15s - 30s).
+- **Transition:** Không có chuyển động camera, nhưng có thể có **Speed Ramping** (tăng tốc độ clip trong hậu kỳ) để làm động tác ăn trông nhanh và điên cuồng hơn (mukbang speed style).
+- **Transitions đặc trưng:** Hard cut ở đầu và cuối video. Không dùng hiệu ứng chuyển cảnh.
+
+## 4. QUY LUẬT BỐ CỤC (Composition Rules)
+Bố cục của video cực kỳ chặt chẽ và mang tính toán học:
+
+1.  **Symmetry (Đối xứng):** Chủ thể trung tâm là con chó Pitbull đen và hàng sườn nướng. Hai bên là Chihuahua và người đàn ông với hai hàng đồ ăn tương ứng. Sự đối xứng tạo cảm giác cân bằng và công bằng cho cuộc đua.
+2.  **Leading Lines (Đường dẫn):** Ba hàng thức ăn (tacos, sườn, bánh mì) tạo thành 3 đường thẳng hội tụ về phía các chủ thể. Điều này ép mắt người xem tập trung vào điểm kết thúc nơi các đối thủ đang ăn.
+3.  **Depth Layers (Lớp chiều sâu):** 
+    *   *Foreground (Tiền cảnh):* Những miếng sườn nướng đầu tiên, rất to và rõ nét do hiệu ứng ống kính góc rộng.
+    *   *Middle ground (Trung cảnh):* Các đối thủ đang ăn.
+    *   *Background (Hậu cảnh):* Tủ bếp và không gian nhà, tạo bối cảnh sinh hoạt đời thường.
+4.  **Reflections (Phản chiếu):** Sàn gỗ bóng loáng tạo ra một lớp gương phản chiếu toàn bộ hàng thức ăn, nhân đôi tác động thị giác và làm cho khung hình trông "sang" và sạch sẽ hơn.
+5.  **Wide-angle Distortion (Biến dạng góc rộng):** Sử dụng ống kính wide làm các vật thể ở gần camera trông to bất thường so với chủ thể ở xa, tạo hiệu ứng thị giác mạnh (forced perspective).
+
+## 5. NHỊP ĐỘ HÌNH ẢNH (Visual Pacing)
+- **Thời lượng shot:** 1 shot duy nhất kéo dài toàn clip.
+- **Nhịp độ:** Nhịp độ không đến từ việc cắt cảnh mà đến từ **nội tại hành động (internal movement)**. Sự hỗn loạn của việc thức ăn biến mất nhanh chóng tạo ra nhịp độ dồn dập.
+- **Tốc độ:** Video thường được tăng tốc (fast-forward) khoảng 1.5x - 2x để tạo cảm giác "siêu năng lực" và tăng sự hài hước.
+
+## 6. MẪU CẮT CẢNH (Editing Patterns)
+- **Pattern:** Không tuân theo các quy tắc điện ảnh truyền thống (như Shot/Reverse shot).
+- **Single Take Master:** Đây là một "Master Shot" duy nhất. Sự hấp dẫn nằm ở chỗ khán giả không bị ngắt quãng, họ chứng kiến quá trình từ đầu đến cuối một cách liên tục.
+- **Audio-Visual Sync:** Nhịp cắt thường không có, nhưng âm thanh (tiếng nhai, tiếng nhạc nhanh) được đồng bộ hóa cực chặt chẽ với tốc độ ăn để tạo cảm giác thỏa mãn (satisfying/ASMR).
+
+**Tổng kết từ góc độ DP:** Đây là phong cách **"Static Kinetic"** - máy ảnh tĩnh nhưng hình ảnh cực kỳ năng động. Nó tận dụng triệt để góc máy sát đất và đường dẫn từ vật thể để lôi cuốn người xem vào một không gian có chiều sâu cực lớn trên một màn hình điện thoại nhỏ hẹp.
+
+Chào bạn, tôi là chuyên gia phân tích ngôn ngữ. Video này thuộc thể loại **"Short-form Competitive Mukbang"** (Mukbang thi đấu dạng ngắn) – một thể loại cực kỳ phổ biến trên TikTok/Shorts/Reels, nơi ngôn ngữ bị triệt tiêu tối đa để nhường chỗ cho **âm thanh hành động (ASMR/Action Sounds)** và **thị giác**.
+
+Dưới đây là phân tích chi tiết phong cách trình bày của nội dung này:
+
+## 1. CẤU TRÚC VĨ MÔ (Macro Structure)
+Đây là cấu trúc "Tối giản tuyệt đối" (Minimalist/High-Impact).
+
+- **Thể loại:** Entertainment/Challenge (Thử thách giải trí).
+- **Mở đầu (Hook):** Không lời chào, không giới thiệu. Video mở đầu trực tiếp bằng cảnh tượng "phi lý" (Visual Hook): 3 hàng thức ăn khổng lồ và 3 đối thủ đang bất động chờ lệnh.
+- **Cold Open:** Chính là 2 giây đầu tiên (Cảnh chuẩn bị).
+- **Các phần:** 
+    1. **The Setup (00:00-00:01):** Thiết lập sự căng thẳng (Tension building).
+    2. **The Command (00:01-00:02):** Khẩu lệnh ngắn gọn.
+    3. **The Chaos (00:02-Kết thúc):** Hành động tốc độ cao (Fast-paced action).
+- **Kết thúc:** Thường kết thúc đột ngột (Smash cut) ngay khi đồ ăn hết hoặc có một hành động gây cười (như con Chihuahua ăn xong trước).
+- **Tỷ lệ:** Narration (5%) vs Nhạc/SFX (95%).
+
+**Sơ đồ cấu trúc:**
+```
+00:00-00:01 → [Visual Hook: Thiết lập đấu trường]
+00:01-00:02 → [The Command: Khẩu lệnh kích hoạt]
+00:02-End   → [Action Sequence: Âm nhạc nhanh + Tiếng nhai tốc độ cao]
+```
+
+## 2. PHONG CÁCH NGÔN NGỮ (Linguistic Style)
+
+### 2a. Ngôi kể / Phong cách nói:
+- **Ngôi kể:** Ngôi thứ hai (Second person) - người dẫn chương trình đóng vai trò trọng tài (Referee), ra lệnh cho các đối thủ và trực tiếp lôi cuốn khán giả vào cuộc đua.
+- **Personality:** Energetic (Năng lượng cao), Authority (Quyền lực - ra lệnh), Competitive (Mang tính thi đấu).
+- **Catchphrases:** "Ready... Set... Go!" – Đây là cụm từ duy nhất và cũng là "DNA" của video.
+
+### 2b. Vocabulary & Sentence Pattern:
+- **Độ dài câu:** Cực ngắn (1-3 từ).
+- **Kiểu câu:** Câu mệnh lệnh (Imperative sentences).
+- **Từ vựng:** Cấp độ Phổ thông (Commonly known). Không có thuật ngữ chuyên môn.
+- **Humor:** Absurdist humor (Hài hước phi lý) – Sự hài hước đến từ việc đặt một con chó tí hon thi đấu với một con chó khổng lồ và một người đàn ông trong một tình huống nghiêm trọng giả tạo.
+
+### 2c. Rhetorical Devices (Thủ pháp tu từ):
+- **Triad (Bộ ba):** "Ready... Set... Go!" tạo ra nhịp điệu hoàn hảo cho sự mong đợi (Anticipation).
+- **Onomatopoeia (Từ tượng thanh):** Mặc dù không nói ra, nhưng video dùng tiếng nhai "crunch", "slurp" cường điệu hóa để kể chuyện.
+- **Juxtaposition (Đối lập):** Sự tương phản giữa sự im lặng tuyệt đối lúc chuẩn bị và sự hỗn loạn ngay sau tiếng "Go!".
+
+### 2d. Transition Phrases (Cụm từ chuyển ý):
+Vì đây là video hành động cực ngắn, các cụm từ chuyển ý thường được dùng trong caption (phụ đề) hoặc các video tương tự của kênh:
+- **Bắt đầu:** "Who wins?", "Round 1", "Let's go!".
+- **Kịch tính:** "Wait for it...", "Look at the speed!", "Unbelievable!".
+- **Kết luận:** "Winner!", "Who's next?", "Check the link".
+
+## 3. NHỊP ĐỘ KỂ (Narration Pacing)
+- **Tốc độ nói:** Rất chậm và rõ ràng ở 2 giây đầu (để tạo kịch tính), sau đó im lặng hoàn toàn để nhường chỗ cho âm thanh hành động.
+- **Energy level:** Từ 1 (Tĩnh lặng) vọt lên 10 (Hỗn loạn) chỉ trong 1 giây.
+- **Tỷ lệ:** 1 giây nói : 10 giây hành động âm thanh.
+
+## 4. CẢM XÚC & TONE (Emotional Arc)
+- **Tone chủ đạo:** Playful (Châm biếm/Vui vẻ) và Intense (Căng thẳng giả tạo).
+- **Emotional Arc:**
+    - 00:00 → Anticipation (Hồi hộp) → Intensity 4.
+    - 00:02 → Adrenaline (Phấn khích) → Intensity 5.
+    - End → Satisfaction (Thỏa mãn) → Intensity 3.
+
+## 5. SO SÁNH VỚI CÁC KÊNH TƯƠNG ĐỒNG
+
+| Khía cạnh | Video này | Kênh tương đồng (Bayashi TV) |
+|-----------|---------------------|---------------------|
+| Tone | Thi đấu/Hài hước | ASMR/Nấu ăn |
+| Pacing | Siêu nhanh | Nhanh, dồn dập |
+| Detail level | Trung bình (Tập trung toàn cảnh) | Cực cao (Tập trung thực phẩm) |
+| Verbal | 1-2 từ | Gần như im lặng (chỉ có tiếng "Wow") |
+
+## 6. SAMPLE SCRIPT RECREATION (English)
+*Chủ đề: Thử thách uống 3 loại nước ngọt màu sắc khác nhau giữa 3 người bạn.*
+
+**[Visual: Three tall glasses filled with Blue, Red, and Green soda. Three people leaning in, straw in mouth, looking intensely at the camera.]**
+
+**Narrator (Deep, energetic voice):**
+"Three colors. One winner."
+
+**[Pause - 1 second of dead silence. Zoom in on the Blue soda.]**
+
+**Narrator:**
+"Ready..." 
+
+**[Pause - Small sound of a bubble popping.]**
+
+**Narrator:**
+"Set..."
+
+**[Camera shakes slightly.]**
+
+**Narrator:**
+"CHUG!"
+
+**[Action: Fast-forward footage of the soda disappearing. Loud slurping SFX, cartoonish 'glug-glug' sounds. Fast, upbeat EDM music kicks in.]**
+
+**[Ending: The red glass is empty first. The person slams the glass on the table.]**
+
+**Narrator (Quickly):**
+"Red wins! Who's next? Comment below!"
+
+---
+**Đặc điểm AI cần bắt chước:**
+1. Sử dụng tối thiểu lời thoại, tập trung vào các từ mệnh lệnh mạnh.
+2. Tạo ra khoảng lặng (silence) trước khi bùng nổ hành động.
+3. Dùng cấu trúc: [Thiết lập] -> [Lệnh] -> [Hành động hỗn loạn].
+
+
+Chào bạn, dưới góc độ của một Chuyên gia thiết kế sản xuất (Production Designer) và Giám đốc nghệ thuật (Art Director), tôi xin phân tích chi tiết "Set Design" và "Visual Arrangement" của video này để bạn có thể tái tạo chính xác bằng AI.
+
+---
+
+## 1. CON NGƯỜI & NHÂN VẬT (People & Characters)
+
+### 1a. Phong cách thể hiện:
+- **Người thật (Live-action):** 100% photorealistic. Không có sự cách điệu hóa.
+- **Presenter:** Xuất hiện trực tiếp trong khung hình, đóng vai trò là một "vận động viên" trong cuộc đua.
+
+### 1b. Trang phục & Ngoại hình:
+**Nhóm 1: Người nam (Main Challenger)**
+- **Trang phục:** Áo dài tay (sweatshirt) màu xanh rêu (olive/forest green). Màu sắc trung tính để không làm xao nhãng khỏi màu sắc rực rỡ của đồ ăn.
+- **Ngoại hình:** Tóc nâu cắt ngắn, gọn gàng. Gương mặt tập trung cao độ, kề sát mặt sàn.
+
+**Nhóm 2: Động vật (Animal Competitors)**
+- **Chó Pitbull:** Lông ngắn màu xám/đen mượt (glossy), cơ bắp, tạo vẻ quyền lực và "đối thủ nặng ký".
+- **Chó Chihuahua:** Lông màu vàng nâu, nhỏ bé, tạo sự tương phản cực đại về kích thước (comical scale contrast).
+
+### 1c. Biểu cảm & Body Language:
+- **Biểu cảm:** Sự tập trung tối đa (intense focus). Ánh mắt nhìn chằm chằm vào hàng thức ăn phía trước.
+- **Posing:** Tư thế nằm rạp người sát đất (prone position). Đây là tư thế mang tính hành động (dynamic action pose), tạo cảm giác bùng nổ ngay khi có lệnh.
+
+---
+
+## 2. BỐI CẢNH & MÔI TRƯỜNG (Settings & Environments)
+
+### 2a. Bối cảnh chính (Primary Setting):
+- **Loại không gian:** Nội thất bếp gia đình hiện đại (Modern Kitchen).
+- **Kiến trúc/Layout:** Điểm nhìn tập trung vào mặt sàn gỗ. Hậu cảnh là tủ bếp màu trắng, tạo nền sạch sẽ và tương phản với sàn gỗ tối màu.
+- **Sàn nhà (The Runway):** Sàn gỗ công nghiệp hoặc gỗ tự nhiên màu nâu mật ong/hổ phách. **Đặc điểm quan trọng nhất:** Bề mặt cực kỳ bóng (high-gloss finish) tạo ra sự phản chiếu đối xứng hoàn hảo cho vật thể.
+- **Ánh sáng:** Ánh sáng trắng ấm (3000K-3500K) từ đèn trần. Tạo ra các điểm sáng (specular highlights) trên mặt sàn và độ bóng dầu trên thức ăn.
+- **Color Palette:** Nâu (sàn), Trắng (tủ bếp), Xanh rêu (áo), và các màu nóng của đồ ăn (đỏ, vàng, cam).
+
+---
+
+## 3. ĐỒ VẬT & ĐẠO CỤ (Objects & Props)
+
+Đây là linh hồn của thiết kế sản xuất trong video này:
+
+- **Hàng Sườn nướng (Center Row):** Cận cảnh nhất. Miếng sườn hình chữ nhật, phủ sốt BBQ màu đỏ nâu đậm, xếp chồng zigzag (herringbone pattern). Độ chi tiết 10/10, thấy rõ độ bóng mượt của sốt.
+- **Hàng Tacos (Left Row):** Vỏ bánh taco vàng nhạt, nhân thịt và rau xanh/đỏ xếp đều tăm tắp tạo thành một đường cong uốn lượn.
+- **Hàng Bánh mì Sliders (Right Row):** Bánh mì tròn, vàng óng (golden brown), bề mặt mịn có rắc mè.
+- **Vai trò:** Các đạo cụ này đóng vai trò là "vạch dẫn" (Leading lines) hướng mắt người xem từ tiền cảnh về phía các nhân vật ở hậu cảnh.
+
+---
+
+## 4. TYPOGRAPHY & ĐỒ HỌA ON-SCREEN
+- **Text/Graphics:** **N/A** (Không xuất hiện trong frame hình ảnh gốc). Video tập trung hoàn toàn vào diễn biến thực tế.
+- **Watermark:** Có thể có logo mờ ở góc (nếu là video từ kênh cụ thể), nhưng không ảnh hưởng đến bố cục chung.
+
+---
+
+## 5. OUTPUT: IMAGE GENERATION REFERENCE SHEET
+
+```json
+{
+  "content_type": "Competitive Eating / Mukbang Action Photography",
+  "style_keywords": [
+    "Worm's eye view",
+    "Forced perspective",
+    "Symmetrical composition",
+    "High-gloss floor reflection",
+    "Vibrant food colors",
+    "Hyper-realistic textures",
+    "Intense focus",
+    "Leading lines"
+  ],
+  "negative_keywords": [
+    "Blurry background",
+    "High angle",
+    "Desaturated",
+    "Messy layout",
+    "Matte surfaces",
+    "Dark shadows",
+    "Cartoonish"
+  ],
+  "color_palette": {
+    "shadow_primary": "#1A0F0A",
+    "shadow_secondary": "#3D2B1F",
+    "highlight_warm": "#FFF4D2",
+    "highlight_cool": "#F0F0F0",
+    "accent_primary": "#B22222",
+    "accent_secondary": "#DAA520",
+    "brand_colors": ["#FFFFFF", "#4B5320"],
+    "dominant_midtones": ["#8B4513", "#A0522D"]
+  },
+  "lighting_setup": {
+    "primary_method": "Indoor Studio/Home Lighting",
+    "key_fill_ratio": "3:1",
+    "light_sources": ["Overhead warm LED", "Ambient bounce from white walls"],
+    "mood": "Energetic, Competitive, Appetizing"
+  },
+  "texture_detail_level": "10/10",
+  "film_grain_intensity": "1/10",
+  "realism_level": "10/10",
+  "production_value": "9/10"
+}
+```
+
+**Lời khuyên cho AI Prompt:** Để tái tạo hình ảnh này, bạn cần nhấn mạnh vào từ khóa **"ground-level wide-angle shot"** và **"three long rows of food leading to a man and two dogs"**. Sự tương phản giữa sự bóng bẩy của sàn nhà và độ chi tiết của miếng sườn là chìa khóa để tạo nên sự hấp dẫn thị giác.
+
+Chào bạn, dưới góc độ là một chuyên gia Hậu kỳ và Biên tập video (Video Editor), tôi xin phân tích kỹ thuật sản xuất của clip này. Đây là một video sử dụng kỹ thuật **"Speed Ramping & Sound Syncing"** (Thay đổi tốc độ và đồng bộ âm thanh) cực kỳ hiệu quả để tạo ra sự hưng phấn cho người xem.
+
+---
+
+## 1. PHƯƠNG PHÁP SẢN XUẤT VIDEO
+- **Phương pháp chính:** Live-action footage (Quay thật).
+- **Kỹ thuật hậu kỳ chủ đạo:** **Speed Ramping** (Tăng tốc độ video trong phần hành động) kết hợp với **Foley Sound Design** (Thiết kế âm thanh tiếng động giả).
+- **Phần mềm ước đoán:** CapCut (phổ biến nhất cho định dạng này) hoặc Adobe Premiere Pro/DaVinci Resolve.
+
+## 2. CÁC KIỂU CHUYỂN ĐỘNG (Motion Types)
+
+### 2a. Camera Movement:
+- **Loại:** **Static (Hoàn toàn tĩnh)**. 
+- Camera được đặt cố định trên giá đỡ sát mặt sàn. Không có zoom, pan hay tilt. 
+- Sự đứng yên của camera giúp người xem tập trung hoàn toàn vào tốc độ "biến mất" của hàng thức ăn.
+
+### 2b. Subject Movement:
+- **Giai đoạn 1 (00:00 - 00:02):** Subtle movement. Các chủ thể giữ nguyên vị trí, chỉ có sự rung động nhẹ của cơ thể để tạo sự kịch tính.
+- **Giai đoạn 2 (00:02 - Kết thúc):** Full motion/High speed. Người và chó chuyển động cực nhanh nhờ kỹ thuật tua nhanh (fast-forward).
+
+### 2c. Speed Effects:
+- **Speed Ramp:** Đây là "chìa khóa" của video.
+    - **0s - 2s:** Tốc độ thực (1x) để khán giả nghe rõ khẩu lệnh.
+    - **2s - Hết:** Tốc độ tăng lên khoảng **300% - 500% (3x - 5x)**. Việc tua nhanh khiến hành động ăn trở nên điên cuồng và hài hước hơn.
+
+## 3. TRANSITIONS (Chuyển cảnh)
+| Loại | Tần suất | Duration | Dùng khi nào |
+|------|----------|---------------|-------------|
+| **Hard cut** | 2 | - | Cắt trực tiếp vào đầu video và cắt bỏ đoạn thừa ở cuối video. |
+
+*Lưu ý:* Video này không sử dụng chuyển cảnh giữa chừng (Long take) để chứng minh tính xác thực của thử thách.
+
+## 4. NHẠC & ÂM THANH (Audio Design)
+
+### 4a. Nhạc nền:
+- **Thể loại:** Upbeat / Circus / Comedy Chase music (Nhạc có nhịp điệu nhanh, vui nhộn, thường dùng trong các cuộc đua hài hước).
+- **Mood:** Tăng dần sự hưng phấn (Build-up) và giữ nhịp độ nhanh liên tục ngay khi tiếng "Go!" vang lên.
+
+### 4b. Sound Effects (SFX):
+- **SFX cực kỳ quan trọng:** Sử dụng các âm thanh "Crunch", "Munch", "Slurp" được cường điệu hóa.
+- **Sync:** Mỗi tiếng nhai được đồng bộ chính xác với từng miếng đồ ăn biến mất. Đây là âm thanh ASMR được chèn thêm trong hậu kỳ (Foley), không phải âm thanh gốc của hiện trường.
+
+### 4c. Voice:
+- **Quality:** Giọng nói trực tiếp, rõ ràng, có năng lượng.
+- **Cấu trúc:** Khẩu lệnh "Ready... Set... Go!" đóng vai trò là điểm kích hoạt (Trigger) cho cả hình ảnh và âm thanh.
+
+## 5. TIMELINE BREAKDOWN (Ước tính clip 10s)
+
+| Thời gian | Duration | Nội dung | Cỡ cảnh | Camera move | Transition | FX/Post-production |
+|-----------|----------|----------|---------|-------------|----------------|--------------------|
+| 00:00 | 2s | Chuẩn bị, đọc lệnh | Wide | Static | Hard cut vào | Normal speed |
+| 00:02 | 7s | Thi đấu ăn tốc độ | Wide | Static | - | **Speed Ramp 5x**, ASMR SFX |
+| 00:09 | 1s | Người chiến thắng | Wide | Static | Hard cut ra | Freeze frame hoặc cắt |
+
+---
+
+## 6. VIDEO GENERATION / RECREATION PARAMETERS
+
+Nếu bạn muốn tái tạo phong cách này bằng AI Video (như Sora, Kling hay Gen-3), hãy sử dụng các prompt tập trung vào **"Time-lapse"** và **"Action symmetry"**.
+
+```json
+{
+  "shot_description": "A high-speed eating competition between a man, a Pitbull, and a Chihuahua on a shiny wooden floor.",
+  "video_prompt": "A continuous long take, ultra-low worm's-eye view shot in a bright modern kitchen. Three long parallel rows of food (tacos, BBQ ribs, and sliders) stretch from the foreground to three competitors: a tan Chihuahua, a black Pitbull, and a young man lying on the floor. After a countdown, they start eating at a hyper-fast time-lapse speed. Food disappears rapidly in a satisfying, rhythmic motion. Glossy floor reflections, intense energy, vibrant cinematic colors, 4k high detail, fast-paced action.",
+  "duration": "10s",
+  "camera_motion": "Static, fixed position",
+  "style_keywords": ["Speed ramp", "Time-lapse", "Symmetrical composition", "Hyper-realistic"]
+}
+```
+
+**Lời khuyên cho Editor:** 
+Để thành công với phong cách này, bạn nên quay ở tốc độ khung hình cao (60fps hoặc 120fps), sau đó dùng tính năng **"Speed Curve"** trong phần mềm biên tập để chuyển đổi mượt mà từ tốc độ thường sang tốc độ cao ngay nốt nhạc đầu tiên của phần hành động. Đừng quên lớp âm thanh ASMR nhai giòn tan để tăng độ "đã" cho người xem.
+
+This is the **Master Reference Sheet** for the "Competitive Social Media Food Race" visual DNA, synthesized from the expert analysis of the provided footage.
+
+---
+
+## A. STYLE DNA SUMMARY
+This style is a high-impact, short-form competitive eating/mukbang challenge characterized by an extreme worm's-eye perspective and rigid symmetry. It utilizes long rows of meticulously arranged food as leading lines that converge on a central trio of competitors: a man, a large dog, and a small dog. The tone is absurdist, energetic, and satisfying, blending high-production food photography with a chaotic, fast-paced action sequence. Visually, it relies on high-gloss hardwood reflections and wide-angle lens distortion to create a sense of immense scale and depth, while the editing uses speed-ramping and synced Foley ASMR to heighten the excitement.
+
+## B. IMAGE GENERATION MASTER PROMPT
+**Prompt:** "A hyper-realistic, high-definition wide-angle POV shot from an extreme worm’s-eye perspective, looking down a long 'runway' of food on a polished hardwood floor. The scene features three perfectly straight, parallel rows of food stretching from the immediate foreground toward the background. The center row consists of glistening, zigzag-stacked BBQ ribs with a dark red glaze; the left row features golden tacos with vibrant green and red fillings; the right row consists of perfectly round, golden-brown sliders with toasted sesame seeds. In the background, three competitors are lying prone on the floor, heads near the ground: a muscular black Pitbull in the center, a tiny tan Chihuahua on the left, and a young man in an olive-green sweatshirt on the right. The floor is high-gloss amber wood, creating a perfect mirror reflection of the food rows. The lighting is warm indoor kitchen lighting with bright specular highlights on the glaze of the meat and the texture of the bread. Wide-angle lens distortion (approx. 14mm) makes the food in the foreground appear large and imposing. The overall atmosphere is intense, competitive, and appetizing. Shot with a professional DSLR or flagship smartphone, 8k resolution, razor-sharp focus on food textures, vibrant color grading, cinematic depth of field."
+
+## C. NEGATIVE PROMPT
+"Top-down view, high-angle shot, blurry foreground, matte or dull floor, desaturated colors, messy or unorganized food, dark or moody lighting, grainy texture, cartoonish, illustration, distorted animal faces, flat lighting, low resolution, outdoor setting, out of focus food."
+
+## D. EXACT COLOR PALETTE
+```json
+{
+  "shadows": ["#1A0F0A", "#3D2B1F"],
+  "midtones": ["#8B4513", "#A0522D"],
+  "highlights": ["#FFF4D2", "#F0F0F0"],
+  "accents": ["#B22222", "#228B22"],
+  "brand_colors": ["#FFFFFF", "#4B5320"],
+  "skin_warm": "#D2A679",
+  "skin_cool": "N/A - Primarily warm lighting"
+}
+```
+
+## E. NARRATION / PRESENTATION STYLE GUIDE
+- **Content type:** Short-form Challenge/Mukbang.
+- **Point of view:** Second person (Presenter acting as a Referee).
+- **Tone & personality:** High-energy, authoritative, playful, and intense.
+- **Sentence patterns:** Extremely short, imperative commands (1-3 words).
+- **Vocabulary level:** Common/Basic English.
+- **Humor style:** Absurdist (the contrast between a tiny dog and a massive man).
+- **15 Transition/Key Phrases:** "Ready...", "Set...", "GO!", "Who wins?", "Look at the speed!", "Unbelievable!", "Round 1", "Wait for it...", "Winner!", "Can he catch up?", "Don't blink!", "Finish it!", "Who's next?", "Check this out!", "Crazy speed!"
+- **Emotional arc pattern:** Suspenseful Stillness (00:00-00:02) -> Explosive Action (00:02-End).
+- **Pacing notes:** Slow and rhythmic for the countdown; hyper-fast and frantic for the action.
+
+## F. SHOT LANGUAGE RULES
+- **Shot size distribution:** 100% Wide Shot (WS) to encompass the full runway of food.
+- **Camera angle preferences:** 100% Worm’s-eye / Ground-level view.
+- **Average shot duration:** One continuous long take (15s-30s).
+- **Transition types:** Hard cuts (Start/End only).
+- **5 Signature Shots:**
+    1. **The Starting Line:** Static wide-angle of the food rows and competitors.
+    2. **The First Bite:** Extreme close-up of the front of the rows as eating begins.
+    3. **The Mirror Reflection:** Focus on the glossy floor reflecting the food.
+    4. **The Scale Contrast:** A frame showing the Chihuahua next to the Pitbull for comic effect.
+    5. **The Clean Floor:** Final frame showing the food gone and the winner.
+
+## G. MOTION / VIDEO RULES
+- **Production method:** Live-action footage with post-production speed manipulation.
+- **Animation/motion techniques:** **Speed Ramping** (Fast-forwarding the eating segment).
+- **Speed & easing:** 1x speed for the intro; 3x-5x speed for the action; Linear easing.
+- **Particle/atmospheric effects:** N/A (Keep it clean and domestic).
+- **Transition timing:** Sync the speed-up exactly with the word "GO!".
+- **Camera movement settings:** 100% Static / Fixed camera.
+
+## H. VISUAL DESIGN REFERENCE
+- **People/Character Design:** Man in a solid-colored olive/green sweatshirt to avoid clashing with food colors. Focus on intense, hungry facial expressions.
+- **Costume/Appearance:** Casual, clean, athletic-adjacent.
+- **Environment/Setting:** Modern domestic kitchen; white cabinets for a clean backdrop; high-gloss amber hardwood floor is mandatory.
+- **Prop/Object Styling:** Food must be perfectly aligned. Meats should have a high-gloss glaze; bread should have a matte, textured finish.
+- **Typography & Graphic Overlay:** N/A (Visuals speak for themselves).
+- **Brand Identity:** High-saturation, warm-toned, clean, and professional high-value production look.
+
+## I. AUDIO DESIGN REFERENCE
+- **Music genre & mood:** Upbeat, fast-tempo circus/comedy chase music (e.g., Sabre Dance style).
+- **SFX usage patterns:** Exaggerated, high-frequency "Crunch," "Slurp," and "Munch" sounds (Foley ASMR).
+- **Voice characteristics:** Deep, booming, energetic masculine voice for the countdown.
+- **Audio mixing ratios:** Voice (20%) : Music (30%) : SFX (50%) during the action phase.

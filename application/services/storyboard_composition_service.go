@@ -85,6 +85,23 @@ type SceneCompositionInfo struct {
 	IsProduction  bool   `json:"is_production"`
 	PacingMode    string `json:"pacing_mode,omitempty"`
 	SourceShotIDs []uint `json:"source_shot_ids,omitempty"`
+	// Voice-over Director fields
+	ScriptSegment   *string        `json:"script_segment,omitempty"`
+	ScriptStartChar *int           `json:"script_start_char,omitempty"`
+	ScriptEndChar   *int           `json:"script_end_char,omitempty"`
+	ShotReason      *string        `json:"shot_reason,omitempty"`
+	SplitRules      json.RawMessage `json:"split_rules,omitempty"`
+	VisualType      *string        `json:"visual_type,omitempty"`
+	ShotRole        *string        `json:"shot_role,omitempty"`
+	// Audio Strategy fields
+	AudioMode       *string        `json:"audio_mode,omitempty"`
+	NarratorEnabled *bool          `json:"narrator_enabled,omitempty"`
+	NarratorDucking *bool          `json:"narrator_ducking,omitempty"`
+	DialogueType    *string        `json:"dialogue_type,omitempty"`
+	AmbienceType    *string        `json:"ambience_type,omitempty"`
+	AmbienceLevel   *string        `json:"ambience_level,omitempty"`
+	MusicMood       *string        `json:"music_mood,omitempty"`
+	MusicLevel      *string        `json:"music_level,omitempty"`
 }
 func (s *StoryboardCompositionService) HasProductionShots(episodeID string) bool {
 	var count int64
@@ -250,6 +267,23 @@ func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string, vie
 			VideoPromptSource: storyboard.VideoPromptSource,
 			SceneID:          storyboard.SceneID,
 			IsProduction:     storyboard.IsProduction,
+			// Voice-over Director fields
+			ScriptSegment:   storyboard.ScriptSegment,
+			ScriptStartChar: storyboard.ScriptStartChar,
+			ScriptEndChar:   storyboard.ScriptEndChar,
+			ShotReason:      storyboard.ShotReason,
+			SplitRules:      json.RawMessage(storyboard.SplitRules),
+			VisualType:      storyboard.VisualType,
+			ShotRole:        storyboard.ShotRole,
+			// Audio Strategy fields
+			AudioMode:       storyboard.AudioMode,
+			NarratorEnabled: storyboard.NarratorEnabled,
+			NarratorDucking: storyboard.NarratorDucking,
+			DialogueType:    storyboard.DialogueType,
+			AmbienceType:    storyboard.AmbienceType,
+			AmbienceLevel:   storyboard.AmbienceLevel,
+			MusicMood:       storyboard.MusicMood,
+			MusicLevel:      storyboard.MusicLevel,
 		}
 
 		// 直接使用关联的角色信息

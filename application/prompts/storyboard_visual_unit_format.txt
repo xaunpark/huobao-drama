@@ -1,0 +1,94 @@
+[Output Format] You must output in JSON array format directly, starting with [ and ending with ]. Each shot object must contain ALL of the following fields:
+[
+  {
+    "shot_id": 1,
+    "script_segment": "exact text from the narrator script that this shot illustrates",
+    "script_start_char": 0,
+    "script_end_char": 50,
+    "estimated_duration_sec": 4,
+    "visual_type": "literal",
+    "shot_role": "establishing",
+    "visual_description": "A vast desert landscape stretching to the horizon, the Nile River winding through lush green banks contrasting sharply with golden sand dunes. Palm trees line the riverbank, their fronds swaying gently.",
+    "reason_for_shot": "Opening establishing shot — introduces the geographic setting before narrowing to specific subjects. Triggered by: new scene introduction.",
+    "triggered_rules": ["scene_change"],
+    "title": "Nile River Valley",
+    "shot_type": "Extreme Long Shot",
+    "angle": "high-angle",
+    "movement": "slow pan",
+    "location": "Nile River valley, North African desert",
+    "time": "golden hour, warm afternoon light",
+    "atmosphere": "vast, ancient, timeless — warm golden tones with deep blue sky",
+    "audio_mode": "narrator_only",
+    "narrator_enabled": true,
+    "narrator_ducking": false,
+    "dialogue_type": "none",
+    "dialogue_text": "",
+    "ambience_type": "desert_wind",
+    "ambience_level": "low",
+    "music_mood": "epic_ancient",
+    "music_level": "low",
+    "sound_effect": "gentle wind, distant water flow",
+    "bgm_prompt": "soft orchestral strings with subtle ethnic percussion, building slowly",
+    "characters": [],
+    "props": [],
+    "scene_id": null
+  }
+]
+
+**Field Descriptions (mandatory for every shot)**:
+- shot_id: Sequential number starting from 1
+- script_segment: The EXACT text from the input script this shot covers (no paraphrasing)
+- script_start_char / script_end_char: Character positions in the original script
+- estimated_duration_sec: Duration in seconds (IDEAL: 3-4, range: 2-5, NEVER exceed 5)
+- visual_type: "literal" (concrete imagery) | "symbolic" (metaphorical/abstract) | "mixed"
+- shot_role: "establishing" | "action" | "detail" | "emotional" | "symbolic" | "transition" | "closing"
+- visual_description: HIGHLY DETAILED description of what the video should show. This field directly drives image/video generation. Be extremely specific about subject, composition, color, lighting, and motion.
+- reason_for_shot: MANDATORY explanation of WHY this shot was created (cite which visual change triggered it)
+- triggered_rules: Array of rule names that triggered creating this shot (e.g. "scene_change", "action_change", "subject_change", "time_change", "focus_change", "contrast_transition", "state_change", "symbolic_needed", "duration_exceeded", "enumeration", "cause_effect", "new_noun")
+- title: Short 3-5 word title
+- shot_type: ELS / LS / MS / CU / ECU (choose based on content)
+- angle: eye-level / high-angle / low-angle / side / dutch
+- movement: fixed / push-in / pull-out / pan / follow / tracking / slow pan
+- audio_mode: "narrator_only" (default) | "dialogue_dominant"
+- narrator_enabled: true/false (false if narrator is completely silent during dialogue)
+- narrator_ducking: true/false (true if narrator voice is lowered to allow dialogue to be heard)
+- dialogue_type: "none" | "reaction" | "soft_line" | "quote" | "full_dialogue" | "crowd" | "ambient_voice"
+- dialogue_text: Actual dialogue text. For "reaction": 1-3 words ("Ouch!", "Whoa!"); for "soft_line": 4-8 words; for "full_dialogue": full sentence; for "crowd": chant/cheer text; for "quote": exact quote
+- ambience_type: Environmental audio tag (e.g. "desert_wind", "crowd", "rain", "river")
+- ambience_level / music_level: "low" | "medium" | "high"
+- music_mood: Background music mood tag (e.g. "epic", "tension", "serene", "triumphant")
+
+**Entity Requirements**:
+- characters array must contain only valid IDs (integers) from the Available Character List. Use empty array [] if no characters.
+- props array must contain only valid IDs (integers) from the Available Prop List. Use empty array [] if no props.
+- scene_id must correspond strictly to a Valid Scene ID from the Extracted Scene Backgrounds list (use null if none fits)
+
+**Script Coverage Rules**:
+- script_segment values must cover the ENTIRE input script with NO GAPS and NO OVERLAPS
+- The concatenation of all script_segments must exactly reconstruct the original script
+
+**Duration Rules**:
+- IDEAL shot duration: 3-4 seconds
+- Every shot must be 2-5 seconds (NEVER exceed 5 seconds)
+- If a script segment exceeds ~12 English words, you MUST split it
+- Approximate rate: 10-12 English words ≈ 5 seconds
+- Prefer MORE shorter shots over fewer longer shots
+
+**Audio Strategy Distribution**:
+- ~20-25% of shots should be "narrator_only" (establishing, transitions, timeline summaries)
+- ~45-50% of shots should be "mixed" (MOST COMMON — narrator + character reactions/sounds)
+- ~25-30% of shots should be "dialogue_dominant" (climaxes, introductions, direct quotes)
+- Dialogue should appear every 2-3 narrator-only shots to maintain rhythm
+- Dialogue density should INCREASE toward the climax of the story
+- After a dialogue cluster, give at least 2 narrator-only shots before next dialogue
+
+**CRITICAL RULES**:
+- **You MUST cover the ENTIRE script.** No skipping any part!
+- **Do NOT split by punctuation or sentence boundaries.** Split by VISUAL CHANGE.
+- **One sentence SHOULD produce multiple shots** — most sentences contain 2-4 visual units.
+- **Merging is RARE** — only merge when two segments show the EXACT same image.
+- **Every shot MUST have a reason_for_shot** — this is MANDATORY.
+- **Target 25-35 shots per 2-minute script** — if you have fewer than 20, you are under-splitting.
+- **Each shot = ONE mental image** — if you can imagine two different pictures, that's two shots.
+
+***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response, including all JSON values, descriptions, and audio tags STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language. Do NOT use any non-English language anywhere in the output JSON.
