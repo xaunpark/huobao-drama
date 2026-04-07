@@ -602,28 +602,55 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 
 	s.taskService.UpdateTaskStatus(taskID, "processing", 50, "正在整理角色数据...")
 
-	var extractedCharacters []struct {
+	// AI returns object format: {narrator_voice_profile: "...", characters: [...]}
+	// Also support legacy array format for backward compatibility
+	type extractedChar struct {
 		Name        string `json:"name"`
 		Role        string `json:"role"`
 		Appearance  string `json:"appearance"`
 		Personality string `json:"personality"`
 		Description string `json:"description"`
+		VoiceStyle  string `json:"voice_style"`
 	}
 
-	if err := utils.SafeParseAIJSON(response, &extractedCharacters); err != nil {
-		s.log.Errorw("Failed to parse AI response for characters", "error", err, "response", response)
-		s.taskService.UpdateTaskError(taskID, fmt.Errorf("解析AI响应失败"))
-		return
+	var charList []extractedChar
+	var narratorProfile string
+
+	// Try object format first
+	var objectResult struct {
+		NarratorVoiceProfile string          `json:"narrator_voice_profile"`
+		Characters           []extractedChar `json:"characters"`
+	}
+	if err := utils.SafeParseAIJSON(response, &objectResult); err == nil && len(objectResult.Characters) > 0 {
+		charList = objectResult.Characters
+		narratorProfile = objectResult.NarratorVoiceProfile
+	} else {
+		// Fallback: try array format
+		if err := utils.SafeParseAIJSON(response, &charList); err != nil {
+			s.log.Errorw("Failed to parse AI response for characters", "error", err, "response", response)
+			s.taskService.UpdateTaskError(taskID, fmt.Errorf("解析AI响应失败"))
+			return
+		}
+	}
+
+	// Save narrator voice profile to Drama if extracted
+	if narratorProfile != "" {
+		if err := s.db.Model(&models.Drama{}).Where("id = ?", episode.DramaID).
+			Update("narrator_voice_profile", narratorProfile).Error; err != nil {
+			s.log.Warnw("Failed to save narrator voice profile", "error", err, "drama_id", episode.DramaID)
+		} else {
+			s.log.Infow("Narrator voice profile saved", "drama_id", episode.DramaID, "profile", narratorProfile)
+		}
 	}
 
 	var savedCharacters []models.Character
-	for _, charData := range extractedCharacters {
+	for _, charData := range charList {
 		// 检查是否已存在同名角色
 		var existingCharacter models.Character
 		err := s.db.Where("drama_id = ? AND name = ?", episode.DramaID, charData.Name).First(&existingCharacter).Error
 
 		if err == nil {
-			// 如果存在，只关联，不更新（或者可以选更新，这里暂不更新）
+			// 如果存在，只关联，不更新
 			if err := s.db.Model(&episode).Association("Characters").Append(&existingCharacter); err != nil {
 				s.log.Warnw("Failed to associate existing character", "error", err)
 			}
@@ -637,6 +664,7 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 				Appearance:  &charData.Appearance,
 				Personality: &charData.Personality,
 				Description: &charData.Description,
+				VoiceStyle:  &charData.VoiceStyle,
 			}
 			if err := s.db.Create(&newCharacter).Error; err != nil {
 				s.log.Errorw("Failed to create extracted character", "error", err)
@@ -652,7 +680,8 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 	}
 
 	s.taskService.UpdateTaskResult(taskID, map[string]interface{}{
-		"characters": savedCharacters,
-		"count":      len(savedCharacters),
+		"characters":             savedCharacters,
+		"count":                  len(savedCharacters),
+		"narrator_voice_profile": narratorProfile,
 	})
 }

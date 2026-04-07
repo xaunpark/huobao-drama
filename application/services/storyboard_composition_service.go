@@ -87,6 +87,7 @@ type SceneCompositionInfo struct {
 	SourceShotIDs []uint `json:"source_shot_ids,omitempty"`
 	// Voice-over Director fields
 	ScriptSegment   *string        `json:"script_segment,omitempty"`
+	NarratorScript  *string        `json:"narrator_script,omitempty"`
 	ScriptStartChar *int           `json:"script_start_char,omitempty"`
 	ScriptEndChar   *int           `json:"script_end_char,omitempty"`
 	ShotReason      *string        `json:"shot_reason,omitempty"`
@@ -269,6 +270,7 @@ func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string, vie
 			IsProduction:     storyboard.IsProduction,
 			// Voice-over Director fields
 			ScriptSegment:   storyboard.ScriptSegment,
+			NarratorScript:  storyboard.NarratorScript,
 			ScriptStartChar: storyboard.ScriptStartChar,
 			ScriptEndChar:   storyboard.ScriptEndChar,
 			ShotReason:      storyboard.ShotReason,

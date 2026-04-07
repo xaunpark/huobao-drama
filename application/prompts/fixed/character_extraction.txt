@@ -1,32 +1,40 @@
 [Output Format]
-**CRITICAL: Return ONLY a valid JSON array. Do NOT include any markdown code blocks, explanations, or other text. Start directly with [ and end with ].**
+**CRITICAL: Return ONLY a valid JSON object. Do NOT include any markdown code blocks, explanations, or other text. Start directly with { and end with }.**
 
-Each element is a character object with these fields:
+The output is a JSON object with two fields:
+1. narrator_voice_profile: A concise description of the ideal narrator voice for this story (string, 20-50 words). Consider the story's genre, tone, and target audience. Example: "Male, mid-30s, warm baritone, calm and authoritative like a documentary narrator, measured pacing with subtle dramatic flair"
+2. characters: An array of character objects
+
+Each character object has these fields:
 - name: Character name (string)
 - role: Role classification (string: "main", "supporting", or "minor")
 - appearance: Detailed visual description for AI image generation (string, 150-300 words). Include: gender, age range, body type, facial features, hairstyle, hair color, eye color, skin tone, clothing style, signature accessories. DO NOT include background or environment.
 - personality: Core personality traits and behavioral patterns (string, 100-200 words)
 - description: Background story and character relationships (string, 100-200 words)
-- voice_style: Voice style for TTS (string, e.g. "deep and calm", "bright and energetic", "soft and gentle")
+- voice_style: Voice characteristics for TTS synthesis (string, 20-40 words). Include: gender, age impression, pitch, tone, pacing, accent. Example: "deep and calm", "bright and energetic", "soft and gentle with slight tremor"
 
 [Example]
-[
-  {
-    "name": "Chen Wei",
-    "role": "main",
-    "appearance": "A 28-year-old Chinese man with a lean, athletic build standing at approximately 180cm. He has sharp, angular facial features with high cheekbones and a strong jawline. His short black hair is slightly tousled and swept to one side. Dark brown almond-shaped eyes carry a determined, intense gaze. Light tan skin with a faint scar on his left temple. He typically wears a dark navy tactical jacket over a plain white t-shirt, with dark grey trousers and black boots. A worn leather watch on his left wrist is his only accessory. His posture is upright and alert, conveying quiet confidence.",
-    "personality": "Highly disciplined and strategic, Chen Wei rarely speaks unless necessary. He thinks several steps ahead and remains composed under pressure. Despite his cold exterior, he harbors deep loyalty to those he trusts and a strong sense of justice that drives his decisions.",
-    "description": "A former special forces operative who left the military after a mission gone wrong. Now working as an independent investigator, he uncovers a conspiracy that reaches into the highest levels of government. His estranged relationship with his younger sister creates an ongoing emotional subplot throughout the series.",
-    "voice_style": "deep and measured, with slow deliberate pacing"
-  },
-  {
-    "name": "Lin Xiao",
-    "role": "supporting",
-    "appearance": "A 25-year-old Chinese woman with a slender frame and delicate features. She has long straight black hair reaching her waist, often worn loose or in a simple low ponytail. Large expressive dark eyes behind thin-framed round glasses. Fair porcelain skin with a small dimple on her right cheek. She favors smart-casual attire: tailored blazers in muted tones (beige, grey, dusty blue) over simple blouses, with straight-leg trousers and flat oxford shoes. She carries a worn leather messenger bag covered in small pins and stickers.",
-    "personality": "Curious and analytical, Lin Xiao approaches every situation like a puzzle to be solved. She is warm and empathetic with friends but can become intensely focused and oblivious to social cues when absorbed in a problem.",
-    "description": "A data analyst at a tech firm who becomes entangled in the conspiracy after discovering anomalies in company financial records. She serves as Chen Wei's reluctant informant and eventually a trusted ally.",
-    "voice_style": "light and bright, with quick speech and occasional excited inflections"
-  }
-]
+{
+  "narrator_voice_profile": "Male, mid-30s, warm baritone, calm and authoritative documentary style, measured pacing with subtle dramatic emphasis on key moments",
+  "characters": [
+    {
+      "name": "Chen Wei",
+      "role": "main",
+      "appearance": "A 28-year-old Chinese man with a lean, athletic build standing at approximately 180cm. He has sharp, angular facial features with high cheekbones and a strong jawline. His short black hair is slightly tousled and swept to one side. Dark brown almond-shaped eyes carry a determined, intense gaze. Light tan skin with a faint scar on his left temple. He typically wears a dark navy tactical jacket over a plain white t-shirt, with dark grey trousers and black boots. A worn leather watch on his left wrist is his only accessory. His posture is upright and alert, conveying quiet confidence.",
+      "personality": "Highly disciplined and strategic, Chen Wei rarely speaks unless necessary. He thinks several steps ahead and remains composed under pressure. Despite his cold exterior, he harbors deep loyalty to those he trusts and a strong sense of justice that drives his decisions.",
+      "description": "A former special forces operative who left the military after a mission gone wrong. Now working as an independent investigator, he uncovers a conspiracy that reaches into the highest levels of government. His estranged relationship with his younger sister creates an ongoing emotional subplot throughout the series.",
+      "voice_style": "deep and measured male voice, mid-20s, with slow deliberate pacing and a quiet intensity"
+    },
+    {
+      "name": "Lin Xiao",
+      "role": "supporting",
+      "appearance": "A 25-year-old Chinese woman with a slender frame and delicate features. She has long straight black hair reaching her waist, often worn loose or in a simple low ponytail. Large expressive dark eyes behind thin-framed round glasses. Fair porcelain skin with a small dimple on her right cheek. She favors smart-casual attire: tailored blazers in muted tones (beige, grey, dusty blue) over simple blouses, with straight-leg trousers and flat oxford shoes. She carries a worn leather messenger bag covered in small pins and stickers.",
+      "personality": "Curious and analytical, Lin Xiao approaches every situation like a puzzle to be solved. She is warm and empathetic with friends but can become intensely focused and oblivious to social cues when absorbed in a problem.",
+      "description": "A data analyst at a tech firm who becomes entangled in the conspiracy after discovering anomalies in company financial records. She serves as Chen Wei's reluctant informant and eventually a trusted ally.",
+      "voice_style": "light and bright young female voice, mid-20s, with quick speech tempo and occasional excited inflections"
+    }
+  ]
+}
 
 ***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response, including ALL JSON field values, STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language. Do NOT use Chinese or any other language in the output JSON.
+

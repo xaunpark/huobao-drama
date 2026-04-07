@@ -29,6 +29,8 @@ type Drama struct {
 	Characters []Character `gorm:"foreignKey:DramaID" json:"characters,omitempty"`
 	Scenes     []Scene     `gorm:"foreignKey:DramaID" json:"scenes,omitempty"`
 	Props      []Prop      `gorm:"foreignKey:DramaID" json:"props,omitempty"`
+	// Voice-over profile
+	NarratorVoiceProfile *string `gorm:"type:text" json:"narrator_voice_profile"` // e.g. "Male, 30s, British accent, deep baritone, calm documentary"
 }
 
 func (d *Drama) TableName() string {
@@ -121,7 +123,8 @@ type Storyboard struct {
 	PacingMode    *string        `gorm:"size:20" json:"pacing_mode"`                     // "standard" | "rapid_cut"
 	SourceShotIDs datatypes.JSON `gorm:"type:json" json:"source_shot_ids"`               // [1,2,3] — IDs of original editorial shots merged
 	// Voice-over Director fields
-	ScriptSegment  *string        `gorm:"type:text" json:"script_segment"`               // Narrator script segment this shot illustrates
+	ScriptSegment  *string        `gorm:"type:text" json:"script_segment"`               // Clean narrator+dialogue text (no metadata tags)
+	NarratorScript *string        `gorm:"type:text" json:"narrator_script"`              // Pure narrator lines only
 	ScriptStartChar *int          `json:"script_start_char"`                             // Start char position in original script
 	ScriptEndChar  *int           `json:"script_end_char"`                               // End char position in original script
 	ShotReason     *string        `gorm:"type:text" json:"shot_reason"`                  // Why this shot was created (AI director reasoning)

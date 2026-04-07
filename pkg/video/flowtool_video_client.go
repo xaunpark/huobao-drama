@@ -2,6 +2,7 @@ package video
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -84,6 +85,55 @@ func (c *FlowToolVideoClient) uploadImage(base64Data string) (string, error) {
 		imageData = "data:image/png;base64," + imageData
 	}
 
+	// Validate: extract raw base64 and check it's actually image data (not HTML/error page)
+	base64Part := imageData
+	if idx := strings.Index(imageData, ","); idx != -1 {
+		base64Part = imageData[idx+1:]
+	}
+	// Quick size check: a real image should be at least a few hundred bytes
+	rawSize := len(base64Part) * 3 / 4 // approximate decoded size
+	if rawSize < 100 {
+		return "", fmt.Errorf("base64 image data too small (%d bytes), likely not a valid image", rawSize)
+	}
+
+	// Decode first few bytes to check magic bytes (image signature)
+	if len(base64Part) > 32 {
+		snippet := base64Part[:32]
+		// Pad if needed for base64 decoding
+		for len(snippet)%4 != 0 {
+			snippet += "="
+		}
+		decoded, err := base64Decode(snippet)
+		if err == nil && len(decoded) >= 4 {
+			isImage := false
+			// PNG: 89 50 4E 47
+			if decoded[0] == 0x89 && decoded[1] == 0x50 && decoded[2] == 0x4E && decoded[3] == 0x47 {
+				isImage = true
+			}
+			// JPEG: FF D8 FF
+			if decoded[0] == 0xFF && decoded[1] == 0xD8 && decoded[2] == 0xFF {
+				isImage = true
+			}
+			// GIF: 47 49 46
+			if decoded[0] == 0x47 && decoded[1] == 0x49 && decoded[2] == 0x46 {
+				isImage = true
+			}
+			// WebP: 52 49 46 46
+			if decoded[0] == 0x52 && decoded[1] == 0x49 && decoded[2] == 0x46 && decoded[3] == 0x46 {
+				isImage = true
+			}
+			// BMP: 42 4D
+			if decoded[0] == 0x42 && decoded[1] == 0x4D {
+				isImage = true
+			}
+			if !isImage {
+				// Log first bytes for debugging
+				hexBytes := fmt.Sprintf("%x", decoded[:min(len(decoded), 16)])
+				return "", fmt.Errorf("base64 data does not contain a valid image (magic bytes: %s, size: %d bytes). The source URL may have expired or returned an error page", hexBytes, rawSize)
+			}
+		}
+	}
+
 	// Detect mime type from the data URI
 	mimeType := "image/png"
 	if strings.Contains(imageData, "data:image/jpeg") || strings.Contains(imageData, "data:image/jpg") {
@@ -93,6 +143,8 @@ func (c *FlowToolVideoClient) uploadImage(base64Data string) (string, error) {
 	} else if strings.Contains(imageData, "data:image/gif") {
 		mimeType = "image/gif"
 	}
+
+	fmt.Printf("[FlowTool Upload] mime=%s, base64_size=%d, decoded_size≈%d bytes\n", mimeType, len(base64Part), rawSize)
 
 	uploadReq := flowToolUploadRequest{
 		ImageData: imageData,
@@ -138,7 +190,19 @@ func (c *FlowToolVideoClient) uploadImage(base64Data string) (string, error) {
 		return "", fmt.Errorf("upload failed: %s", errMsg)
 	}
 
+	fmt.Printf("[FlowTool Upload] Success: media_id=%s\n", uploadResp.MediaID)
 	return uploadResp.MediaID, nil
+}
+
+// base64Decode is a small helper to decode a base64 snippet for validation.
+func base64Decode(s string) ([]byte, error) {
+	// Try standard encoding first, then URL-safe encoding
+	decoded, err := base64.StdEncoding.DecodeString(s)
+	if err != nil {
+		// Try URL-safe encoding
+		return base64.URLEncoding.DecodeString(s)
+	}
+	return decoded, nil
 }
 
 // GenerateVideo implements VideoClient.GenerateVideo for Flow-Tool.

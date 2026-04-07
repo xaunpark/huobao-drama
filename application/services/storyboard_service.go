@@ -39,25 +39,31 @@ func NewStoryboardService(db *gorm.DB, cfg *config.Config, log *logger.Logger) *
 }
 
 type Storyboard struct {
-	ShotNumber  int    `json:"shot_number"`
-	Title       string `json:"title"`        // 镜头标题
-	ShotType    string `json:"shot_type"`    // 景别
-	Angle       string `json:"angle"`        // 镜头角度
-	Time        string `json:"time"`         // 时间
-	Location    string `json:"location"`     // 地点
-	SceneID     *uint  `json:"scene_id"`     // 背景ID（AI直接返回，可为null）
-	Movement    string `json:"movement"`     // 运镜
-	Action      string `json:"action"`       // 动作
-	Dialogue    string `json:"dialogue"`     // 对话/独白
-	Result      string `json:"result"`       // 画面结果
-	Atmosphere  string `json:"atmosphere"`   // 环境氛围
-	Emotion     string `json:"emotion"`      // 情绪
-	Duration    int    `json:"duration"`     // 时长（秒）
-	BgmPrompt   string `json:"bgm_prompt"`   // 配乐提示词
-	SoundEffect string `json:"sound_effect"` // 音效描述
-	Characters  []uint `json:"characters"`   // 涉及的角色ID列表
-	Props       []uint `json:"props"`        // 涉及的道具ID列表
-	IsPrimary   bool   `json:"is_primary"`   // 是否主镜
+	ShotNumber     int    `json:"shot_number"`
+	Title          string `json:"title"`           // 镜头标题
+	ShotType       string `json:"shot_type"`       // 景别
+	Angle          string `json:"angle"`           // 镜头角度
+	Time           string `json:"time"`            // 时间
+	Location       string `json:"location"`        // 地点
+	SceneID        *uint  `json:"scene_id"`        // 背景ID
+	Movement       string `json:"movement"`        // 运镜
+	Action         string `json:"action"`          // 动作
+	Dialogue       string `json:"dialogue"`        // 对话/独白
+	Result         string `json:"result"`          // 画面结果
+	Atmosphere     string `json:"atmosphere"`      // 环境氛围
+	Emotion        string `json:"emotion"`         // 情绪
+	Duration       int    `json:"duration"`        // 时长（秒）
+	BgmPrompt      string `json:"bgm_prompt"`      // 配乐提示词
+	SoundEffect    string `json:"sound_effect"`    // 音效描述
+	Characters     []uint `json:"characters"`      // 涉及的角色ID列表
+	Props          []uint `json:"props"`           // 涉及的道具ID列表
+	IsPrimary      bool   `json:"is_primary"`      // 是否主镜
+	NarratorScript string `json:"narrator_script"` // Narrator text for voice-over
+	AudioMode      string `json:"audio_mode"`      // narrator_only | dialogue_dominant
+	// Voice profile fields (injected into video prompt for all modes)
+	CharacterDescs       string `json:"-"` // "Gray: a cautious blue character...; Orin: a bold orange character..."
+	CharacterVoiceStyles string `json:"-"` // "Gray: deep and calm; Orin: bright and energetic"
+	NarratorVoiceProfile string `json:"-"` // "Male, 30s, calm documentary tone"
 }
 
 type GenerateStoryboardResult struct {
@@ -96,6 +102,8 @@ type VoiceoverShot struct {
 	MusicLevel      string `json:"music_level"`
 	SoundEffect     string `json:"sound_effect"`
 	BgmPrompt       string `json:"bgm_prompt"`
+	// Narrator text (extracted from [NARRATOR] tags or untagged lines)
+	NarratorText string `json:"narrator_text"`
 	// References
 	Characters []uint `json:"characters"`
 	Props      []uint `json:"props"`
@@ -1034,14 +1042,43 @@ func (s *StoryboardService) processVisualUnitGeneration(taskID, episodeID string
 				shots[i].AudioMode = block.AudioMode
 			}
 
-			// Use block RawContent as script_segment if AI didn't capture it correctly
-			if block.RawContent != "" && (shots[i].ScriptSegment == "" || shots[i].ScriptSegment == "null") {
-				shots[i].ScriptSegment = block.RawContent
-			}
+			// Build clean text fields from parsed segments
+			var narratorParts []string
+			var cleanParts []string
+
+			// Reset fields that will be rebuilt from parsed segments
+			// (avoid duplication: AI JSON may already have these, but parsed tags are authoritative)
+			shots[i].DialogueText = ""
+			shots[i].SoundEffect = ""
 
 			// Wire expanded tags from parsed lines into shot fields
 			for _, seg := range block.Lines {
 				switch seg.Type {
+				case "narrator":
+					if seg.Text != "" {
+						narratorParts = append(narratorParts, seg.Text)
+						cleanParts = append(cleanParts, seg.Text)
+					}
+				case "dialogue":
+					if seg.Text != "" {
+						if shots[i].DialogueText == "" {
+							shots[i].DialogueText = seg.Text
+						} else {
+							shots[i].DialogueText += "\n" + seg.Text
+						}
+						// Include dialogue with character tag in clean script
+						label := seg.Character
+						if label == "" {
+							label = "Character"
+						}
+						cleanParts = append(cleanParts, fmt.Sprintf("[%s] %s", label, seg.Text))
+					}
+				case "crowd":
+					if seg.Text != "" {
+						shots[i].DialogueText = seg.Text
+						shots[i].DialogueType = "crowd"
+						cleanParts = append(cleanParts, "[CROWD] "+seg.Text)
+					}
 				case "sfx":
 					if seg.Text != "" {
 						if shots[i].SoundEffect == "" {
@@ -1056,12 +1093,10 @@ func (s *StoryboardService) processVisualUnitGeneration(taskID, episodeID string
 					}
 				case "camera":
 					if seg.Text != "" {
-						// Camera tag overrides movement field
 						shots[i].Movement = seg.Text
 					}
 				case "vfx":
 					if seg.Text != "" {
-						// Append VFX instructions to visual description
 						if shots[i].VisualDescription != "" {
 							shots[i].VisualDescription += " [VFX: " + seg.Text + "]"
 						} else {
@@ -1070,29 +1105,50 @@ func (s *StoryboardService) processVisualUnitGeneration(taskID, episodeID string
 					}
 				case "note":
 					if seg.Text != "" {
-						// Append director's note to reason_for_shot
 						if shots[i].ReasonForShot != "" {
 							shots[i].ReasonForShot += " | Director note: " + seg.Text
 						} else {
 							shots[i].ReasonForShot = "Director note: " + seg.Text
 						}
 					}
-				case "dialogue":
-					// Override dialogue_text with user-specified dialogue
-					if seg.Text != "" {
-						if shots[i].DialogueText == "" {
-							shots[i].DialogueText = seg.Text
-						} else {
-							shots[i].DialogueText += "\n" + seg.Text
-						}
-					}
-				case "crowd":
-					if seg.Text != "" {
-						shots[i].DialogueText = seg.Text
-						shots[i].DialogueType = "crowd"
-					}
 				}
 			}
+
+			// Set NarratorText (pure narrator lines only)
+			if len(narratorParts) > 0 {
+				shots[i].NarratorText = strings.Join(narratorParts, "\n")
+			}
+
+			// Always override ScriptSegment with clean version (narrator + dialogue, no metadata tags)
+			if len(cleanParts) > 0 {
+				shots[i].ScriptSegment = strings.Join(cleanParts, "\n")
+			} else if block.RawContent != "" && shots[i].ScriptSegment == "" {
+				// Fallback: if no parsed segments, use raw content
+				shots[i].ScriptSegment = block.RawContent
+			}
+
+			// Infer AudioMode from parsed content if not already set
+			hasNarrator := len(narratorParts) > 0
+			hasDialogue := shots[i].DialogueText != ""
+			if shots[i].AudioMode == "" || shots[i].AudioMode == "null" {
+				if hasDialogue {
+					shots[i].AudioMode = "dialogue_dominant"
+				} else if hasNarrator {
+					shots[i].AudioMode = "narrator_only"
+				}
+			}
+
+			narratorPreview := shots[i].NarratorText
+			if len(narratorPreview) > 80 {
+				narratorPreview = narratorPreview[:80] + "..."
+			}
+			s.log.Debugw("Structured shot post-processing",
+				"shot_id", shots[i].ShotID,
+				"narrator_text_len", len(shots[i].NarratorText),
+				"dialogue_text_len", len(shots[i].DialogueText),
+				"audio_mode", shots[i].AudioMode,
+				"narrator_preview", narratorPreview,
+			)
 		}
 	}
 
@@ -1119,7 +1175,7 @@ func (s *StoryboardService) processVisualUnitGeneration(taskID, episodeID string
 	}
 
 	// Save to database
-	if err := s.saveVoiceoverShots(episodeID, shots); err != nil {
+	if err := s.saveVoiceoverShots(episodeID, dramaID, shots); err != nil {
 		s.log.Errorw("Failed to save voiceover shots", "error", err, "task_id", taskID)
 		if updateErr := s.taskService.UpdateTaskError(taskID, fmt.Errorf("Failed to save shots: %w", err)); updateErr != nil {
 			s.log.Errorw("Failed to update task error", "error", updateErr, "task_id", taskID)
@@ -1156,7 +1212,7 @@ func (s *StoryboardService) processVisualUnitGeneration(taskID, episodeID string
 }
 
 // saveVoiceoverShots maps VoiceoverShot[] to models.Storyboard and saves to DB
-func (s *StoryboardService) saveVoiceoverShots(episodeID string, shots []VoiceoverShot) error {
+func (s *StoryboardService) saveVoiceoverShots(episodeID string, dramaID uint, shots []VoiceoverShot) error {
 	epID, err := strconv.ParseUint(episodeID, 10, 32)
 	if err != nil {
 		return fmt.Errorf("invalid episode ID: %s", episodeID)
@@ -1165,6 +1221,9 @@ func (s *StoryboardService) saveVoiceoverShots(episodeID string, shots []Voiceov
 	if len(shots) == 0 {
 		return fmt.Errorf("AI returned 0 shots, refusing to save")
 	}
+
+	// Load narrator voice profile BEFORE transaction (avoid using s.db inside tx)
+	narratorProfile := s.loadNarratorVoiceProfile(dramaID)
 
 	return s.db.Transaction(func(tx *gorm.DB) error {
 		// Verify episode exists
@@ -1194,25 +1253,77 @@ func (s *StoryboardService) saveVoiceoverShots(episodeID string, shots []Voiceov
 			return result.Error
 		}
 
+		// narratorProfile already loaded before transaction
+
+		// Batch-load all character descriptions ONCE (avoid N+1 queries)
+		allCharIDs := make(map[uint]bool)
+		for _, shot := range shots {
+			for _, cid := range shot.Characters {
+				allCharIDs[cid] = true
+			}
+		}
+		charDescMap := make(map[uint]string)  // charID -> "Name (appearance)"
+		charVoiceMap := make(map[uint]string) // charID -> "Name: voice style"
+		if len(allCharIDs) > 0 {
+			var ids []uint
+			for id := range allCharIDs {
+				ids = append(ids, id)
+			}
+			var chars []models.Character
+			if err := tx.Where("id IN ?", ids).Find(&chars).Error; err == nil {
+				for _, c := range chars {
+					desc := c.Name
+					if c.Appearance != nil && *c.Appearance != "" {
+						desc += " (" + *c.Appearance + ")"
+					} else if c.Description != nil && *c.Description != "" {
+						desc += " (" + *c.Description + ")"
+					}
+					charDescMap[c.ID] = desc
+					if c.VoiceStyle != nil && *c.VoiceStyle != "" {
+						charVoiceMap[c.ID] = c.Name + ": " + *c.VoiceStyle
+					}
+				}
+			}
+		}
+
 		// Save each voiceover shot as a Storyboard
 		for _, shot := range shots {
 			// Build visual description as the Description field
 			description := shot.VisualDescription
 
+			// Build character descriptions and voice styles from preloaded maps
+			var charDescParts []string
+			var charVoiceParts []string
+			for _, cid := range shot.Characters {
+				if d, ok := charDescMap[cid]; ok {
+					charDescParts = append(charDescParts, d)
+				}
+				if v, ok := charVoiceMap[cid]; ok {
+					charVoiceParts = append(charVoiceParts, v)
+				}
+			}
+			charDescs := strings.Join(charDescParts, "; ")
+			charVoices := strings.Join(charVoiceParts, "; ")
+
 			// Generate image/video prompts from VoiceoverShot fields using existing helpers
 			sbForPrompt := Storyboard{
-				ShotNumber:  shot.ShotID,
-				Title:       shot.Title,
-				ShotType:    shot.ShotType,
-				Angle:       shot.Angle,
-				Movement:    shot.Movement,
-				Location:    shot.Location,
-				Time:        shot.Time,
-				Atmosphere:  shot.Atmosphere,
-				Action:      shot.VisualDescription, // Use visual description as action for prompts
-				Dialogue:    shot.DialogueText,
-				SoundEffect: shot.SoundEffect,
-				Duration:    shot.EstimatedDuration,
+				ShotNumber:           shot.ShotID,
+				Title:                shot.Title,
+				ShotType:             shot.ShotType,
+				Angle:                shot.Angle,
+				Movement:             shot.Movement,
+				Location:             shot.Location,
+				Time:                 shot.Time,
+				Atmosphere:           shot.Atmosphere,
+				Action:               shot.VisualDescription,
+				Dialogue:             shot.DialogueText,
+				SoundEffect:          shot.SoundEffect,
+				Duration:             shot.EstimatedDuration,
+				NarratorScript:       shot.NarratorText,
+				AudioMode:            shot.AudioMode,
+				CharacterDescs:       charDescs,
+				CharacterVoiceStyles: charVoices,
+				NarratorVoiceProfile: narratorProfile,
 			}
 
 			// Load props for prompt generation
@@ -1234,6 +1345,24 @@ func (s *StoryboardService) saveVoiceoverShots(episodeID string, shots []Voiceov
 
 			imagePrompt := s.generateImagePrompt(sbForPrompt, propDescriptions)
 			videoPrompt := s.generateVideoPrompt(sbForPrompt)
+
+			// Safeguard: ensure narrator text is in video prompt for narrator shots
+			if shot.NarratorText != "" && !strings.Contains(videoPrompt, "Narration") {
+				s.log.Warnw("Narrator text missing from video prompt — injecting safeguard",
+					"shot_id", shot.ShotID,
+					"narrator_text_len", len(shot.NarratorText),
+					"audio_mode", shot.AudioMode,
+					"dialogue_text_len", len(shot.DialogueText),
+				)
+				// Force inject narrator text
+				videoPrompt = strings.Replace(videoPrompt,
+					"The character's mouth is completely closed, silent scene. --no talking, speaking, moving lips",
+					fmt.Sprintf("Narration (voice-over): %s. The character's mouth is strictly closed, silent expression, purely visual acting, no speaking, voiceover scene. --no talking, speaking, moving lips, open mouth, chatting", shot.NarratorText),
+					1)
+			} else if shot.NarratorText != "" {
+				s.log.Infow("Narrator text successfully included in video prompt",
+					"shot_id", shot.ShotID, "narrator_text_len", len(shot.NarratorText))
+			}
 
 			// Convert string fields to pointers (nil if empty)
 			strPtr := func(v string) *string {
@@ -1279,6 +1408,7 @@ func (s *StoryboardService) saveVoiceoverShots(episodeID string, shots []Voiceov
 				Duration:         shot.EstimatedDuration,
 				// Voice-over Director fields
 				ScriptSegment:   strPtr(shot.ScriptSegment),
+				NarratorScript:  strPtr(shot.NarratorText),
 				ScriptStartChar: intPtr(shot.ScriptStartChar),
 				ScriptEndChar:   intPtr(shot.ScriptEndChar),
 				ShotReason:      strPtr(shot.ReasonForShot),
@@ -1485,7 +1615,10 @@ func (s *StoryboardService) generateVideoPrompt(sb Storyboard) string {
 		parts = append(parts, fmt.Sprintf("Action: %s", sb.Action))
 	}
 
-
+	// 1.5 Character visual descriptions (for visual consistency across shots)
+	if sb.CharacterDescs != "" {
+		parts = append(parts, fmt.Sprintf("Characters in scene: %s", sb.CharacterDescs))
+	}
 
 	// 2. 结果（动作的最终视觉状态 - 紧跟Action以保持叙事连贯）
 	if sb.Result != "" {
@@ -1519,32 +1652,50 @@ func (s *StoryboardService) generateVideoPrompt(sb Storyboard) string {
 		parts = append(parts, fmt.Sprintf("Atmosphere: %s", sb.Atmosphere))
 	}
 
-	// 7. 对话与口型约束
-	if sb.Dialogue != "" {
+	// 7. Voice-over narration + dialogue + lip-sync constraints
+	isVoiceoverMode := sb.AudioMode == "narrator_only" || (sb.AudioMode == "" && sb.NarratorScript != "" && sb.Dialogue == "")
+
+	if sb.NarratorScript != "" && isVoiceoverMode {
+		// Narrator-only shot: inject narration as visual context, enforce closed mouth
+		narratorLine := fmt.Sprintf("Narration (voice-over): %s", sb.NarratorScript)
+		if sb.NarratorVoiceProfile != "" {
+			narratorLine += fmt.Sprintf(" [Voice profile: %s]", sb.NarratorVoiceProfile)
+		}
+		parts = append(parts, narratorLine)
+		parts = append(parts, "The character's mouth is strictly closed, silent expression, purely visual acting, no speaking, voiceover scene. --no talking, speaking, moving lips, open mouth, chatting")
+	} else if sb.Dialogue != "" {
 		parts = append(parts, fmt.Sprintf("Dialogue: %s", sb.Dialogue))
-		
-		// 自动判断如果是旁白/独白，则禁止嘴部动作；如果是对话，则要求说话
+
+		// Check if dialogue is actually voiceover notation
 		dialogueLower := strings.ToLower(strings.TrimSpace(sb.Dialogue))
-		isVoiceover := strings.HasPrefix(dialogueLower, "(vo)") || 
-		   strings.HasPrefix(dialogueLower, "(monologue)") || 
-		   strings.Contains(dialogueLower, "voiceover") || 
-		   strings.HasPrefix(dialogueLower, "【旁白") || 
-		   strings.HasPrefix(dialogueLower, "[旁白") || 
-		   strings.HasPrefix(dialogueLower, "(narrator") ||
-		   strings.Contains(dialogueLower, "（旁白）")
-		
+		isVoiceover := strings.HasPrefix(dialogueLower, "(vo)") ||
+			strings.HasPrefix(dialogueLower, "(monologue)") ||
+			strings.Contains(dialogueLower, "voiceover") ||
+			strings.HasPrefix(dialogueLower, "【旁白") ||
+			strings.HasPrefix(dialogueLower, "[旁白") ||
+			strings.HasPrefix(dialogueLower, "(narrator") ||
+			strings.Contains(dialogueLower, "（旁白）")
+
 		if isVoiceover {
 			parts = append(parts, "The character's mouth is strictly closed, silent expression, purely visual acting, no speaking, voiceover scene. --no talking, speaking, moving lips, open mouth, chatting")
 		} else {
 			parts = append(parts, "The character is actively speaking, lip-syncing naturally to the dialog, mouth moving")
+			// Inject character voice styles for dialogue shots
+			if sb.CharacterVoiceStyles != "" {
+				parts = append(parts, fmt.Sprintf("[Character voice: %s]", sb.CharacterVoiceStyles))
+			}
+		}
+
+		// If there's both narrator and dialogue (narrator_ducking), include narration context
+		if sb.NarratorScript != "" {
+			parts = append(parts, fmt.Sprintf("Narration context (voice-over): %s", sb.NarratorScript))
 		}
 	} else {
-		// 如果完全没有对话，要求保持嘴部闭合
+		// No dialogue and no narrator — pure visual scene
 		parts = append(parts, "The character's mouth is completely closed, silent scene. --no talking, speaking, moving lips")
 	}
 
-	// 8. 音效（作为环境物理上下文，帮助AI理解场景的物理特性）
-	// BGM intentionally omitted - could conflict with style DNA (some styles require ZERO music)
+	// 8. 音效（作为环境物理上下文）
 	if sb.SoundEffect != "" {
 		parts = append(parts, fmt.Sprintf("Sound effects: %s", sb.SoundEffect))
 	}
@@ -1555,6 +1706,41 @@ func (s *StoryboardService) generateVideoPrompt(sb Storyboard) string {
 		return strings.Join(parts, ". ")
 	}
 	return "Cinematic video scene"
+}
+
+// buildCharacterDescs loads character visual descriptions for video prompt injection
+func (s *StoryboardService) buildCharacterDescs(charIDs []uint) string {
+	if len(charIDs) == 0 {
+		return ""
+	}
+	var chars []models.Character
+	if err := s.db.Where("id IN ?", charIDs).Find(&chars).Error; err != nil {
+		return ""
+	}
+	var descs []string
+	for _, c := range chars {
+		desc := c.Name
+		// Prefer Appearance (visual), fallback to Description
+		if c.Appearance != nil && *c.Appearance != "" {
+			desc += " (" + *c.Appearance + ")"
+		} else if c.Description != nil && *c.Description != "" {
+			desc += " (" + *c.Description + ")"
+		}
+		descs = append(descs, desc)
+	}
+	return strings.Join(descs, "; ")
+}
+
+// loadNarratorVoiceProfile loads the Drama-level narrator voice profile
+func (s *StoryboardService) loadNarratorVoiceProfile(dramaID uint) string {
+	var drama models.Drama
+	if err := s.db.Select("narrator_voice_profile").First(&drama, dramaID).Error; err != nil {
+		return ""
+	}
+	if drama.NarratorVoiceProfile != nil {
+		return *drama.NarratorVoiceProfile
+	}
+	return ""
 }
 
 func (s *StoryboardService) saveStoryboards(episodeID string, storyboards []Storyboard) error {
@@ -1635,11 +1821,66 @@ func (s *StoryboardService) saveStoryboards(episodeID string, storyboards []Stor
 		// 注意：不删除背景，因为背景是在分镜拆解前就提取好的
 		// AI会直接返回scene_id，不需要在这里做字符串匹配
 
+		// Load narrator voice profile once for all shots (using tx to avoid deadlock)
+		var narratorProfile string
+		var tempDrama models.Drama
+		if err := tx.Select("narrator_voice_profile").First(&tempDrama, episode.DramaID).Error; err == nil {
+			if tempDrama.NarratorVoiceProfile != nil {
+				narratorProfile = *tempDrama.NarratorVoiceProfile
+			}
+		}
+
+		// Batch-load all character descriptions ONCE (avoid N+1 queries)
+		allCharIDs := make(map[uint]bool)
+		for _, sb := range storyboards {
+			for _, cid := range sb.Characters {
+				allCharIDs[cid] = true
+			}
+		}
+		charDescMap := make(map[uint]string)
+		charVoiceMap := make(map[uint]string)
+		if len(allCharIDs) > 0 {
+			var ids []uint
+			for id := range allCharIDs {
+				ids = append(ids, id)
+			}
+			var chars []models.Character
+			if err := tx.Where("id IN ?", ids).Find(&chars).Error; err == nil {
+				for _, c := range chars {
+					desc := c.Name
+					if c.Appearance != nil && *c.Appearance != "" {
+						desc += " (" + *c.Appearance + ")"
+					} else if c.Description != nil && *c.Description != "" {
+						desc += " (" + *c.Description + ")"
+					}
+					charDescMap[c.ID] = desc
+					if c.VoiceStyle != nil && *c.VoiceStyle != "" {
+						charVoiceMap[c.ID] = c.Name + ": " + *c.VoiceStyle
+					}
+				}
+			}
+		}
+
 		// 保存新的分镜头
 		for _, sb := range storyboards {
 			// 构建描述信息，包含对话
 			description := fmt.Sprintf("【镜头类型】%s\n【运镜】%s\n【动作】%s\n【对话】%s\n【结果】%s\n【情绪】%s",
 				sb.ShotType, sb.Movement, sb.Action, sb.Dialogue, sb.Result, sb.Emotion)
+
+			// Build character descriptions and voice styles from preloaded maps
+			var charDescParts []string
+			var charVoiceParts []string
+			for _, cid := range sb.Characters {
+				if d, ok := charDescMap[cid]; ok {
+					charDescParts = append(charDescParts, d)
+				}
+				if v, ok := charVoiceMap[cid]; ok {
+					charVoiceParts = append(charVoiceParts, v)
+				}
+			}
+			sb.CharacterDescs = strings.Join(charDescParts, "; ")
+			sb.CharacterVoiceStyles = strings.Join(charVoiceParts, "; ")
+			sb.NarratorVoiceProfile = narratorProfile
 
 			// 取出道具名称和描述用于 Prompt 生成
 			var propDescriptions string

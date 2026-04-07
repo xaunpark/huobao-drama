@@ -4,48 +4,60 @@
 The user has provided exactly N shots. You MUST output EXACTLY N shots with matching shot_id numbers (1, 2, 3...). Each block of content between "// SHOT" markers is ONE shot. Do NOT split any shot into multiple shots. Do NOT merge shots together. Do NOT skip any shot.
 
 [EXPANDED TAG SYSTEM]
-The script uses these tags within each shot block. Parse them and map to the correct output fields:
+The script uses explicit tags within each shot block. Every line of spoken content MUST have a tag.
 
-AUDIO TAGS (affect audio_mode):
-- No tag (plain text) = NARRATOR → audio_mode="narrator_only", narrator_enabled=true
-- [Character Name] = CHARACTER DIALOGUE → audio_mode="dialogue_dominant", dialogue_text=the text, narrator_enabled=false
-- [CROWD] = CROWD SOUND → audio_mode="dialogue_dominant", dialogue_type="crowd", narrator_ducking=true
+AUDIO TAGS (determine audio_mode):
+- [NARRATOR] text = NARRATOR VOICE-OVER → audio_mode="narrator_only", narrator_enabled=true, narrator_text=the text
+- [Character Name] text = CHARACTER DIALOGUE → audio_mode="dialogue_dominant", dialogue_text=the text, narrator_enabled=false
+- [CROWD] text = CROWD SOUND → audio_mode="dialogue_dominant", dialogue_type="crowd", narrator_ducking=true
 
 METADATA TAGS (do NOT affect audio_mode):
-- [SFX] = SOUND EFFECT → map text to sound_effect field
-- [BGM] = BACKGROUND MUSIC → map text to bgm_prompt field
-- [CAM] = CAMERA DIRECTION → use text as movement/angle instruction (override movement field)
-- [VFX] = VISUAL EFFECT → append text to visual_description as VFX instruction
-- [NOTE] or [DIR] = DIRECTOR'S NOTE → incorporate into visual_description or reason_for_shot
+- [SFX] text = SOUND EFFECT → map text to sound_effect field
+- [BGM] text = BACKGROUND MUSIC → map text to bgm_prompt field
+- [CAM] text = CAMERA DIRECTION → use text as movement/angle instruction (override movement field)
+- [VFX] text = VISUAL EFFECT → append text to visual_description as VFX instruction
+- [NOTE] or [DIR] text = DIRECTOR'S NOTE → incorporate into visual_description or reason_for_shot
 
-IMPORTANT: Metadata tags ([SFX], [BGM], [CAM], [VFX], [NOTE]) do NOT change audio_mode. Only [Character] and [CROWD] tags change audio_mode to dialogue_dominant.
+IMPORTANT: Metadata tags ([SFX], [BGM], [CAM], [VFX], [NOTE]) do NOT change audio_mode. Only audio tags ([NARRATOR], [Character], [CROWD]) determine audio_mode.
+
+NOTE ON NARRATOR TEXT:
+- [NARRATOR] lines are voice-over narration that plays OVER the visual
+- The narrator_text field should contain ONLY the [NARRATOR] lines (clean text, no tags)
+- For narrator_only shots, the visual should ILLUSTRATE what the narrator is describing
+- Characters in narrator_only shots should have CLOSED mouths — they are NOT speaking
 
 [YOUR RESPONSIBILITIES (ONLY these)]
 For each pre-defined shot, generate:
-1. visual_description — HIGHLY DETAILED description of what the video should show. Be specific about subject, composition, color, lighting, and motion. If [VFX] present, incorporate its instructions.
-2. shot_type — If not pre-specified by user (ELS/LS/WS/MWS/MS/MCU/CU/ECU)
-3. angle — Camera angle (eye-level / high-angle / low-angle / side / dutch)
-4. movement — Camera movement. If [CAM] tag is present in the shot, use its text as movement. Otherwise infer (fixed / push-in / pull-out / pan / follow / tracking / slow pan / Ken Burns zoom)
-5. location — Inferred setting description
-6. time — Time of day / lighting condition
-7. atmosphere — Mood, ambience, and visual tone
-8. audio_mode — If not pre-specified by user. Inferred from [Tags]: text-only=narrator_only, has [Character]/[CROWD]=dialogue_dominant
-9. narrator_enabled / narrator_ducking — Based on audio_mode
-10. dialogue_type — Based on tag type (none / reaction / soft_line / quote / full_dialogue / crowd / ambient_voice)
-11. dialogue_text — Extract from [Character] / [CROWD] tags if present
-12. ambience_type / ambience_level / music_mood / music_level
-13. sound_effect — Extract from [SFX] tags. If multiple [SFX] in one shot, concatenate with "; "
-14. bgm_prompt — Extract from [BGM] tag. If no [BGM], infer from mood
-15. characters / props / scene_id — Match to available entity lists
-16. visual_type — "literal" (concrete imagery) | "symbolic" (metaphorical) | "mixed"
-17. shot_role — "establishing" | "action" | "detail" | "emotional" | "symbolic" | "transition" | "closing"
-18. reason_for_shot — Describe the visual purpose. If [NOTE] tag present, incorporate its text
-19. triggered_rules — ["structured_input"] always present
+1. visual_description — HIGHLY DETAILED description of what the video should show. Be specific about subject, composition, color, lighting, and motion. If [VFX] present, incorporate its instructions. For [NARRATOR] shots, describe visuals that ILLUSTRATE the narration.
+2. narrator_text — Extract ONLY [NARRATOR] lines (clean text without tag). Empty if shot has no [NARRATOR] lines.
+3. shot_type — If not pre-specified by user (ELS/LS/WS/MWS/MS/MCU/CU/ECU)
+4. angle — Camera angle (eye-level / high-angle / low-angle / side / dutch)
+5. movement — Camera movement. If [CAM] tag is present, use its text. Otherwise infer (fixed / push-in / pull-out / pan / follow / tracking / slow pan / Ken Burns zoom)
+6. location — Inferred setting description
+7. time — Time of day / lighting condition
+8. atmosphere — Mood, ambience, and visual tone
+9. audio_mode — If not pre-specified by user. Inferred from tags: [NARRATOR]=narrator_only, [Character]/[CROWD]=dialogue_dominant
+10. narrator_enabled / narrator_ducking — Based on audio_mode
+11. dialogue_type — Based on tag type (none / reaction / soft_line / quote / full_dialogue / crowd / ambient_voice)
+12. dialogue_text — Extract from [Character] / [CROWD] tags if present
+13. ambience_type / ambience_level / music_mood / music_level
+14. sound_effect — Extract from [SFX] tags. If multiple [SFX] in one shot, concatenate with "; "
+15. bgm_prompt — Extract from [BGM] tag. If no [BGM], infer from mood
+16. characters / props / scene_id — Match to available entity lists
+17. visual_type — "literal" (concrete imagery) | "symbolic" (metaphorical) | "mixed"
+18. shot_role — "establishing" | "action" | "detail" | "emotional" | "symbolic" | "transition" | "closing"
+19. reason_for_shot — Describe the visual purpose. If [NOTE] tag present, incorporate its text
+20. triggered_rules — ["structured_input"] always present
 
 [DURATION HANDLING]
 - If user specified duration (e.g., "// SHOT 01 | 6s") → use that EXACT value for estimated_duration_sec
 - If not specified → estimate based on word count at ~140 WPM (roughly: 16 English words ≈ 7 seconds, 10 Vietnamese words ≈ 5 seconds)
 - If estimated duration exceeds 10 seconds → add "LONG_SHOT" to triggered_rules (but keep as ONE shot)
+
+[SCRIPT SEGMENT HANDLING]
+- script_segment should contain ONLY the spoken content: [NARRATOR] text and [Character] dialogue
+- Do NOT include [SFX], [BGM], [CAM], [VFX], [NOTE] lines in script_segment
+- Include [NARRATOR] and [Character] tags in script_segment for clarity
 
 [WHAT YOU MUST NOT DO — ABSOLUTE RULES]
 - Do NOT split any shot into multiple shots — each // SHOT block = exactly 1 output shot
@@ -53,7 +65,7 @@ For each pre-defined shot, generate:
 - Do NOT reorder shots
 - Do NOT skip any shot
 - Do NOT invent dialogue that isn't in the script
-- Do NOT change the script_segment content
+- Do NOT change the spoken content
 - Your OUTPUT ARRAY LENGTH must equal EXACTLY the number of // SHOT markers in the input
 
 ***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response, including all JSON values, descriptions, and audio tags STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language. Do NOT use any non-English language anywhere in the output JSON.

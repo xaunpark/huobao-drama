@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/drama-generator/backend/domain/models"
 )
@@ -130,12 +131,58 @@ func (s *StoryboardService) UpdateStoryboard(storyboardID string, updates map[st
 	if sb.Duration == 0 {
 		sb.Duration = storyboard.Duration
 	}
+	// Voice-over fields: always load from DB for video prompt generation
+	if storyboard.NarratorScript != nil {
+		sb.NarratorScript = *storyboard.NarratorScript
+	}
+	if storyboard.AudioMode != nil {
+		sb.AudioMode = *storyboard.AudioMode
+	}
+
+	// Load character visual descriptions and voice styles for video prompt
+	var charIDs []uint
+	if err := s.db.Table("storyboard_characters").
+		Where("storyboard_id = ?", storyboard.ID).
+		Pluck("character_id", &charIDs).Error; err == nil && len(charIDs) > 0 {
+		sb.CharacterDescs = s.buildCharacterDescs(charIDs)
+		// Build voice styles
+		var chars []models.Character
+		if err := s.db.Where("id IN ?", charIDs).Find(&chars).Error; err == nil {
+			var voiceParts []string
+			for _, c := range chars {
+				if c.VoiceStyle != nil && *c.VoiceStyle != "" {
+					voiceParts = append(voiceParts, c.Name+": "+*c.VoiceStyle)
+				}
+			}
+			sb.CharacterVoiceStyles = strings.Join(voiceParts, "; ")
+		}
+	}
+
+	// Load narrator voice profile from Drama
+	var episode models.Episode
+	if err := s.db.Select("drama_id").First(&episode, storyboard.EpisodeID).Error; err == nil {
+		sb.NarratorVoiceProfile = s.loadNarratorVoiceProfile(episode.DramaID)
+	}
 
 	// 只有在不是 AI 生成的情况下，才根据内容自动生成简单的 video_prompt
 	// 或者如果 updates 中明确传了新的 video_prompt，则使用那个（见上文）
 	if _, hasNewPrompt := updates["video_prompt"]; !hasNewPrompt {
 		if storyboard.VideoPromptSource != "ai" {
 			videoPrompt := s.generateVideoPrompt(sb)
+
+			// Safeguard: ensure narrator text is in video prompt for narrator shots
+			if sb.NarratorScript != "" && !strings.Contains(videoPrompt, "Narration") {
+				s.log.Warnw("UpdateStoryboard: Narrator text missing from video prompt — injecting safeguard",
+					"storyboard_id", storyboardID,
+					"narrator_script_len", len(sb.NarratorScript),
+					"audio_mode", sb.AudioMode,
+				)
+				videoPrompt = strings.Replace(videoPrompt,
+					"The character's mouth is completely closed, silent scene. --no talking, speaking, moving lips",
+					fmt.Sprintf("Narration (voice-over): %s. The character's mouth is strictly closed, silent expression, purely visual acting, no speaking, voiceover scene. --no talking, speaking, moving lips, open mouth, chatting", sb.NarratorScript),
+					1)
+			}
+
 			updateData["video_prompt"] = videoPrompt
 			updateData["video_prompt_source"] = "auto"
 		}

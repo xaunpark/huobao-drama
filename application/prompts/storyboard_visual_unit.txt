@@ -109,3 +109,5 @@ VISUAL-AUDIO SYNC:
 - narrator_only shots → prefer Wide Shot / Extreme Long Shot (show scale/setting) or Medium Shot (for gentle pacing)
 - dialogue_dominant shots → Medium Close-up / Close-up (see expressions, lip-sync ready)
 - When audio_mode changes → visual shot size SHOULD also change
+
+***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response, including all JSON values, descriptions, and audio tags STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language. Do NOT use any non-English language anywhere in the output JSON.

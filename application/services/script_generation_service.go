@@ -116,8 +116,9 @@ func (s *ScriptGenerationService) processCharacterGeneration(taskID string, req 
 
 	s.log.Infow("AI response received for character generation", "length", len(text), "preview", text[:minInt(200, len(text))], "task_id", taskID)
 
-	// AI直接返回数组格式
-	var result []struct {
+	// AI returns object format: {narrator_voice_profile: "...", characters: [...]}
+	// Also support legacy array format for backward compatibility
+	type extractedChar struct {
 		Name        string `json:"name"`
 		Role        string `json:"role"`
 		Description string `json:"description"`
@@ -126,14 +127,39 @@ func (s *ScriptGenerationService) processCharacterGeneration(taskID string, req 
 		VoiceStyle  string `json:"voice_style"`
 	}
 
-	if err := utils.SafeParseAIJSON(text, &result); err != nil {
-		s.log.Errorw("Failed to parse characters JSON", "error", err, "raw_response", text[:minInt(500, len(text))], "task_id", taskID)
-		s.taskService.UpdateTaskStatus(taskID, "failed", 0, "解析AI返回结果失败: " + err.Error())
-		return
+	var charList []extractedChar
+	var narratorProfile string
+
+	// Try object format first
+	var objectResult struct {
+		NarratorVoiceProfile string          `json:"narrator_voice_profile"`
+		Characters           []extractedChar `json:"characters"`
+	}
+	if err := utils.SafeParseAIJSON(text, &objectResult); err == nil && len(objectResult.Characters) > 0 {
+		charList = objectResult.Characters
+		narratorProfile = objectResult.NarratorVoiceProfile
+	} else {
+		// Fallback: try array format
+		if err := utils.SafeParseAIJSON(text, &charList); err != nil {
+			s.log.Errorw("Failed to parse characters JSON", "error", err, "raw_response", text[:minInt(500, len(text))], "task_id", taskID)
+			s.taskService.UpdateTaskStatus(taskID, "failed", 0, "解析AI返回结果失败: "+err.Error())
+			return
+		}
+	}
+
+	// Save narrator voice profile to Drama if extracted
+	if narratorProfile != "" {
+		dramaID, _ := strconv.ParseUint(req.DramaID, 10, 32)
+		if err := s.db.Model(&models.Drama{}).Where("id = ?", uint(dramaID)).
+			Update("narrator_voice_profile", narratorProfile).Error; err != nil {
+			s.log.Warnw("Failed to save narrator voice profile", "error", err, "drama_id", req.DramaID)
+		} else {
+			s.log.Infow("Narrator voice profile saved", "drama_id", req.DramaID, "profile", narratorProfile)
+		}
 	}
 
 	var characters []models.Character
-	for _, char := range result {
+	for _, char := range charList {
 		// 检查角色是否已存在
 		var existingChar models.Character
 		err := s.db.Where("drama_id = ? AND name = ?", req.DramaID, char.Name).First(&existingChar).Error
@@ -181,12 +207,13 @@ func (s *ScriptGenerationService) processCharacterGeneration(taskID string, req 
 
 	// 更新任务状态为完成
 	resultData := map[string]interface{}{
-		"characters": characters,
-		"count":      len(characters),
+		"characters":             characters,
+		"count":                  len(characters),
+		"narrator_voice_profile": narratorProfile,
 	}
 	s.taskService.UpdateTaskResult(taskID, resultData)
 
-	s.log.Infow("Character generation completed", "task_id", taskID, "drama_id", req.DramaID, "character_count", len(characters))
+	s.log.Infow("Character generation completed", "task_id", taskID, "drama_id", req.DramaID, "character_count", len(characters), "has_narrator_profile", narratorProfile != "")
 }
 
 // GenerateScenesForEpisode 已废弃，使用 StoryboardService.GenerateStoryboard 替代

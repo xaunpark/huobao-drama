@@ -293,13 +293,40 @@ func (s *VideoGenerationService) ProcessVideoGeneration(videoGenID uint) {
 	}
 
 	// 构造imageURL参数（单图模式使用，其他模式传空字符串）
-	// 如果是本地图片，转换为base64
+	// 优先使用本地路径，避免外部URL过期导致 PUBLIC_ERROR_IP_INPUT_IMAGE
 	imageURL := ""
 	if videoGen.ImageURL != nil {
-		base64Image, err := s.convertImageToBase64(*videoGen.ImageURL)
+		resolvedImagePath := *videoGen.ImageURL
+
+		// 如果存储的是外部URL（非本地路径），尝试从关联的ImageGeneration查找local_path
+		if strings.HasPrefix(resolvedImagePath, "http://") || strings.HasPrefix(resolvedImagePath, "https://") {
+			if videoGen.ImageGenID != nil {
+				var imgGen models.ImageGeneration
+				if err := s.db.Select("local_path, image_url").Where("id = ?", *videoGen.ImageGenID).First(&imgGen).Error; err == nil {
+					if imgGen.LocalPath != nil && *imgGen.LocalPath != "" {
+						s.log.Infow("Using local_path from ImageGeneration instead of external URL",
+							"id", videoGenID,
+							"image_gen_id", *videoGen.ImageGenID,
+							"local_path", *imgGen.LocalPath,
+							"original_url_prefix", resolvedImagePath[:min(len(resolvedImagePath), 80)])
+						resolvedImagePath = *imgGen.LocalPath
+					}
+				}
+			}
+		}
+
+		s.log.Infow("Resolving image for video generation",
+			"id", videoGenID,
+			"resolved_path", resolvedImagePath[:min(len(resolvedImagePath), 80)],
+			"is_local", !strings.HasPrefix(resolvedImagePath, "http"))
+
+		base64Image, err := s.convertImageToBase64(resolvedImagePath)
 		if err != nil {
-			s.log.Warnw("Failed to convert image to base64, using original URL", "error", err)
-			imageURL = *videoGen.ImageURL
+			s.log.Errorw("Failed to convert image to base64",
+				"error", err,
+				"id", videoGenID,
+				"resolved_path", resolvedImagePath[:min(len(resolvedImagePath), 80)])
+			imageURL = resolvedImagePath
 		} else {
 			imageURL = base64Image
 		}
