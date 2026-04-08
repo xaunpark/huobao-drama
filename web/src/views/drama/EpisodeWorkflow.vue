@@ -2030,36 +2030,32 @@ const extractCharactersAndBackgrounds = async () => {
   try {
     const episodeId = currentEpisode.value.id;
 
-    // 改为串行执行，避免本地AI(如Locally AI)并发请求时报"no workers online"错误
-    ElMessage.success("正在创建角色提取任务...");
-    const characterTask = await generationAPI.generateCharacters({
-      drama_id: dramaId.toString(),
-      episode_id: Number(episodeId),
-      outline: currentEpisode.value.script_content || "",
-      count: 0,
-      model: selectedTextModel.value, // 传递用户选择的文本模型
-    });
+    ElMessage.success("正在同时创建角色、场景、道具提取任务...");
+    
+    const [characterTask, backgroundTask, propTask] = await Promise.all([
+      generationAPI.generateCharacters({
+        drama_id: dramaId.toString(),
+        episode_id: Number(episodeId),
+        outline: currentEpisode.value.script_content || "",
+        count: 0,
+        model: selectedTextModel.value,
+      }),
+      dramaAPI.extractBackgrounds(
+        episodeId.toString(),
+        selectedTextModel.value,
+      ),
+      propAPI.extractFromScript(
+        typeof episodeId === 'string' ? parseInt(episodeId) : episodeId,
+      )
+    ]);
 
-    ElMessage.success("角色提取任务正在处理...");
-    await pollExtractTask(characterTask.task_id, "character");
+    ElMessage.success("所有提取任务已创建，正在处理中...");
 
-    ElMessage.success("角色提取完成，正在创建场景提取任务...");
-    const backgroundTask = await dramaAPI.extractBackgrounds(
-      episodeId.toString(),
-      selectedTextModel.value,
-    ); // 传递用户选择的文本模型
-
-    ElMessage.success("场景提取任务正在处理...");
-    await pollExtractTask(backgroundTask.task_id, "background");
-
-    // 提取道具（串行执行，在场景提取完成后）
-    ElMessage.success("场景提取完成，正在创建道具提取任务...");
-    const propTask = await propAPI.extractFromScript(
-      typeof episodeId === 'string' ? parseInt(episodeId) : episodeId,
-    );
-
-    ElMessage.success("道具提取任务正在处理...");
-    await pollExtractTask(propTask.task_id, "prop");
+    await Promise.all([
+      pollExtractTask(characterTask.task_id, "character"),
+      pollExtractTask(backgroundTask.task_id, "background"),
+      pollExtractTask(propTask.task_id, "prop")
+    ]);
 
     ElMessage.success($t("workflow.charactersAndScenesExtractSuccess"));
     await loadDramaData();
