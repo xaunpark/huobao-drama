@@ -248,45 +248,65 @@ func (s *VideoGenerationService) ProcessVideoGeneration(videoGenID uint) {
 		opts = append(opts, video.WithSeed(*videoGen.Seed))
 	}
 
+	if videoGen.GenerationMode != nil {
+		opts = append(opts, video.WithGenerationMode(*videoGen.GenerationMode))
+	} else if videoGen.ReferenceMode != nil {
+		opts = append(opts, video.WithGenerationMode(*videoGen.ReferenceMode))
+	}
+
+	bypassBase64 := videoGen.Provider == "flow-tool"
+
 	// 根据参考图模式添加相应的选项，并将本地图片转换为base64
 	if videoGen.ReferenceMode != nil {
 		switch *videoGen.ReferenceMode {
 		case "first_last":
-			// 首尾帧模式 - 转换本地图片为base64
+			// 首尾帧模式
 			if videoGen.FirstFrameURL != nil {
-				firstFrameBase64, err := s.convertImageToBase64(*videoGen.FirstFrameURL)
-				if err != nil {
-					s.log.Warnw("Failed to convert first frame to base64, using original URL", "error", err)
+				if bypassBase64 {
 					opts = append(opts, video.WithFirstFrame(*videoGen.FirstFrameURL))
 				} else {
-					opts = append(opts, video.WithFirstFrame(firstFrameBase64))
+					firstFrameBase64, err := s.convertImageToBase64(*videoGen.FirstFrameURL)
+					if err != nil {
+						s.log.Warnw("Failed to convert first frame to base64, using original URL", "error", err)
+						opts = append(opts, video.WithFirstFrame(*videoGen.FirstFrameURL))
+					} else {
+						opts = append(opts, video.WithFirstFrame(firstFrameBase64))
+					}
 				}
 			}
 			if videoGen.LastFrameURL != nil {
-				lastFrameBase64, err := s.convertImageToBase64(*videoGen.LastFrameURL)
-				if err != nil {
-					s.log.Warnw("Failed to convert last frame to base64, using original URL", "error", err)
+				if bypassBase64 {
 					opts = append(opts, video.WithLastFrame(*videoGen.LastFrameURL))
 				} else {
-					opts = append(opts, video.WithLastFrame(lastFrameBase64))
+					lastFrameBase64, err := s.convertImageToBase64(*videoGen.LastFrameURL)
+					if err != nil {
+						s.log.Warnw("Failed to convert last frame to base64, using original URL", "error", err)
+						opts = append(opts, video.WithLastFrame(*videoGen.LastFrameURL))
+					} else {
+						opts = append(opts, video.WithLastFrame(lastFrameBase64))
+					}
 				}
 			}
 		case "multiple":
-			// 多图模式 - 转换本地图片为base64
+			// 多图模式
 			if videoGen.ReferenceImageURLs != nil {
 				var imageURLs []string
 				if err := json.Unmarshal([]byte(*videoGen.ReferenceImageURLs), &imageURLs); err == nil {
-					var base64Images []string
-					for _, imgURL := range imageURLs {
-						base64Img, err := s.convertImageToBase64(imgURL)
-						if err != nil {
-							s.log.Warnw("Failed to convert reference image to base64, using original URL", "error", err, "url", imgURL)
-							base64Images = append(base64Images, imgURL)
-						} else {
-							base64Images = append(base64Images, base64Img)
+					if bypassBase64 {
+						opts = append(opts, video.WithReferenceImages(imageURLs))
+					} else {
+						var base64Images []string
+						for _, imgURL := range imageURLs {
+							base64Img, err := s.convertImageToBase64(imgURL)
+							if err != nil {
+								s.log.Warnw("Failed to convert reference image to base64, using original URL", "error", err, "url", imgURL)
+								base64Images = append(base64Images, imgURL)
+							} else {
+								base64Images = append(base64Images, base64Img)
+							}
 						}
+						opts = append(opts, video.WithReferenceImages(base64Images))
 					}
-					opts = append(opts, video.WithReferenceImages(base64Images))
 				}
 			}
 		}
@@ -320,15 +340,19 @@ func (s *VideoGenerationService) ProcessVideoGeneration(videoGenID uint) {
 			"resolved_path", resolvedImagePath[:min(len(resolvedImagePath), 80)],
 			"is_local", !strings.HasPrefix(resolvedImagePath, "http"))
 
-		base64Image, err := s.convertImageToBase64(resolvedImagePath)
-		if err != nil {
-			s.log.Errorw("Failed to convert image to base64",
-				"error", err,
-				"id", videoGenID,
-				"resolved_path", resolvedImagePath[:min(len(resolvedImagePath), 80)])
+		if bypassBase64 {
 			imageURL = resolvedImagePath
 		} else {
-			imageURL = base64Image
+			base64Image, err := s.convertImageToBase64(resolvedImagePath)
+			if err != nil {
+				s.log.Errorw("Failed to convert image to base64",
+					"error", err,
+					"id", videoGenID,
+					"resolved_path", resolvedImagePath[:min(len(resolvedImagePath), 80)])
+				imageURL = resolvedImagePath
+			} else {
+				imageURL = base64Image
+			}
 		}
 	}
 
@@ -361,17 +385,6 @@ func (s *VideoGenerationService) ProcessVideoGeneration(videoGenID uint) {
 			} else if *imageGen.FrameType == "key" {
 				referenceMode = "key_frame_style"
 				s.log.Infow("Detected key frame image in single mode", "id", videoGenID)
-			}
-
-			// 对于 flow-tool 提供商，如果是 action_sequence 或 key_frame_style，
-			// 我们希望将其作为参考图（R2V）发送，而不是起始帧（I2V_S）
-			if videoGen.Provider == "flow-tool" && (referenceMode == "action_sequence" || referenceMode == "key_frame_style") {
-				if imageURL != "" {
-					// 将单图 imageURL 转移到 ReferenceImageURLs 中以触发 R2V，并且清空 imageURL 防止触发 I2V_S
-					opts = append(opts, video.WithReferenceImages([]string{imageURL}))
-					imageURL = ""
-					s.log.Infow("Routed single image to R2V mode for flow-tool", "mode", referenceMode, "id", videoGenID)
-				}
 			}
 		}
 	}

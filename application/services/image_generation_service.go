@@ -204,12 +204,14 @@ func (s *ImageGenerationService) ProcessImageGeneration(imageGenID uint) {
 		referenceImagePaths = append([]string{*imageGen.LocalPath}, referenceImagePaths...)
 	}
 
+	bypassBase64 := imageGen.Provider == "flow-tool"
+
 	// 将所有参考图片路径转换为 base64（如果是本地路径）或保持原样（如果是 URL）
 	var referenceImages []string
 	for _, imgPath := range referenceImagePaths {
-		// 判断是否为 HTTP/HTTPS URL
-		if strings.HasPrefix(imgPath, "http://") || strings.HasPrefix(imgPath, "https://") {
-			// 保持 URL 原样
+		// 判断是否为 HTTP/HTTPS URL 或 flow-tool (bỏ qua base64)
+		if bypassBase64 || strings.HasPrefix(imgPath, "http://") || strings.HasPrefix(imgPath, "https://") {
+			// 保持 URL hoặc Local Path 原样
 			referenceImages = append(referenceImages, imgPath)
 		} else {
 			// 视为本地路径，转换为 base64

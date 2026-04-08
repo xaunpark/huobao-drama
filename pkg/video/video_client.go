@@ -39,6 +39,7 @@ type VideoOptions struct {
 	FirstFrameURL      string
 	LastFrameURL       string
 	ReferenceImageURLs []string
+	GenerationMode     string
 }
 
 type VideoOption func(*VideoOptions)
@@ -112,6 +113,12 @@ func WithLastFrame(url string) VideoOption {
 func WithReferenceImages(urls []string) VideoOption {
 	return func(o *VideoOptions) {
 		o.ReferenceImageURLs = urls
+	}
+}
+
+func WithGenerationMode(mode string) VideoOption {
+	return func(o *VideoOptions) {
+		o.GenerationMode = mode
 	}
 }
 
