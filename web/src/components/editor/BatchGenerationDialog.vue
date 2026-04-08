@@ -126,6 +126,7 @@ import { ElMessage } from 'element-plus'
 import JSZip from 'jszip'
 import axios from 'axios'
 import { useI18n } from 'vue-i18n'
+import { workerDelay } from '@/utils/worker-timer'
 import { dramaAPI } from '@/api/drama'
 import { generateFramePrompt } from '@/api/frame'
 import { imageAPI } from '@/api/image'
@@ -338,7 +339,7 @@ const processPrompt = async (sb: Storyboard) => {
       } else if (task.status === 'failed') {
         throw new Error(task.message || 'Prompt failed')
       }
-      await new Promise(r => setTimeout(r, 2000))
+      await workerDelay(2000)
     }
 
     let finalPrompt = ""
@@ -421,7 +422,7 @@ const processImage = async (sb: Storyboard, prompt: string) => {
       } else if (img?.status === 'failed') {
         throw new Error(img.error_msg || 'Image generation failed')
       }
-      await new Promise(r => setTimeout(r, 3000))
+      await workerDelay(3000)
     }
   } catch (e) {
     taskStates[sb.id].image = 'error'
@@ -487,7 +488,7 @@ const processVideo = async (sb: Storyboard, image: any) => {
       } else if (videoTask.status === 'failed') {
         throw new Error(videoTask.error_msg || 'Video generation failed')
       }
-      await new Promise(r => setTimeout(r, 5000))
+      await workerDelay(5000)
     }
   } catch (e) {
     taskStates[sb.id].video = 'error'
@@ -636,7 +637,7 @@ const startUpscaleAll = async () => {
           taskStates[sb.id].videoId = currentlyUpscaling.id
           let isUpscaled = false
           while (!isUpscaled && !shouldStop.value) {
-            await new Promise(r => setTimeout(r, 5000))
+            await workerDelay(5000)
             const check = await videoAPI.getVideo(currentlyUpscaling.id)
             if (check.status === 'completed' && check.is_upscaled) {
               isUpscaled = true
@@ -655,7 +656,7 @@ const startUpscaleAll = async () => {
           await videoAPI.upscaleVideo(targetVideo.id)
           let isUpscaled = false
           while (!isUpscaled && !shouldStop.value) {
-            await new Promise(r => setTimeout(r, 5000))
+            await workerDelay(5000)
             const check = await videoAPI.getVideo(targetVideo.id)
             if (check.status === 'completed' && check.is_upscaled) {
               isUpscaled = true

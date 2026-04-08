@@ -160,7 +160,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import {
@@ -172,6 +172,7 @@ import { dramaAPI } from '@/api/drama'
 import type { ImageGeneration, ImageStatus } from '@/types/image'
 import type { Drama } from '@/types/drama'
 import { getImageUrl } from '@/utils/image'
+import { workerSetInterval, workerClearInterval } from '@/utils/worker-timer'
 import GenerateImageDialog from './components/GenerateImageDialog.vue'
 import ImageDetailDialog from './components/ImageDetailDialog.vue'
 
@@ -291,6 +292,8 @@ const goBack = () => {
   router.back()
 }
 
+let imageListPollingTimer: number | null = null;
+
 onMounted(() => {
   const dramaId = route.query.drama_id as string
   if (dramaId) {
@@ -300,14 +303,19 @@ onMounted(() => {
   loadDramas()
   loadImages()
   
-  const interval = setInterval(() => {
+  imageListPollingTimer = workerSetInterval(() => {
     const hasProcessing = images.value.some(img => img.status === 'processing')
     if (hasProcessing) {
       loadImages()
     }
   }, 5000)
-  
-  return () => clearInterval(interval)
+})
+
+onBeforeUnmount(() => {
+  if (imageListPollingTimer !== null) {
+    workerClearInterval(imageListPollingTimer)
+    imageListPollingTimer = null
+  }
 })
 </script>
 

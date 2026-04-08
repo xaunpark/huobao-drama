@@ -129,6 +129,7 @@ import { taskAPI } from '@/api/task'
 import type { Storyboard } from '@/types/drama'
 import { useAISettings } from '@/composables/useAISettings'
 import { getImageUrl, getVideoUrl } from '@/utils/image'
+import { workerDelay } from '@/utils/worker-timer'
 
 const props = defineProps<{
   modelValue: boolean
@@ -333,7 +334,7 @@ const processPrompt = async (sb: Storyboard) => {
       } else if (task.status === 'failed') {
         throw new Error(task.message || 'Prompt extraction failed')
       }
-      await new Promise(r => setTimeout(r, 2000))
+      await workerDelay(2000)
     }
 
     const finalPrompt = result.single_frame?.prompt || ""
@@ -415,7 +416,7 @@ const processVideo = async (sb: Storyboard) => {
       } else if (videoTask.status === 'failed') {
         throw new Error(videoTask.error_msg || 'Generation failed')
       }
-      await new Promise(r => setTimeout(r, 5000))
+      await workerDelay(5000)
     }
   } catch (e) {
     taskStates[sb.id].video = 'error'
@@ -524,7 +525,7 @@ const startUpscaleAll = async () => {
           // Poll for completion
           let isFinished = false
           while (!isFinished && !shouldStop.value) {
-            await new Promise(r => setTimeout(r, 5000))
+            await workerDelay(5000)
             const check = await videoAPI.getVideo(target.id)
             if (check.status === 'completed' && check.is_upscaled) {
               isFinished = true
@@ -540,7 +541,7 @@ const startUpscaleAll = async () => {
           taskStates[sb.id].videoId = currentlyUpscaling.id
           let isFinished = false
           while (!isFinished && !shouldStop.value) {
-            await new Promise(r => setTimeout(r, 5000))
+            await workerDelay(5000)
             const check = await videoAPI.getVideo(currentlyUpscaling.id)
             if (check.status === 'completed' && check.is_upscaled) {
               isFinished = true

@@ -1504,6 +1504,7 @@ import type { Drama } from "@/types/drama";
 import { AppHeader } from "@/components/common";
 import { getImageUrl, hasImage } from "@/utils/image";
 import { useAISettings } from "@/composables/useAISettings";
+import { workerDelay, workerSetInterval, workerClearInterval } from "@/utils/worker-timer";
 
 const { maxConcurrentThreads } = useAISettings();
 
@@ -1995,7 +1996,7 @@ const pollImageStatus = async (
 
   for (let i = 0; i < maxAttempts; i++) {
     try {
-      await new Promise((resolve) => setTimeout(resolve, pollInterval));
+      await workerDelay(pollInterval);
 
       const imageGen = await imageAPI.getImage(imageGenId);
 
@@ -2093,7 +2094,7 @@ const pollExtractTask = async (
   const interval = 2000; // 每2秒查询一次
 
   for (let i = 0; i < maxAttempts; i++) {
-    await new Promise((resolve) => setTimeout(resolve, interval));
+    await workerDelay(interval);
 
     try {
       const task = await generationAPI.getTaskStatus(taskId);
@@ -2421,7 +2422,7 @@ const pollTaskStatus = async (taskId: string) => {
       if (task.status === "completed") {
         // 任务完成
         if (pollTimer) {
-          clearInterval(pollTimer);
+          workerClearInterval(pollTimer);
           pollTimer = null;
         }
         generatingShots.value = false;
@@ -2439,7 +2440,7 @@ const pollTaskStatus = async (taskId: string) => {
       } else if (task.status === "failed") {
         // 任务失败
         if (pollTimer) {
-          clearInterval(pollTimer);
+          workerClearInterval(pollTimer);
           pollTimer = null;
         }
         generatingShots.value = false;
@@ -2448,7 +2449,7 @@ const pollTaskStatus = async (taskId: string) => {
       // 否则继续轮询
     } catch (error: any) {
       if (pollTimer) {
-        clearInterval(pollTimer);
+        workerClearInterval(pollTimer);
         pollTimer = null;
       }
       generatingShots.value = false;
@@ -2460,7 +2461,7 @@ const pollTaskStatus = async (taskId: string) => {
   await checkStatus();
 
   // 每2秒轮询一次
-  pollTimer = setInterval(checkStatus, 2000);
+  pollTimer = workerSetInterval(checkStatus, 2000);
 };
 
 const regenerateShots = async () => {
@@ -2982,12 +2983,12 @@ const handleExtractScenes = async () => {
     // 自动刷新几次
     let checkCount = 0;
     const maxChecks = 5;
-    const checkInterval = setInterval(async () => {
+    const checkInterval = workerSetInterval(async () => {
       checkCount++;
       await loadDramaData();
 
       if (checkCount >= maxChecks) {
-        clearInterval(checkInterval);
+        workerClearInterval(checkInterval);
       }
     }, 3000);
   } catch (error: any) {

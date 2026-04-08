@@ -174,6 +174,7 @@ import { videoAPI } from '@/api/video'
 import { dramaAPI } from '@/api/drama'
 import type { VideoGeneration, VideoStatus } from '@/types/video'
 import type { Drama } from '@/types/drama'
+import { workerSetInterval, workerClearInterval } from '@/utils/worker-timer'
 import GenerateVideoDialog from './components/GenerateVideoDialog.vue'
 import VideoDetailDialog from './components/VideoDetailDialog.vue'
 
@@ -294,7 +295,7 @@ const goBack = () => {
 }
 
 const startPolling = () => {
-  pollInterval = setInterval(() => {
+  pollInterval = workerSetInterval(() => {
     const hasProcessing = videos.value.some(v => v.status === 'processing')
     if (hasProcessing) {
       loadVideos()
@@ -304,7 +305,7 @@ const startPolling = () => {
 
 const stopPolling = () => {
   if (pollInterval) {
-    clearInterval(pollInterval)
+    workerClearInterval(pollInterval)
     pollInterval = null
   }
 }

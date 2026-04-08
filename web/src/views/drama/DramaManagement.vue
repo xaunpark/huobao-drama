@@ -790,6 +790,7 @@ import {
   ImagePreview,
 } from "@/components/common";
 import { getImageUrl, hasImage } from "@/utils/image";
+import { workerSetInterval, workerClearInterval } from "@/utils/worker-timer";
 
 const router = useRouter();
 const route = useRoute();
@@ -856,14 +857,14 @@ const startPolling = (
   maxAttempts = 20,
   interval = 3000,
 ) => {
-  if (pollingTimer) clearInterval(pollingTimer);
+  if (pollingTimer) workerClearInterval(pollingTimer);
 
   let attempts = 0;
-  pollingTimer = setInterval(async () => {
+  pollingTimer = workerSetInterval(async () => {
     attempts++;
     await callback();
     if (attempts >= maxAttempts) {
-      if (pollingTimer) clearInterval(pollingTimer);
+      if (pollingTimer) workerClearInterval(pollingTimer);
       pollingTimer = null;
     }
   }, interval);
@@ -872,7 +873,7 @@ const startPolling = (
 // Clear timer on unmount
 import { onUnmounted } from "vue";
 onUnmounted(() => {
-  if (pollingTimer) clearInterval(pollingTimer);
+  if (pollingTimer) workerClearInterval(pollingTimer);
 });
 
 const loadDramaData = async () => {
@@ -1055,10 +1056,10 @@ const handleExtractCharacters = async () => {
 
     // 自动刷新几次
     let checkCount = 0;
-    const checkInterval = setInterval(() => {
+    const checkInterval = workerSetInterval(() => {
       loadDramaData();
       checkCount++;
-      if (checkCount > 10) clearInterval(checkInterval);
+      if (checkCount > 10) workerClearInterval(checkInterval);
     }, 5000);
   } catch (error: any) {
     ElMessage.error(error.message || "提取失败");
@@ -1093,10 +1094,10 @@ const handleExtractScenes = async () => {
 
     // 自动刷新几次
     let checkCount = 0;
-    const checkInterval = setInterval(() => {
+    const checkInterval = workerSetInterval(() => {
       loadScenes();
       checkCount++;
-      if (checkCount > 10) clearInterval(checkInterval);
+      if (checkCount > 10) workerClearInterval(checkInterval);
     }, 5000);
   } catch (error: any) {
     ElMessage.error(error.message || "提取失败");
@@ -1429,10 +1430,10 @@ const handleExtractProps = async () => {
 
     // 自动刷新几次
     let checkCount = 0;
-    const checkInterval = setInterval(() => {
+    const checkInterval = workerSetInterval(() => {
       loadDramaData();
       checkCount++;
-      if (checkCount > 10) clearInterval(checkInterval);
+      if (checkCount > 10) workerClearInterval(checkInterval);
     }, 5000);
   } catch (error: any) {
     ElMessage.error(error.message || t("common.failed"));

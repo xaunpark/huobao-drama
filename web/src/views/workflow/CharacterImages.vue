@@ -115,6 +115,7 @@ import { dramaAPI } from "@/api/drama";
 import { characterLibraryAPI } from "@/api/character-library";
 import type { Character } from "@/types/drama";
 import { getImageUrl, hasImage } from "@/utils/image";
+import { workerSetInterval, workerClearInterval } from "@/utils/worker-timer";
 
 const route = useRoute();
 const router = useRouter();
@@ -236,7 +237,7 @@ let pollingTimer: number | null = null;
 const startPolling = () => {
   if (pollingTimer) return;
 
-  pollingTimer = window.setInterval(async () => {
+  pollingTimer = workerSetInterval(async () => {
     try {
       const drama = await dramaAPI.get(dramaId);
       if (drama.characters) {
@@ -262,7 +263,7 @@ const startPolling = () => {
 
 const stopPolling = () => {
   if (pollingTimer) {
-    clearInterval(pollingTimer);
+    workerClearInterval(pollingTimer);
     pollingTimer = null;
   }
   batchGenerating.value = false;

@@ -727,6 +727,7 @@ import type { Drama, DramaStatus } from "@/types/drama";
 import { AppHeader } from "@/components/common";
 import { getImageUrl, hasImage } from "@/utils/image";
 import { useAISettings } from "@/composables/useAISettings";
+import { workerSetInterval, workerClearInterval } from "@/utils/worker-timer";
 
 const { maxConcurrentThreads } = useAISettings();
 
@@ -1357,7 +1358,7 @@ let characterPollingTimer: number | null = null;
 const startCharacterPolling = () => {
   if (characterPollingTimer) return;
 
-  characterPollingTimer = window.setInterval(async () => {
+  characterPollingTimer = workerSetInterval(async () => {
     try {
       await loadDramaData();
 
@@ -1400,7 +1401,7 @@ const startCharacterPolling = () => {
 
 const stopCharacterPolling = () => {
   if (characterPollingTimer) {
-    clearInterval(characterPollingTimer);
+    workerClearInterval(characterPollingTimer);
     characterPollingTimer = null;
   }
   batchGenerating.value = false;

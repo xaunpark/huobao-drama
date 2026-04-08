@@ -2243,6 +2243,7 @@ import {
 import { dramaAPI } from "@/api/drama";
 import { propAPI } from "@/api/prop";
 import { generateFramePrompt, type FrameType } from "@/api/frame";
+import { workerDelay, workerSetInterval, workerClearInterval } from "@/utils/worker-timer";
 import { imageAPI } from "@/api/image";
 import { videoAPI } from "@/api/video";
 import { aiAPI } from "@/api/ai";
@@ -3112,8 +3113,8 @@ const extractFramePrompt = async () => {
         } else if (task.status === "failed") {
           throw new Error(task.message || task.error || "生成失败");
         }
-        // 等待1秒后继续轮询
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        // 等待1秒后继续轮询 (workerDelay is immune to background tab throttling)
+        await workerDelay(1000);
       }
     };
 
@@ -3233,7 +3234,7 @@ const startPolling = () => {
   // 记录开始轮询时的帧类型
   pollingFrameType = selectedFrameType.value;
 
-  pollingTimer = setInterval(async () => {
+  pollingTimer = workerSetInterval(async () => {
     if (!currentStoryboard.value) {
       stopPolling();
       return;
@@ -3282,7 +3283,7 @@ const startPolling = () => {
 // 停止轮询
 const stopPolling = () => {
   if (pollingTimer) {
-    clearInterval(pollingTimer);
+    workerClearInterval(pollingTimer);
     pollingTimer = null;
   }
   pollingFrameType = null;
@@ -3893,7 +3894,7 @@ const loadStoryboardVideos = async (storyboardId: number) => {
 const startVideoPolling = () => {
   if (videoPollingTimer) return;
 
-  videoPollingTimer = setInterval(async () => {
+  videoPollingTimer = workerSetInterval(async () => {
     if (!currentStoryboard.value) {
       stopVideoPolling();
       return;
@@ -3948,7 +3949,7 @@ const startVideoPolling = () => {
 // 停止视频轮询
 const stopVideoPolling = () => {
   if (videoPollingTimer) {
-    clearInterval(videoPollingTimer);
+    workerClearInterval(videoPollingTimer);
     videoPollingTimer = null;
   }
 };
@@ -4103,21 +4104,21 @@ const handleGenerateRapidCut = async () => {
 };
 
 const pollRapidCutTask = (taskId: string) => {
-  const timer = setInterval(async () => {
+  const timer = workerSetInterval(async () => {
     try {
       const res = await taskAPI.getStatus(taskId);
       if (res.status === 'completed') {
-        clearInterval(timer);
+        workerClearInterval(timer);
         generatingRapidCut.value = false;
         ElMessage.success("Rapid Cut 生成完毕");
         await loadStoryboardsView('production');
       } else if (res.status === 'failed') {
-        clearInterval(timer);
+        workerClearInterval(timer);
         generatingRapidCut.value = false;
         ElMessage.error("Rapid Cut 生成失败: " + res.error);
       }
     } catch (error) {
-      clearInterval(timer);
+      workerClearInterval(timer);
       generatingRapidCut.value = false;
       console.error("轮询 Rapid Cut 状态失败:", error);
     }
@@ -4526,7 +4527,7 @@ const loadVideoMerges = async () => {
 const startMergePolling = () => {
   if (mergePollingTimer) return;
 
-  mergePollingTimer = setInterval(async () => {
+  mergePollingTimer = workerSetInterval(async () => {
     if (!episodeId.value) {
       stopMergePolling();
       return;
@@ -4556,7 +4557,7 @@ const startMergePolling = () => {
 // 停止视频合成列表轮询
 const stopMergePolling = () => {
   if (mergePollingTimer) {
-    clearInterval(mergePollingTimer);
+    workerClearInterval(mergePollingTimer);
     mergePollingTimer = null;
   }
 };
