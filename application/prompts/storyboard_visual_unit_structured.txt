@@ -43,7 +43,7 @@ For each pre-defined shot, generate:
 13. ambience_type / ambience_level / music_mood / music_level
 14. sound_effect — Extract from [SFX] tags. If multiple [SFX] in one shot, concatenate with "; "
 15. bgm_prompt — Extract from [BGM] tag. If no [BGM], infer from mood
-16. characters / props / scene_id — Match to available entity lists
+16. characters / props / scene_id — Match to available entity lists. When characters have state variants (e.g. "Truck (Empty)" vs "Truck (Loaded with Logs)"), select the variant matching the character's visual state in that shot. Orientation/movement changes (e.g. truck flipping) do NOT need a different variant.
 17. visual_type — "literal" (concrete imagery) | "symbolic" (metaphorical) | "mixed"
 18. shot_role — "establishing" | "action" | "detail" | "emotional" | "symbolic" | "transition" | "closing"
 19. reason_for_shot — Describe the visual purpose. If [NOTE] tag present, incorporate its text

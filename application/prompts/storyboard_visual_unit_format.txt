@@ -60,6 +60,11 @@
 
 **Entity Requirements**:
 - characters array must contain only valid IDs (integers) from the Available Character List. Use empty array [] if no characters.
+- When the Available Character List contains state variants of the same entity (e.g. "Truck (Empty)" ID=5, "Truck (Loaded with Logs)" ID=6), you MUST select the variant that matches the character's current visual state in that specific shot.
+  Example: If characters include ID=5 "Truck (Empty)" and ID=6 "Truck (Loaded with Logs)":
+  - Shot where workers are loading logs onto the truck → characters: [5] (truck is still empty at the start of loading)
+  - Shot where loaded truck drives on highway → characters: [6] (truck now has logs on it)
+  - Shot where loaded truck flips over → characters: [6] (still the loaded truck, just flipped — no new variant needed for orientation change)
 - props array must contain only valid IDs (integers) from the Available Prop List. Use empty array [] if no props.
 - scene_id must correspond strictly to a Valid Scene ID from the Extracted Scene Backgrounds list (use null if none fits)
 

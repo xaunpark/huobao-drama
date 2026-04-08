@@ -6,35 +6,103 @@ The output is a JSON object with two fields:
 2. characters: An array of character objects
 
 Each character object has these fields:
-- name: Character name (string)
+- name: Character name (string). If the character has visual state variants, use the format "BaseName (State)" — see [State Variant Rules] below.
 - role: Role classification (string: "main", "supporting", or "minor")
-- appearance: Detailed visual description for AI image generation (string, 150-300 words). Include: gender, age range, body type, facial features, hairstyle, hair color, eye color, skin tone, clothing style, signature accessories. DO NOT include background or environment.
-- personality: Core personality traits and behavioral patterns (string, 100-200 words)
-- description: Background story and character relationships (string, 100-200 words)
-- voice_style: Voice characteristics for TTS synthesis (string, 20-40 words). Include: gender, age impression, pitch, tone, pacing, accent. Example: "deep and calm", "bright and energetic", "soft and gentle with slight tremor"
+- appearance: Detailed visual description for AI image generation (string, 150-300 words). Include: gender, age range, body type, facial features, hairstyle, hair color, eye color, skin tone, clothing style, signature accessories. DO NOT include background or environment. For state variants, describe the character IN THAT SPECIFIC STATE — include the added/changed visual elements.
+- personality: Core personality traits and behavioral patterns (string, 100-200 words). For state variants, keep the same personality as the base character.
+- description: Background story and character relationships (string, 100-200 words). For state variants, briefly describe what state this is and how it differs from the base state.
+- voice_style: Voice characteristics for TTS synthesis (string, 20-40 words). For non-living entities (vehicles, objects), use "none".
 
-[Example]
+[State Variant Rules]
+When a character or entity undergoes a SIGNIFICANT VISUAL CHANGE across the story that adds or removes major visual elements attached to its body/surface, you MUST create a SEPARATE character entry for each visually distinct state.
+
+**Naming Convention:** "BaseName (State Description)"
+- The base/default state should also have a state qualifier: "Truck (Empty)", NOT just "Truck"
+- Each variant must have its own unique `appearance` describing that specific visual state
+
+**WHEN TO CREATE A STATE VARIANT — only when major visual elements are ADDED TO or REMOVED FROM the entity:**
+
+Example 1 — Vehicle with cargo changes:
+- "Truck (Empty)" → plain truck with empty flatbed
+- "Truck (Loaded with Logs)" → same truck but now with timber logs stacked high on the flatbed, secured with straps
+- "Truck (Towed by Rescue Vehicle)" → same truck now connected by heavy chains to a tow truck, being pulled
+
+Example 2 — Person with major outfit/equipment change:
+- "Knight (Casual Clothes)" → young man in linen tunic and leather boots
+- "Knight (Full Battle Armor)" → same man now wearing full plate armor, helmet, shield on back, sword at hip
+
+Example 3 — Animal with transformation:
+- "Caterpillar" → a green caterpillar with yellow stripes on a leaf
+- "Butterfly" → a monarch butterfly with orange-and-black wings (transformed from the caterpillar)
+
+Example 4 — Object with attached elements:
+- "Fishing Boat (Clean)" → small wooden fishing boat with nets
+- "Fishing Boat (Decorated for Festival)" → same boat now covered in colorful flags, lanterns, and flower garlands
+
+**WHEN NOT TO CREATE A STATE VARIANT — these are handled by video/shot prompts, NOT by creating new characters:**
+
+- Movement/position changes: truck driving vs truck parked — same entity, just moving
+- Orientation changes: truck standing upright vs truck flipped on its side — same entity, just rotated
+- Facial expressions: character smiling vs character crying — same face, just expression change
+- Temporary actions: character raising hand vs lowering hand — same character, momentary pose
+- Camera angle: close-up vs wide shot of same character — same character, different framing
+- Lighting: character in daylight vs character at night — same character, different environment (handled by Scene/Background)
+- Damage without added elements: a cracked window, a dented car — still the same object visually
+
+**Key test:** Would you need to DRAW ADDITIONAL OBJECTS on the reference image to accurately depict this state? If YES → create a variant. If NO → don't.
+
+[Example — Script with State Variants]
+Given a script about a logging truck adventure, the output should be:
 {
   "narrator_voice_profile": "Male, mid-30s, warm baritone, calm and authoritative documentary style, measured pacing with subtle dramatic emphasis on key moments",
   "characters": [
     {
-      "name": "Chen Wei",
+      "name": "Truck (Empty)",
       "role": "main",
-      "appearance": "A 28-year-old Chinese man with a lean, athletic build standing at approximately 180cm. He has sharp, angular facial features with high cheekbones and a strong jawline. His short black hair is slightly tousled and swept to one side. Dark brown almond-shaped eyes carry a determined, intense gaze. Light tan skin with a faint scar on his left temple. He typically wears a dark navy tactical jacket over a plain white t-shirt, with dark grey trousers and black boots. A worn leather watch on his left wrist is his only accessory. His posture is upright and alert, conveying quiet confidence.",
-      "personality": "Highly disciplined and strategic, Chen Wei rarely speaks unless necessary. He thinks several steps ahead and remains composed under pressure. Despite his cold exterior, he harbors deep loyalty to those he trusts and a strong sense of justice that drives his decisions.",
-      "description": "A former special forces operative who left the military after a mission gone wrong. Now working as an independent investigator, he uncovers a conspiracy that reaches into the highest levels of government. His estranged relationship with his younger sister creates an ongoing emotional subplot throughout the series.",
-      "voice_style": "deep and measured male voice, mid-20s, with slow deliberate pacing and a quiet intensity"
+      "appearance": "A large industrial flatbed truck with a bright red cab and chrome bumper. The cab has two round headlights and a tall exhaust pipe on the right side. The flatbed is empty and made of dark steel with wooden side rails. The truck has six large black rubber tires with muddy treads. A small company logo is painted in white on the driver door. The truck looks sturdy and well-maintained.",
+      "personality": "Not applicable — this is a vehicle.",
+      "description": "The main truck in its default empty state, before loading cargo. This is the base configuration seen at the start and after unloading.",
+      "voice_style": "none"
     },
     {
-      "name": "Lin Xiao",
+      "name": "Truck (Loaded with Logs)",
+      "role": "main",
+      "appearance": "A large industrial flatbed truck with a bright red cab and chrome bumper. The cab has two round headlights and a tall exhaust pipe on the right side. The flatbed is now stacked high with large brown timber logs, approximately 20 logs arranged in three layers and secured with thick orange ratchet straps. The logs extend slightly beyond the rear of the flatbed. Sawdust and bark fragments are scattered on the truck bed. The truck sits lower on its suspension due to the heavy load. Six large black rubber tires with muddy treads.",
+      "personality": "Not applicable — this is a vehicle.",
+      "description": "The truck after being loaded with timber logs at the logging site. The heavy cargo is the key visual difference from the empty state.",
+      "voice_style": "none"
+    },
+    {
+      "name": "Truck (Towed by Rescue Vehicle)",
+      "role": "main",
+      "appearance": "A large industrial flatbed truck with a bright red cab and chrome bumper, now with its empty flatbed. The truck's front wheels are lifted off the ground by a heavy-duty tow bar. A thick steel chain connects the truck's front axle to the rear of a yellow tow truck. The tow bar and chain are prominent visual elements linking the two vehicles together. The truck appears damaged with a cracked windshield and a dented front fender.",
+      "personality": "Not applicable — this is a vehicle.",
+      "description": "The truck after the accident, now being towed away by a rescue vehicle. The key visual elements are the tow chain, lifted front wheels, and connection to the rescue truck.",
+      "voice_style": "none"
+    },
+    {
+      "name": "Rescue Truck",
       "role": "supporting",
-      "appearance": "A 25-year-old Chinese woman with a slender frame and delicate features. She has long straight black hair reaching her waist, often worn loose or in a simple low ponytail. Large expressive dark eyes behind thin-framed round glasses. Fair porcelain skin with a small dimple on her right cheek. She favors smart-casual attire: tailored blazers in muted tones (beige, grey, dusty blue) over simple blouses, with straight-leg trousers and flat oxford shoes. She carries a worn leather messenger bag covered in small pins and stickers.",
-      "personality": "Curious and analytical, Lin Xiao approaches every situation like a puzzle to be solved. She is warm and empathetic with friends but can become intensely focused and oblivious to social cues when absorbed in a problem.",
-      "description": "A data analyst at a tech firm who becomes entangled in the conspiracy after discovering anomalies in company financial records. She serves as Chen Wei's reluctant informant and eventually a trusted ally.",
-      "voice_style": "light and bright young female voice, mid-20s, with quick speech tempo and occasional excited inflections"
+      "appearance": "A heavy-duty yellow tow truck with flashing orange emergency lights on the roof. It has a large hydraulic tow arm extending from the rear bed, currently engaged and lifting the red truck's front. The cab is yellow with black and white chevron safety stripes on the rear. Heavy steel bumpers front and back. The word 'RESCUE' is painted in large black letters on both sides.",
+      "personality": "Not applicable — this is a vehicle.",
+      "description": "The rescue/tow truck that arrives to help the damaged logging truck. It appears in the later scenes to tow the truck away.",
+      "voice_style": "none"
+    },
+    {
+      "name": "Driver Wang",
+      "role": "supporting",
+      "appearance": "A 45-year-old Chinese man with a stocky build and weathered tan skin. He has short-cropped grey-black hair and deep-set brown eyes with crow's feet wrinkles. A broad face with a flat nose and thick eyebrows. He wears a faded blue denim work jacket over a white undershirt, dark green cargo pants with multiple pockets, and heavy brown work boots. A yellow hard hat sits on his head. He has rough, calloused hands.",
+      "personality": "Hardworking and reliable, Wang has been driving trucks for over 20 years. He is calm under pressure and has a dry sense of humor.",
+      "description": "The logging truck driver who experiences the accident. He is a veteran driver who knows the mountain roads well.",
+      "voice_style": "deep and gravelly male voice, mid-40s, slow and steady pacing with a rural accent"
     }
   ]
 }
 
-***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response, including ALL JSON field values, STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language. Do NOT use Chinese or any other language in the output JSON.
+Notice in the example above:
+- "Truck" has 3 variants because each state has MAJOR VISUAL ELEMENTS added/changed (logs, tow chain+lifted wheels)
+- "Rescue Truck" has NO variants — it looks the same throughout the story
+- "Driver Wang" has NO variants — his outfit doesn't change, expressions are handled by video prompts
+- Variants share the same base description but each adds the specific visual elements of that state
 
+***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response, including ALL JSON field values, STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language. Do NOT use Chinese or any other language in the output JSON.
