@@ -178,5 +178,9 @@ export const dramaAPI = {
 
   deleteStoryboard(storyboardId: number) {
     return request.delete(`/storyboards/${storyboardId}`)
+  },
+
+  clearBatchData(episodeId: string) {
+    return request.post(`/episodes/${episodeId}/clear-generated-data`)
   }
 }

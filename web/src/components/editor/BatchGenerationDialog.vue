@@ -58,6 +58,9 @@
           <el-button type="info" plain :loading="isDownloadingZip" @click="downloadAllVideos">
              <el-icon><Download /></el-icon> {{ $t('professionalEditor.batch.downloadAll') }}
           </el-button>
+          <el-button type="danger" plain :disabled="isBatching" @click="clearBatchData">
+            <el-icon><Delete /></el-icon> {{ $t('professionalEditor.batch.resetAllData', 'Reset All Data') }}
+          </el-button>
           <el-button type="danger" plain v-if="isBatching" @click="stopBatch">
             {{ $t('professionalEditor.batch.stop') }}
           </el-button>
@@ -121,8 +124,8 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from 'vue'
-import { MagicStick, Download } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
+import { MagicStick, Download, Delete } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import JSZip from 'jszip'
 import axios from 'axios'
 import { useI18n } from 'vue-i18n'
@@ -185,6 +188,46 @@ const refreshStoryboardsFromDB = async () => {
   } catch (e) {
     console.warn('Failed to refresh storyboards from DB, using props data', e)
     localStoryboards.value = [...props.storyboards]
+  }
+}
+
+const clearBatchData = async () => {
+  if (isBatching.value) return;
+  
+  try {
+    await ElMessageBox.confirm(
+      t('professionalEditor.batch.resetConfirmMsg', 'Bạn có chắc chắn muốn xóa toàn bộ Dữ liệu đã tạo (Prompt Hình, Hình ảnh, Video) của phân cảnh này không? Hành động này sẽ đưa Storyboard về trạng thái gốc.'),
+      t('professionalEditor.batch.resetConfirmTitle', 'Xác nhận xóa dữ liệu'),
+      {
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
+        type: 'warning',
+      }
+    )
+    
+    // Prevent UI from overlapping actions
+    const loadingMessage = ElMessage({
+      message: t('professionalEditor.batch.resettingData', 'Đang dọn dẹp dữ liệu...'),
+      type: 'info',
+      duration: 0
+    })
+
+    try {
+      await dramaAPI.clearBatchData(props.episodeId.toString())
+      // Reload UI state purely from scratch
+      await refreshStoryboardsFromDB()
+      for(const id in taskStates) {
+        taskStates[id] = { prompt: 'pending', image: 'pending', video: 'pending', progress: 0 }
+      }
+      loadingMessage.close()
+      ElMessage.success(t('professionalEditor.batch.resetSuccess', 'Xóa thành công, toàn bộ shot đã về trạng thái chờ!'))
+    } catch (e: any) {
+      loadingMessage.close()
+      ElMessage.error(t('professionalEditor.batch.resetFailed', 'Xóa thất bại') + ': ' + (e.message || 'Unknown'))
+    }
+    
+  } catch (e) {
+    // cancelled by user
   }
 }
 

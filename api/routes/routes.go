@@ -143,6 +143,7 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 			episodes.GET("/:episode_id/storyboards", sceneHandler.GetStoryboardsForEpisode)
 			episodes.POST("/:episode_id/finalize", dramaHandler.FinalizeEpisode)
 			episodes.GET("/:episode_id/download", dramaHandler.DownloadEpisodeVideo)
+			episodes.POST("/:episode_id/clear-generated-data", storyboardHandler.ClearGeneratedData)
 			// Rapid Cut routes
 			episodes.POST("/:episode_id/rapid-cut", rapidCutHandler.GenerateRapidCut)
 			episodes.DELETE("/:episode_id/rapid-cut", rapidCutHandler.DeleteRapidCut)

@@ -115,3 +115,16 @@ func (h *StoryboardHandler) DeleteStoryboard(c *gin.Context) {
 
 	response.Success(c, nil)
 }
+
+// ClearGeneratedData clears all AI generated data (prompts, images, videos) for an episode's storyboards
+func (h *StoryboardHandler) ClearGeneratedData(c *gin.Context) {
+	episodeID := c.Param("episode_id")
+
+	if err := h.storyboardService.ClearGeneratedData(episodeID); err != nil {
+		h.log.Errorw("Failed to clear generated data", "error", err, "episode_id", episodeID)
+		response.InternalError(c, err.Error())
+		return
+	}
+
+	response.Success(c, gin.H{"message": "Generated data cleared successfully"})
+}

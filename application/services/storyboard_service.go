@@ -2125,6 +2125,31 @@ func (s *StoryboardService) DeleteStoryboard(storyboardID uint) error {
 	return nil
 }
 
+// ClearGeneratedData clears all AI generated data (prompts, images, videos) for an episode's storyboards
+func (s *StoryboardService) ClearGeneratedData(episodeID string) error {
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		// 1. Get all storyboard IDs for this episode
+		var sbIDs []uint
+		if err := tx.Model(&models.Storyboard{}).Where("episode_id = ?", episodeID).Pluck("id", &sbIDs).Error; err != nil {
+			return err
+		}
+		if len(sbIDs) == 0 {
+			return nil
+		}
+
+		// 2. Soft-delete generation records associated with these storyboards
+		tx.Where("storyboard_id IN ?", sbIDs).Delete(&models.ImageGeneration{})
+		tx.Where("storyboard_id IN ?", sbIDs).Delete(&models.VideoGeneration{})
+
+		// 3. Nullify storyboard references
+		if err := tx.Exec("UPDATE storyboards SET image_prompt = NULL, video_prompt = NULL, composed_image = NULL, video_url = NULL WHERE id IN ?", sbIDs).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
 func min(a, b int) int {
 	if a < b {
 		return a
