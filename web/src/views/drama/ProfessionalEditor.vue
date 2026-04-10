@@ -4209,6 +4209,9 @@ const selectScene = async (sceneId: number) => {
 };
 
 const selectStoryboard = (id: string) => {
+  if (currentStoryboardId.value !== id) {
+    selectedImagesForVideo.value = [];
+  }
   currentStoryboardId.value = id;
 };
 
