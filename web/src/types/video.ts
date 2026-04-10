@@ -31,7 +31,7 @@ export interface VideoGeneration {
   generation_mode?: 'direct_r2v' | 'shot_i2v'
 }
 
-export type VideoStatus = 'pending' | 'processing' | 'upscaling' | 'completed' | 'failed'
+export type VideoStatus = 'pending' | 'processing' | 'upscaling' | 'completed' | 'failed' | 'upscaled' | 'upscale_failed'
 
 export type VideoProvider = 'runway' | 'pika' | 'doubao' | 'openai'
 

@@ -251,7 +251,7 @@ func (s *AssetService) ImportFromVideoGen(videoGenID uint) (*models.Asset, error
 		return nil, fmt.Errorf("video generation not found")
 	}
 
-	if videoGen.Status != models.VideoStatusCompleted || videoGen.VideoURL == nil {
+	if (videoGen.Status != models.VideoStatusCompleted && videoGen.Status != models.VideoStatusUpscaled && videoGen.Status != models.VideoStatusUpscaleFailed) || (videoGen.VideoURL == nil && videoGen.LocalPath == nil) {
 		return nil, fmt.Errorf("video is not ready")
 	}
 
@@ -264,10 +264,15 @@ func (s *AssetService) ImportFromVideoGen(videoGenID uint) (*models.Asset, error
 		storyboardNum = &videoGen.Storyboard.StoryboardNumber
 	}
 
+	var url string
+	if videoGen.VideoURL != nil {
+		url = *videoGen.VideoURL
+	}
+
 	asset := &models.Asset{
 		Name:          fmt.Sprintf("Video_%d", videoGen.ID),
 		Type:          models.AssetTypeVideo,
-		URL:           *videoGen.VideoURL,
+		URL:           url,
 		LocalPath:     videoGen.LocalPath, // 同步 local_path 到 assets 表
 		DramaID:       &dramaID,
 		EpisodeID:     episodeID,

@@ -1681,7 +1681,7 @@
                               <VideoPlay />
                             </el-icon>
                           </div>
-                          <div v-if="video.is_upscaled" class="hd-badge">HD</div>
+                          <div v-if="video.status === 'upscaled' || video.is_upscaled" class="hd-badge">HD</div>
                         </div>
                         <div v-else class="image-placeholder">
                           <el-icon :size="32">
@@ -1692,9 +1692,9 @@
                         <!-- 视频操作按钮 -->
                         <div class="video-actions">
                           <div
-                            v-if="video.status === 'completed' || video.status === 'upscaling'"
+                            v-if="['completed', 'upscaling', 'upscaled', 'upscale_failed'].includes(video.status)"
                             class="add-to-assets-button"
-                            @click.stop="video.status === 'completed' && addVideoToAssets(video)"
+                            @click.stop="['completed', 'upscaled', 'upscale_failed'].includes(video.status) && addVideoToAssets(video)"
                             :style="{ opacity: video.status === 'upscaling' ? 0.5 : 1, cursor: video.status === 'upscaling' ? 'not-allowed' : 'pointer' }"
                           >
                             <el-icon
@@ -1714,16 +1714,16 @@
                             </el-icon>
                           </div>
                           <div
-                            v-if="(video.status === 'completed' && !video.is_upscaled) || video.status === 'upscaling'"
+                            v-if="['completed', 'upscale_failed'].includes(video.status) || video.status === 'upscaling'"
                             class="upscale-video-button"
                             title="提升画质 (Upscale)"
-                            @click.stop="video.status === 'completed' && handleUpscaleVideo(video)"
+                            @click.stop="['completed', 'upscale_failed'].includes(video.status) && handleUpscaleVideo(video)"
                             :style="{ cursor: video.status === 'upscaling' ? 'not-allowed' : 'pointer' }"
                           >
                             <el-icon v-if="video.status === 'upscaling'" :size="18" color="var(--el-color-primary)" class="is-loading"><Loading /></el-icon>
                             <el-icon v-else :size="18" color="var(--el-color-success)"><MagicStick /></el-icon>
                           </div>
-                          <div v-if="video.status !== 'completed' && video.status !== 'upscaling'"></div>
+                          <div v-if="!['completed', 'upscaling', 'upscaled', 'upscale_failed'].includes(video.status)"></div>
                           <!-- 删除按钮 -->
                           <div
                             class="delete-video-button"
@@ -3370,7 +3370,7 @@ const playVideo = (video: VideoGeneration) => {
 
 // 添加视频到素材库
 const addVideoToAssets = async (video: VideoGeneration) => {
-  if (video.status !== "completed" || !video.video_url) {
+  if (!['completed', 'upscaled', 'upscale_failed'].includes(video.status) || (!video.video_url && !video.local_path)) {
     ElMessage.warning("只能添加已完成的视频到素材库");
     return;
   }

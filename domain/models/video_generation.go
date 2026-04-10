@@ -62,11 +62,13 @@ type VideoGeneration struct {
 type VideoStatus string
 
 const (
-	VideoStatusPending    VideoStatus = "pending"
-	VideoStatusProcessing VideoStatus = "processing"
-	VideoStatusCompleted  VideoStatus = "completed"
-	VideoStatusFailed     VideoStatus = "failed"
-	VideoStatusUpscaling  VideoStatus = "upscaling"
+	VideoStatusPending       VideoStatus = "pending"
+	VideoStatusProcessing    VideoStatus = "processing"
+	VideoStatusCompleted     VideoStatus = "completed"
+	VideoStatusFailed        VideoStatus = "failed"
+	VideoStatusUpscaling     VideoStatus = "upscaling"
+	VideoStatusUpscaled      VideoStatus = "upscaled"
+	VideoStatusUpscaleFailed VideoStatus = "upscale_failed"
 )
 
 type VideoProvider string

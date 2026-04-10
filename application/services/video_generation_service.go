@@ -602,18 +602,20 @@ func (s *VideoGenerationService) completeVideoGeneration(videoGenID uint, videoU
 
 	// 数据库中保存原始URL和本地路径
 	updates := map[string]interface{}{
-		"status":     models.VideoStatusCompleted,
 		"video_url":  videoURL,
 		"local_path": localVideoPath,
 	}
 
 	// check if it was upscaling before setting to complete
 	var oldVideoGen models.VideoGeneration
+	targetStatus := models.VideoStatusCompleted
 	if err := s.db.First(&oldVideoGen, videoGenID).Error; err == nil {
 		if oldVideoGen.Status == models.VideoStatusUpscaling {
-			updates["is_upscaled"] = true
+			targetStatus = models.VideoStatusUpscaled
+			updates["is_upscaled"] = true // Keep for backward compatibility
 		}
 	}
+	updates["status"] = targetStatus
 
 	// 只有当 duration 大于 0 时才保存，避免保存无效的 0 值
 	if duration != nil && *duration > 0 {
@@ -657,8 +659,16 @@ func (s *VideoGenerationService) completeVideoGeneration(videoGenID uint, videoU
 }
 
 func (s *VideoGenerationService) updateVideoGenError(videoGenID uint, errorMsg string) {
+	var oldVideoGen models.VideoGeneration
+	targetStatus := models.VideoStatusFailed
+	if err := s.db.First(&oldVideoGen, videoGenID).Error; err == nil {
+		if oldVideoGen.Status == models.VideoStatusUpscaling {
+			targetStatus = models.VideoStatusUpscaleFailed
+		}
+	}
+
 	if err := s.db.Model(&models.VideoGeneration{}).Where("id = ?", videoGenID).Updates(map[string]interface{}{
-		"status":    models.VideoStatusFailed,
+		"status":    targetStatus,
 		"error_msg": errorMsg,
 	}).Error; err != nil {
 		s.log.Errorw("Failed to update video generation error", "error", err, "id", videoGenID)

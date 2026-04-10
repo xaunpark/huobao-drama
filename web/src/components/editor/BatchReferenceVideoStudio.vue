@@ -209,10 +209,10 @@ const initTaskStates = async () => {
         (!v.generation_mode && v.reference_mode === 'multiple')
       ) || []
 
-      const completedVidHd = r2vVideos.find((v: any) => v.status === 'completed' && v.is_upscaled)
+      const completedVidHd = r2vVideos.find((v: any) => v.status === 'upscaled' || (v.status === 'completed' && v.is_upscaled))
       const upscalingVid = r2vVideos.find((v: any) => v.status === 'upscaling')
       const completedVid = r2vVideos.find((v: any) => v.status === 'completed' && !v.is_upscaled)
-      const failedWithBase = r2vVideos.find((v: any) => (v.status === 'failed' || v.status === 'error') && (v.video_url || v.local_path))
+      const failedWithBase = r2vVideos.find((v: any) => v.status === 'upscale_failed' || ((v.status === 'failed' || v.status === 'error') && (v.video_url || v.local_path)))
 
       if (completedVidHd) {
         videoState = 'hd'
@@ -514,7 +514,7 @@ const startUpscaleAll = async () => {
       
       try {
         const vidRes = await videoAPI.listVideos({ storyboard_id: String(sb.id), page_size: 10 })
-        const target = vidRes.items?.find((v: any) => (v.status === 'completed' && !v.is_upscaled) || (v.status === 'failed' && (v.video_url || v.local_path)))
+        const target = vidRes.items?.find((v: any) => (v.status === 'completed' && !v.is_upscaled) || v.status === 'upscale_failed' || (v.status === 'failed' && (v.video_url || v.local_path)))
         const currentlyUpscaling = vidRes.items?.find((v: any) => v.status === 'upscaling')
 
         if (target && !currentlyUpscaling) {
@@ -527,7 +527,7 @@ const startUpscaleAll = async () => {
           while (!isFinished && !shouldStop.value) {
             await workerDelay(5000)
             const check = await videoAPI.getVideo(target.id)
-            if (check.status === 'completed' && check.is_upscaled) {
+            if (check.status === 'upscaled' || (check.status === 'completed' && check.is_upscaled)) {
               isFinished = true
               taskStates[sb.id].video = 'hd'
               taskStates[sb.id].progress = 100
@@ -543,7 +543,7 @@ const startUpscaleAll = async () => {
           while (!isFinished && !shouldStop.value) {
             await workerDelay(5000)
             const check = await videoAPI.getVideo(currentlyUpscaling.id)
-            if (check.status === 'completed' && check.is_upscaled) {
+            if (check.status === 'upscaled' || (check.status === 'completed' && check.is_upscaled)) {
               isFinished = true
               taskStates[sb.id].video = 'hd'
               taskStates[sb.id].progress = 100
@@ -609,9 +609,11 @@ const downloadAllVideos = async () => {
       } else {
         // Preference logic:
         // 1. HD (upscaled) vs non-HD
-        if (vid.is_upscaled && !currentBest.is_upscaled) {
+        const isVidHd = vid.status === 'upscaled' || vid.is_upscaled
+        const isCurrentBestHd = currentBest.status === 'upscaled' || currentBest.is_upscaled
+        if (isVidHd && !isCurrentBestHd) {
           bestVideos.set(sbId, vid)
-        } else if (vid.is_upscaled === currentBest.is_upscaled) {
+        } else if (isVidHd === isCurrentBestHd) {
           // If both same HD status, pick latest
           if (new Date(vid.created_at) > new Date(currentBest.created_at)) {
             bestVideos.set(sbId, vid)
