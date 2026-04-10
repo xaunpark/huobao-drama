@@ -1,0 +1,76 @@
+=== OUTPUT FORMAT ===
+
+You MUST return a valid JSON array of shot objects. No markdown, no explanation, just the JSON array.
+
+Each shot object must have these fields:
+
+```json
+[
+  {
+    "shot_id": 1,
+    "lyrics_block_id": 1,
+    "lyrics_text": "The wheels on the bus go round and round",
+    "timestamp_start": "0:12",
+    "timestamp_end": "0:15",
+    "duration_sec": 3,
+    "section_type": "verse",
+    "section_number": 1,
+    "verse_subject": "The Wheels",
+    "shot_role": "establishing",
+    "is_callback": false,
+    "callback_to_shot_id": null,
+    "visual_description": "Wide shot of a school bus driving down a country road. Wheels spinning rapidly. Rolling hills in the background, open sky above.",
+    "title": "Bus Wheels Spinning",
+    "shot_type": "LS",
+    "camera_movement": "static",
+    "animation_hint": "wheel_spin, bounce",
+    "overlay_text": "",
+    "location": "Country road",
+    "atmosphere": "Morning, outdoor, open road",
+    "bgm_prompt": "Upbeat children's melody, acoustic guitar",
+    "sound_effect": "Bus engine humming",
+    "transition_in": "hard_cut",
+    "characters": [1],
+    "props": [2],
+    "scene_id": 1
+  }
+]
+```
+
+=== FIELD DEFINITIONS ===
+
+shot_id: Sequential number starting from 1
+lyrics_block_id: Reference to the source lyrics block number from the analysis
+lyrics_text: The exact lyrics text this shot illustrates (empty for instrumental)
+timestamp_start: Start time in M:SS format
+timestamp_end: End time in M:SS format
+duration_sec: Duration in seconds (must be 2-5s, sum must match total lyrics duration)
+section_type: "verse" | "chorus" | "bridge" | "intro" | "outro" | "instrumental"
+section_number: Which verse/chorus number (1, 2, 3...)
+verse_subject: The subject of the current verse section (from section header)
+shot_role: "establishing" | "reveal" | "detail" | "group_payoff"
+is_callback: true if this shot repeats/references a previous shot (for cumulative songs)
+callback_to_shot_id: shot_id of the original shot being referenced (null if not callback)
+visual_description: Detailed visual description for AI image generation (REQUIRED, be very descriptive)
+title: Short descriptive title for the shot (2-5 words)
+shot_type: "ELS" | "LS" | "MS" | "CU" | "ECU" (Extreme Long / Long / Medium / Close-up / Extreme Close-up)
+camera_movement: "static" | "pan_left" | "pan_right" | "zoom_in" | "zoom_out" | "tilt_up" | "tilt_down"
+animation_hint: Comma-separated animation keywords (e.g. "lip_sync, bounce, wave, spin")
+overlay_text: On-screen text to display (onomatopoeia, refrains). Empty string if none.
+location: Scene location name
+atmosphere: Mood/lighting description
+bgm_prompt: Background music description
+sound_effect: Sound effects for this shot
+transition_in: "hard_cut" | "crossfade" (how this shot transitions from previous)
+characters: Array of character IDs from the provided character list
+props: Array of prop IDs from the provided prop list
+scene_id: Background scene ID from the provided scene list (null if no match)
+
+=== CRITICAL RULES ===
+
+1. Return ONLY the JSON array. No markdown code fences, no explanation text.
+2. Every lyrics block MUST be covered by at least one shot.
+3. Duration values MUST be integers (whole seconds).
+4. visual_description MUST be detailed enough for AI image generation (minimum 30 words).
+5. Characters and props arrays MUST only contain IDs from the provided lists.
+6. For instrumental blocks, lyrics_text should be empty but visual_description must describe the visual.

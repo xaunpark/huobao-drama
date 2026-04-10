@@ -260,6 +260,13 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID string
 
 	s.log.Infow("Processing storyboard generation", "task_id", taskID, "episode_id", episodeID, "split_mode", splitMode)
 
+	// Route to nursery_rhyme mode if selected
+	if splitMode == "nursery_rhyme" {
+		s.log.Infow("Using NURSERY_RHYME mode — lyrics-synced shot planning for children's music videos", "task_id", taskID)
+		s.processNurseryRhymeGeneration(taskID, episodeID, dramaID, model, scriptContent, characterList, sceneList, propList)
+		return
+	}
+
 	// Route to visual_unit mode if selected
 	if splitMode == "visual_unit" {
 		s.log.Infow("Using VISUAL_UNIT mode — AI Director voice-over shot planning", "task_id", taskID)

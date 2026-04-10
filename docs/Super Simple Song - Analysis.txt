@@ -1,0 +1,512 @@
+Dưới đây là phân tích chi tiết về DNA thị giác của video "Old MacDonald Had A Farm" từ kênh Super Simple Songs để phục vụ việc tái tạo bằng AI.
+
+## 1. KỸ THUẬT TẠO HÌNH ẢNH
+- **Phương pháp:** 2D Animation (Digital Illustration).
+- **Phong cách:** Cartoon/Vector art dành cho trẻ em. Nhân vật được tạo hình từ các khối hình học cơ bản, nét vẽ sạch sẽ.
+- **Mức độ photorealistic:** 1/10 (Hoàn toàn cách điệu).
+- **Dấu hiệu AI:** Không có (Hoàn toàn do họa sĩ vẽ và diễn hoạt).
+- **Chuyển động:** Chuyển động dạng cắt dán (cut-out animation), nhân vật di chuyển theo trục khớp đơn giản.
+- **Face-cam:** Không có.
+
+## 2. MÀU SẮC CHÍNH XÁC
+### 2a. Bảng màu Shadow/Dark zones:
+- **Shadow chính:** #4A3728 (Nâu sẫm cho bùn/gỗ).
+- **Shadow phụ:** #1E5631 (Xanh lá đậm cho bóng cây).
+- **Blacks:** Không bị lift, đen nguyên bản #000000 dùng cho viền mắt.
+
+### 2b. Bảng màu Highlight/Bright zones:
+- **Highlight chính:** #FFFFFF (Trắng tinh cho mắt, hàng rào).
+- **Glow/Bloom:** Không có. Các điểm sáng là các mảng màu đặc (flat color).
+
+### 2c. Bảng màu Midtone:
+- **Skin tones:** #FFDBAC (Màu da sáng của ông lão và cô bé).
+- **Cỏ/Đồi:** #92D050 (Xanh lá sáng).
+- **Bầu trời:** #A3E4F7 (Xanh cyan nhạt).
+
+### 2d. Bảng màu Accent / Brand Colors:
+- **Đỏ (#C00000):** Nhà kho và chữ "S" logo.
+- **Vàng (#FFC000):** Banjo và rơm.
+
+### 2e. Tỷ lệ màu trong frame:
+- **Phân bổ:** 20% tối, 50% trung tính, 30% sáng.
+- **Tổng thể:** High-key (Rất sáng và rõ ràng).
+- **Color grading:** Vibrant/Saturation cao, tạo cảm giác vui tươi, năng động.
+
+## 3. ÁNH SÁNG CHÍNH XÁC
+### 3a. Setup ánh sáng chủ đạo:
+- **Loại:** Ánh sáng môi trường phẳng (Flat lighting), không có hướng nắng gắt.
+- **Key light:** Tán xạ đều từ phía trước, tạo bóng đổ nhẹ dưới chân nhân vật (Drop shadow đơn giản).
+- **Rim/Back light:** Không có.
+
+### 3b. Biến thể ánh sáng:
+- **Ngoại cảnh (Farm):** Ánh sáng ban ngày rực rỡ, không mây.
+- **Nội thất (Nhà kho):** Ánh sáng ấm hơn một chút nhờ màu vàng của rơm, nhưng vẫn rất sáng.
+
+### 3c. Hiệu ứng đặc biệt:
+- Không sử dụng God rays, lens flare hay hiệu ứng khí quyển. Mọi thứ đều rõ nét ở mọi khoảng cách.
+
+## 4. TEXTURE & CHẤT LIỆU
+### 4a. Tổng thể:
+- **Độ phân giải:** 1080p+, cực kỳ sắc nét (Razor sharp).
+- **Texture rendering:** Hoàn toàn là màu phẳng (Flat) hoặc gradient rất nhẹ. Không có vân bề mặt phức tạp.
+
+### 4b. Các vật liệu chính:
+- **Da/Lông:** Mịn, không có lỗ chân lông hay chi tiết sợi (như heo, bò, cừu).
+- **Gỗ (Nhà kho):** Chỉ thể hiện bằng các đường thẳng song song đơn giản.
+- **Bùn:** Mảng màu nâu phẳng với các vết bắn cách điệu.
+
+## 5. FILM GRAIN & POST-PROCESSING
+- **Film grain:** 0/10 (Không có).
+- **Vignette/Aberration:** Không có.
+- **Depth of field:** Deep DoF (Tất cả các lớp tiền cảnh và hậu cảnh đều sắc nét như nhau).
+- **Aspect ratio:** 16:9.
+
+## 6. SO SÁNH VỚI CÁC STYLE QUEN THUỘC
+- **Show tương đương:** *Cocomelon*, *Little Baby Bum*, *Peppa Pig* (nhưng Super Simple có khối hình học rõ hơn).
+- **YouTube:** Kênh *Pinkfong*, *LooLoo Kids*.
+- **Nghệ thuật:** Vector Minimalism.
+
+## 7. SAMPLE PROMPT RECONSTRUCTION
+
+### Frame 1: Ông lão và Cô bé chơi nhạc trước nhà kho
+{
+  "frame_description": "Old MacDonald with white beard and a young girl playing banjo in front of a red barn.",
+  "full_prompt": "Flat 2D vector illustration, Super Simple Songs style, a cheerful old farmer with a long white beard and a young girl with red pigtails playing banjo and fiddle. Vibrant red barn background, yellow hay bales, bright green rolling hills under a clear blue cyan sky. Thick clean outlines, minimalist shading, high saturation, playful characters with large expressive eyes, 4k digital art for children.",
+  "negative_prompt": "photorealistic, 3d render, grainy, blurry, complex textures, dark shadows, moody lighting, messy lines.",
+  "recommended_model": "DALL-E 3 or Midjourney v6 (with --style raw)",
+  "recommended_settings": {"cfg_scale": 7, "steps": 30, "sampler": "Euler a"}
+}
+
+### Frame 2: Chú heo trong vũng bùn
+{
+  "frame_description": "A happy pink pig standing in a mud puddle inside a farm fence.",
+  "full_prompt": "Minimalist 2D cartoon of a cute plump pink pig with a curly tail, standing in a brown mud puddle. White wooden fence in the background, flat green grass, vibrant color palette. Style of children's nursery rhymes, clean vector lines, no gradients, soft drop shadow, bright and happy atmosphere, high definition illustration.",
+  "negative_prompt": "realistic fur, mud texture, complex background, cinematic lighting, adult theme, scary, distorted.",
+  "recommended_model": "Midjourney v6",
+  "recommended_settings": {"cfg_scale": 8, "steps": 25, "sampler": "DPM++ 2M Karras"}
+}
+
+### Frame 3: Chú bò trong nhà kho rơm
+{
+  "frame_description": "A brown cow with spots standing on yellow hay inside a wooden barn.",
+  "full_prompt": "Vector art of a friendly brown and white spotted cow in a barn. Yellow hay on the floor, red wooden walls, simple geometric shapes. Children's educational video aesthetic, bright primary colors, flat design, thick black outlines for eyes, cheerful expression, 2D digital painting, high contrast, clean and simple composition.",
+  "negative_prompt": "3D CGI, realistic cow, messy barn, dark lighting, low resolution, anatomical correctness.",
+  "recommended_model": "Flux.1 [dev]",
+  "recommended_settings": {"cfg_scale": 3.5, "steps": 28, "sampler": "Euler"}
+}
+
+
+==============
+
+
+Chào bạn, với tư cách là một Đạo diễn Hình ảnh (DP), tôi đã phân tích ngôn ngữ thị giác của video "Old MacDonald Had A Farm" từ kênh Super Simple Songs. Đây là một video hoạt hình 2D có tính toán kỹ lưỡng về mặt giáo dục thị giác cho trẻ nhỏ.
+
+Dưới đây là bản phân tích chi tiết:
+
+## 1. THỐNG KÊ CỠ CẢNH (Shot Size Distribution)
+
+Video tuân thủ cấu trúc kể chuyện rất rõ ràng qua các cỡ cảnh để giúp trẻ em dễ dàng nhận diện chủ thể.
+
+| Cỡ cảnh | Tần suất | % tổng | Dùng khi nào (context) |
+|----------|--------|--------|------------------------|
+| Extreme Wide Shot (EWS) | 6 | 10% | Thiết lập bối cảnh nông trại (phần đầu mỗi đoạn chuyển cảnh giữa các con vật). |
+| Wide Shot (WS) | 15 | 25% | Cảnh Old MacDonald và cô bé chơi nhạc cùng nhau. Cho thấy sự tương tác. |
+| Medium Wide (MWS) | 12 | 20% | Giới thiệu từng con vật mới (heo, vịt, ngựa...) trong môi trường của chúng. |
+| Close-Up (CU) | 20 | 35% | Đặc tả gương mặt con vật khi phát ra tiếng kêu ("oink", "quack"). Nhấn mạnh biểu cảm. |
+| Insert/Detail Shot | 5 | 8% | Đặc tả tay ông lão chơi vĩ cầm hoặc tay cô bé gảy đàn banjo. |
+| Text/Title Card | 2 | 2% | Logo đầu video và các chữ cái "E-I-E-I-O" xuất hiện trên màn hình. |
+
+## 2. THỐNG KÊ GÓC MÁY (Camera Angle)
+
+Vì đối tượng là trẻ em mầm non, góc máy được giữ cực kỳ ổn định để tránh gây rối mắt.
+
+| Góc máy | Tần suất | % | Dùng khi nào |
+|---------|--------|---|-------------|
+| Eye-level | 58 | 98% | Hầu như toàn bộ video. Tạo sự gần gũi, ngang tầm mắt của trẻ nhỏ, giúp dễ tiếp thu thông tin. |
+| Low angle (nhìn lên) | 1 | 2% | Một số cảnh rất nhẹ khi con vật lớn (như bò) xuất hiện để tạo cảm giác về kích cỡ nhưng không gây sợ hãi. |
+
+## 3. CHUYỂN ĐỘNG CAMERA (Camera Movement)
+
+**Phương pháp:** Animation camera (Diễn hoạt camera kỹ thuật số). Camera hoàn toàn mượt mà và chính xác.
+
+| Loại chuyển động | Tần suất | Tốc độ | Mô tả chi tiết |
+|-------------------|----------|--------|-----------------|
+| Static (tĩnh) | 45 shot | - | Chiếm đa số. Giúp trẻ tập trung vào hành động của nhân vật và âm nhạc. |
+| Pan right/left | 8 lần | Trung bình | Camera lia ngang để chuyển từ khu vực này sang khu vực khác của nông trại (ví dụ từ chuồng heo sang ao vịt). |
+| Digital Zoom in | 5 lần | Chậm | Thu hẹp góc nhìn từ Wide Shot vào con vật để chuẩn bị cho đoạn cao trào của tiếng kêu. |
+
+- **Thời gian trung bình mỗi shot:** 3 - 5 giây.
+- **Transitions:** Chủ yếu là **Hard Cut** (cắt thẳng) theo nhịp nhạc. Đôi khi dùng **Pan/Slide** (trượt màn hình) khi chuyển bối cảnh lớn.
+- **Transition đặc trưng:** Cắt cảnh đúng vào nốt nhạc đầu tiên của mỗi nhịp (downbeat).
+
+## 4. QUY LUẬT BỐ CỤC (Composition Rules)
+
+Bố cục của video cực kỳ đơn giản và đối xứng để thu hút sự chú ý vào giữa màn hình.
+
+1.  **Center Placement (Chủ thể ở chính giữa):** 80% thời lượng con vật hoặc nhóm nhân vật chính nằm ở trung tâm để trẻ không phải tìm kiếm chủ thể.
+2.  **Rule of Thirds (Quy tắc 1/3):** Dùng trong cảnh ông lão (bên trái) và cô bé (bên phải) để tạo sự cân bằng đối xứng hai bên.
+3.  **Depth Layers (Lớp chiều sâu):** Luôn có 3 lớp rõ rệt:
+    *   **Foreground (Tiền cảnh):** Hàng rào trắng hoặc bụi cỏ che một góc nhỏ bên dưới.
+    *   **Midground (Trung cảnh):** Nhân vật và các yếu tố tương tác (nhà kho, bùn, ao).
+    *   **Background (Hậu cảnh):** Những ngọn đồi xanh và bầu trời.
+4.  **Negative Space (Không gian âm):** Phần bầu trời phía trên luôn trống trải, dùng để đặt các chữ cái "E-I-E-I-O" hoặc bóng thoại tiếng kêu của con vật.
+5.  **Graphic Overlays:** Các chữ cái xuất hiện ở vị trí cố định (thường là trung tâm trên cao) giúp trẻ kết hợp nghe và nhìn mặt chữ.
+
+## 5. NHỊP ĐỘ HÌNH ẢNH (Visual Pacing)
+
+- **Nhịp độ:** Rất đều đặn và có tính chu kỳ.
+- **Sự thay đổi theo nội dung:**
+    *   Khi chơi nhạc (Intro/Chorus): Nhịp cắt nhanh hơn (~2 giây/shot) để tạo sự phấn khích.
+    *   Khi giới thiệu con vật (Verse): Shot giữ lâu hơn (~4-6 giây) để trẻ có thời gian nhận diện con vật và nghe tiếng kêu.
+- **Kết luận:** Nhịp độ hình ảnh hoàn toàn đồng nhất với nhịp 4/4 của bài hát.
+
+## 6. MẪU CẮT CẢNH (Editing Patterns)
+
+1.  **Establishing → Action → Detail:** Bắt đầu bằng cảnh toàn nông trại → Cảnh ông lão chơi nhạc → Cắt vào tay chơi đàn.
+2.  **Shot / Reverse Shot (Biến thể):** Cắt giữa cảnh ông lão/cô bé đang hát sang cảnh con vật đang đáp lại.
+3.  **Cyclical Pattern (Mẫu lặp lại):** Đây là đặc trưng nhất của kênh. Mỗi phân đoạn con vật mới đều tuân thủ đúng một lộ trình: *Cảnh toàn nông trại -> Giới thiệu con vật -> Cận cảnh tiếng kêu -> Cảnh toàn cả nhóm ăn mừng.*
+4.  **Action Match:** Chuyển động của nhân vật (dậm chân, gảy đàn) luôn khớp chính xác tuyệt đối với nốt nhạc.
+
+**Tổng kết từ DP:** Video sử dụng ngôn ngữ hình ảnh "Sạch - Rõ - Đối xứng". Mọi kỹ thuật từ cỡ cảnh đến bố cục đều nhằm mục đích loại bỏ sự xao nhãng, giúp khán giả nhỏ tuổi tập trung tối đa vào mối liên hệ giữa hình ảnh con vật và âm thanh của chúng.
+
+
+==============
+
+
+Chào bạn, với tư cách là một Nhà phân tích Ngôn ngữ học, tôi xin gửi tới bạn bản phân tích chi tiết phong cách kể chuyện và trình bày của video "Old MacDonald Had A Farm" từ kênh **Super Simple Songs**.
+
+Đây là một ví dụ điển hình về **"Cumulative Song"** (Bài hát cộng dồn) dành cho trẻ em, nơi ngôn ngữ được tối giản hóa tối đa để phục vụ mục đích giáo dục ngữ âm.
+
+---
+
+## 1. CẤU TRÚC VĨ MÔ (Macro Structure)
+- **Thể loại:** Educational/Entertainment for Children (Nhạc thiếu nhi giáo dục).
+- **Mở đầu:** Logo kênh (5s) -> Nhạc dạo đồng quê (fiddle/banjo) vui nhộn thiết lập không gian nông trại.
+- **Cold Open:** Không có. Video đi thẳng vào nội dung chính.
+- **Các "phần" (Chapters):** Chia theo từng loài vật. Mỗi loài vật là một "hồi" (verse) có cấu trúc lặp lại tuyệt đối.
+- **Tầng Narrative:** 
+    *   Tầng 1: Lời dẫn chuyện (kể về Old MacDonald).
+    *   Tầng 2: Âm thanh mô phỏng (onomatopoeia - tiếng kêu của vật).
+    *   Tầng 3: Hình ảnh chữ cái bổ trợ (E-I-E-I-O).
+- **Kết thúc:** Một đoạn điệp khúc tổng hợp (Grand Finale) nơi tất cả các con vật xuất hiện cùng lúc, kết thúc bằng một nốt ngân dài vui vẻ.
+- **Sponsor:** Không có (Thường nằm ở cuối hoặc trong phần mô tả).
+- **Tỷ lệ Narration (Hát) vs Nhạc:** 80% hát, 20% nhạc dạo giữa các đoạn.
+
+**Sơ đồ cấu trúc:**
+- 00:00-00:05 → Brand Intro.
+- 00:05-00:14 → Musical Intro (Establishing the mood).
+- 00:15-00:39 → Verse 1 (The Pig - Oink).
+- 00:40-01:04 → Verse 2 (The Duck - Quack).
+- 01:05-01:31 → Verse 3 (The Horse - Neigh).
+- ... (Lặp lại cho đến hết các con vật) ...
+- 03:00-03:15 → Grand Finale & Logo Outro.
+
+---
+
+## 2. PHONG CÁCH NGÔN NGỮ (Linguistic Style)
+
+### 2a. Ngôi kể / Phong cách nói:
+- **Ngôi kể:** Ngôi thứ ba ("Old MacDonald had a farm").
+- **Voice:** Single narrator (Giọng nam trầm ấm, phát âm cực kỳ rõ ràng - hyper-articulation).
+- **Personality:** "Friendly Educator" (Người thầy thân thiện). Vui vẻ, đầy năng lượng nhưng không quá nhanh.
+- **Verbal tics:** Cụm từ vô nghĩa có tính nhạc "E-I-E-I-O" dùng làm cầu nối nhịp điệu.
+
+### 2b. Vocabulary & Sentence Pattern:
+- **Độ dài câu:** Rất ngắn (4-6 từ/câu). 
+- **Từ vựng:** Cấp độ mầm mon (A0). Chủ yếu là danh từ đơn tiết (pig, duck, cow) và từ mô phỏng âm thanh (onomatopoeia).
+- **Sentence Pattern:** Cấu trúc S-V-O lặp lại: [Subject] + [Had] + [Object].
+- **Metaphor:** Không có. Ngôn ngữ hoàn toàn trực diện (literal).
+- **Humor:** Không nằm ở ngôn từ mà nằm ở cách phát âm các tiếng kêu con vật một cách hài hước.
+
+### 2c. Rhetorical Devices (Thủ pháp tu từ):
+- **Repetition (Lặp lại):** Đây là thủ pháp chủ đạo. Lặp lại cấu trúc câu để tạo sự ghi nhớ (Memory anchor).
+- **Onomatopoeia (Từ mô phỏng âm thanh):** Oink, Quack, Moo, Neigh... là linh hồn của bài hát.
+- **Anaphora:** Lặp lại cụm "And on that farm..." ở đầu mỗi phân đoạn.
+- **Parallelism (Cấu trúc song hành):** Mỗi verse có cấu trúc giống hệt nhau, chỉ thay tên con vật và tiếng kêu.
+
+### 2d. Transition Phrases (Cụm từ chuyển ý):
+Vì đây là bài hát, các cụm chuyển ý nằm ngay trong lời nhạc:
+- **Chuyển sang phần mới:** "And on that farm he had a..."
+- **Chuyển sang giải thích tiếng kêu:** "With a [sound-sound] here..."
+- **Chuyển vị trí âm thanh:** "...and a [sound-sound] there."
+- **Chuyển sang tổng kết:** "Everywhere a [sound-sound]."
+- **Kết đoạn:** "Old MacDonald had a farm, E-I-E-I-O."
+
+---
+
+## 3. NHỊP ĐỘ KỂ (Narration Pacing)
+- **Tốc độ nói:** Khoảng 100-110 từ/phút (Chậm hơn người bình thường nói để trẻ em kịp nghe).
+- **Đoạn chậm/nghỉ:** Luôn có khoảng nghỉ 1-2 giây sau khi nhắc tên con vật để trẻ em "đoán" hoặc nhìn hình ảnh trước khi tiếng kêu vang lên.
+- **Energy Level:** Tăng dần về cuối video (khi các con vật hòa ca).
+
+---
+
+## 4. CẢM XÚC & TONE (Emotional Arc)
+- **Tone chủ đạo:** Playful (Ham học hỏi), Joyful (Vui sướng).
+- **Emotional Arc:**
+    *   00:15 → Warmth → 3 → Bắt đầu câu chuyện.
+    *   00:25 → Surprise → 4 → Tiếng kêu của chú heo đầu tiên.
+    *   03:00 → High Energy → 5 → Tất cả cùng hát (Finale).
+
+---
+
+## 5. SO SÁNH VỚI CÁC KÊNH TƯƠNG ĐỒNG
+
+| Khía cạnh | Super Simple Songs | Cocomelon | Pinkfong |
+|-----------|---------------------|---------------------|---------------------|
+| Tone | Giản dị, mộc mạc (folk) | Hiện đại, điện tử | Pop, sôi động (k-pop style) |
+| Pacing | Chậm, rõ chữ | Trung bình | Nhanh |
+| Detail level | Tập trung vào 1 từ khóa | Nhiều chi tiết đời sống | Tập trung vào hành động |
+| Voice | Giọng người lớn ấm áp | Giọng trẻ em | Giọng high-pitch |
+
+---
+
+## 6. SAMPLE SCRIPT RECREATION (Style: Super Simple Songs)
+*Chủ đề: Farmer Brown's Garden (Dạy về các loại rau củ)*
+
+**[Intro - Acoustic Guitar Strumming - Bright & Cheerful]**
+
+**(Narrator - Warm, clear voice)**
+Old Farmer Brown had a green, green garden.
+E-I-E-I-O!
+And in that garden, he had a **Carrot**.
+E-I-E-I-O!
+With a *crunch-crunch* here,
+And a *crunch-crunch* there.
+Here a *crunch*,
+There a *crunch*,
+Everywhere a *crunch-crunch*!
+Old Farmer Brown had a green, green garden.
+E-I-E-I-O!
+
+**(Transition - Upbeat Fiddle)**
+
+And in that garden, he had a **Potato**.
+E-I-E-I-O!
+With a *dig-dig* here,
+And a *dig-dig* there.
+Here a *dig*,
+There a *dig*,
+Everywhere a *dig-dig*!
+*Crunch-crunch* here,
+*Crunch-crunch* there.
+Old Farmer Brown had a green, green garden.
+E-I-E-I-O!
+
+---
+**Ghi chú cho AI Writing:** Khi tạo nội dung theo phong cách này, hãy luôn giữ cấu trúc câu đơn giản nhất có thể (S-V-O), sử dụng nhiều từ láy mô phỏng âm thanh, và lặp lại các cụm từ chốt ít nhất 3 lần trong một phân đoạn.
+
+
+============
+
+
+Chào bạn, với tư cách là chuyên gia Thiết kế Sản xuất và Giám đốc Nghệ thuật, tôi đã phân tích hệ thống hình ảnh của video "Old MacDonald Had A Farm" (Super Simple Songs). Đây là một thiết kế mẫu mực về sự tối giản (minimalism) phục vụ mục đích giáo dục cho trẻ em.
+
+Dưới đây là bản phân tích chi tiết:
+
+## 1. CON NGƯỜI / NHÂN VẬT (People & Characters)
+
+### 1a. Phong cách thể hiện con người:
+- **Loại hình:** 2D Illustration/Animation. 
+- **Phong cách:** Stylized (Cách điệu hóa cao). Nhân vật được xây dựng từ các khối hình học cơ bản (vòng tròn cho mặt, hình trụ cho thân).
+- **Mức độ Realism:** 1/10 (Hoàn toàn không tả thực).
+
+### 1b. Trang phục & Ngoại hình:
+
+**Nhóm 1: Old MacDonald (Ông lão)**
+- **Ngoại hình:** Râu trắng muốt bao quanh mặt, mũi to tròn màu hồng, mắt đen lớn (dot eyes). Đội mũ rơm vàng nhạt.
+- **Trang phục:** Áo thun vàng bên trong, quần yếm (overalls) màu xanh denim sáng, có túi trước ngực.
+- **Style:** Trang phục nông dân cổ điển, đường nét sạch sẽ, không có nếp nhăn vải.
+
+**Nhóm 2: The Girl (Cô bé)**
+- **Ngoại hình:** Tóc đỏ thắt bím hai bên (pigtails), mắt tròn to hơn ông lão để tạo vẻ ngây thơ.
+- **Trang phục:** Phối màu giống ông lão (áo vàng, quần yếm xanh) tạo tính đồng bộ (visual harmony). Đi ủng màu vàng.
+
+**Nhóm 3: Các con vật (Heo, Vịt, Ngựa, Cừu, Bò, Gà tây)**
+- **Đặc điểm chung:** Mắt to tròn với lòng trắng rõ rệt, cơ thể tròn trịa (chubby). 
+- **Màu sắc:** Màu sắc biểu tượng (Heo hồng, Vịt xanh/nâu, Bò nâu đốm sẫm).
+
+### 1c. Biểu cảm & Body Language:
+- **Biểu cảm:** Luôn mỉm cười, miệng mở rộng khi hát. Rất vui vẻ và tích cực.
+- **Ánh mắt:** Đa phần nhìn trực diện vào camera để tạo kết nối với trẻ em.
+- **Cử chỉ:** Nhún nhảy theo nhịp nhạc, tay chơi nhạc cụ rất đơn giản (chỉ chuyển động cánh tay).
+
+## 2. BỐI CẢNH & MÔI TRƯỜNG (Settings & Environments)
+
+### 2a. Bối cảnh chính (Nông trại):
+- **Loại không gian:** Ngoài trời, phong cảnh đồng quê (Countryside).
+- **Kiến trúc:** Nhà kho (Barn) màu đỏ đặc trưng với mái xám, hàng rào trắng (picket fence) bao quanh.
+- **Bố cục:** Các lớp đồi xanh chồng lên nhau (parallax layering) để tạo cảm giác về chiều sâu dù là 2D phẳng.
+- **Ánh sáng:** Ánh sáng ban ngày phẳng (flat daylight). Không có nguồn sáng điểm, toàn bộ cảnh được chiếu sáng đều.
+- **Color palette:** Xanh lá (cỏ), Xanh cyan (trời), Đỏ (nhà kho), Vàng (nắng/rơm).
+
+### 2b. Bối cảnh phụ:
+- **Vũng bùn (Mud puddle):** Hình oval nâu đơn giản cho chú heo.
+- **Ao nước (Pond):** Hình oval xanh dương cho vịt.
+- **Trong nhà kho (Inside barn):** Màu nâu ấm, có các khối rơm vàng.
+
+## 3. ĐỒ VẬT & ĐẠO CỤ (Objects & Props)
+- **Nhạc cụ (Banjo & Fiddle):** Thiết kế tối giản, màu gỗ nâu, không có chi tiết dây đàn phức tạp.
+- **Cuộn rơm (Hay bales):** Hình trụ màu vàng rực, có các đường xoắn ốc bên trong để biểu thị lớp rơm. Mức độ chi tiết: 2/10.
+- **Hàng rào:** Các thanh gỗ trắng thẳng tắp, sạch sẽ không có vết bẩn hay nứt vỡ.
+
+## 4. TYPOGRAPHY & ĐỒ HỌA ON-SCREEN
+### 4a. Text elements:
+- **Loại text:** Chữ cái E-I-E-I-O và tiếng kêu con vật (oink, quack).
+- **Font chữ:** Rounded Sans-serif (như *Arial Rounded* hoặc *VAG Round*), tạo cảm giác an toàn, thân thiện.
+- **Hiệu ứng:** Chữ thường có màu trắng, nằm trong bóng thoại (speech bubbles) hoặc nổi tự do trên bầu trời.
+- **Animation:** Chữ nảy lên (bounce) hoặc xuất hiện theo nhịp hát.
+
+### 4b. Graphic elements:
+- **Logo:** "Super Simple Songs" với các màu sắc rực rỡ (đỏ, vàng, xanh, tím) trên nền trắng.
+- **Watermark:** Logo nhỏ ở góc phải màn hình.
+
+## 5. OUTPUT: IMAGE GENERATION REFERENCE SHEET
+
+```json
+{
+  "content_type": "Children's 2D Animation Illustration",
+  "style_keywords": [
+    "flat design",
+    "vector art",
+    "bold outlines",
+    "geometric shapes",
+    "vibrant primary colors",
+    "minimalist background",
+    "cute characters",
+    "Super Simple Songs aesthetic"
+  ],
+  "negative_keywords": [
+    "photorealistic",
+    "3d render",
+    "complex textures",
+    "gritty",
+    "dark shadows",
+    "atmospheric fog",
+    "detailed fur",
+    "gradients"
+  ],
+  "color_palette": {
+    "shadow_primary": "#4A3728",
+    "shadow_secondary": "#1E5631",
+    "highlight_warm": "#FFF200",
+    "highlight_cool": "#A3E4F7",
+    "accent_primary": "#C00000",
+    "accent_secondary": "#FFC000",
+    "brand_colors": ["#ED1C24", "#FFF200", "#00A651", "#00ADEF"],
+    "dominant_midtones": ["#92D050", "#FFDBAC"]
+  },
+  "lighting_setup": {
+    "primary_method": "flat ambient lighting",
+    "key_fill_ratio": "1:1",
+    "light_sources": ["uniform overhead daylight"],
+    "mood": "happy, energetic, educational"
+  },
+  "texture_detail_level": "1/10",
+  "film_grain_intensity": "0/10",
+  "realism_level": "1/10",
+  "production_value": "9/10 (High-end digital vector)"
+}
+```
+
+Bản phân tích này giúp bạn hiểu rõ rằng mọi yếu tố trong video này đều được tối giản hóa để tập trung vào thông điệp giáo dục, với bảng màu rực rỡ và hình khối rõ ràng giúp trẻ em dễ dàng nhận diện và ghi nhớ.
+
+
+=================
+
+
+Chào bạn, với tư cách là chuyên gia Motion Graphics và Hậu kỳ, tôi xin gửi tới bạn bản phân tích kỹ thuật sản xuất của video "Old MacDonald Had A Farm" từ Super Simple Songs.
+
+---
+
+## 1. PHƯƠNG PHÁP SẢN XUẤT VIDEO
+- **Phương pháp chính:** **Full 2D Digital Animation (Puppet Animation / Cut-out style).**
+- **Kỹ thuật:** Sử dụng các nhân vật được thiết kế dưới dạng Vector (Illustrator), sau đó được "rigging" (gắn xương) để diễn hoạt các khớp nối như tay, chân, cổ.
+- **Phần mềm ước đoán:** **Adobe Animate (trước đây là Flash)** hoặc **Adobe After Effects** (kết hợp với các plugin như Duik Ángela để diễn hoạt nhân vật).
+
+---
+
+## 2. CÁC KIỂU CHUYỂN ĐỘNG (Motion Types)
+
+### 2a. Camera Movement (Kỹ thuật số):
+- **Tốc độ:** Chậm và mượt mà.
+- **Digital Zoom:** Thường là *Slow Zoom In* (từ 100% lên 110%) để tăng dần sự tập trung vào con vật khi nó chuẩn bị phát ra tiếng kêu.
+- **Pan:** Chuyển động ngang (Pan left/right) được dùng như một kỹ thuật chuyển cảnh để giới thiệu khu vực mới trong nông trại.
+- **Easing:** Sử dụng **Ease-in-out** cực kỳ mượt, không có điểm dừng đột ngột, tạo cảm giác thân thiện.
+
+### 2b. Subject Movement (Nhân vật & Đồ vật):
+- **Nhân vật:** Diễn hoạt theo kiểu "Bouncing" (nhún nhảy) đồng bộ với nhịp trống (beat). Các chi tiết nhỏ như mắt (chớp), miệng (mở theo lời hát) được diễn hoạt lặp lại (loop).
+- **Vật thể:** Cây cối, rơm rực nhún nhẹ như có gió.
+- **Text/Graphics:** Các chữ cái "E-I-E-I-O" và tiếng kêu con vật thường có hiệu ứng **Pop-up / Bounce** (nảy lên) khi xuất hiện.
+
+### 2c. Parallax / Depth Effects:
+- **Parallax:** Sử dụng rõ rệt với ít nhất 4 lớp (Layers): 
+    1. Tiền cảnh (hàng rào - di chuyển nhanh nhất). 
+    2. Trung cảnh (nhân vật/nhà kho). 
+    3. Hậu cảnh gần (đồi xanh thấp - di chuyển chậm). 
+    4. Hậu cảnh xa (núi/trời - tĩnh).
+- Kỹ thuật này tạo ra chiều sâu không gian cho một video 2D phẳng.
+
+### 2d. Particle & Atmospheric Effects:
+- **Musical Notes:** Các nốt nhạc bay lên nhẹ nhàng khi ông lão chơi đàn.
+- **Speech Bubbles:** Các khung thoại chứa chữ tiếng kêu xuất hiện rồi biến mất nhanh chóng.
+
+---
+
+## 3. TRANSITIONS (Chuyển cảnh)
+
+| Loại | Tần suất | Duration | Dùng khi nào |
+|------|----------|---------------|-------------|
+| **Hard cut** | ~90% | - | Cắt giữa các câu hát hoặc khi thay đổi cỡ cảnh (từ toàn sang cận). |
+| **Slide / Pan** | ~10% | 800-1200ms | Khi di chuyển từ vị trí con vật này sang vị trí con vật khác trên nông trại. |
+
+---
+
+## 4. NHẠC & ÂM THANH (Audio Design)
+
+### 4a. Nhạc nền:
+- **Thể loại:** **Acoustic Country / Folk.**
+- **Instruments:** Banjo (âm thanh gảy đặc trưng), Fiddle (vĩ cầm đồng quê), Acoustic Guitar, Upright Bass và bộ gõ đơn giản (shakers/snare).
+- **Mood:** Vui tươi, nhịp điệu 4/4 ổn định giúp trẻ em dễ dậm chân theo.
+
+### 4b. Sound Effects (SFX):
+- **Tiếng kêu con vật:** Được xử lý sạch, cường độ lớn hơn nhạc nền một chút để nhấn mạnh.
+- **Sync:** Hình ảnh miệng nhân vật mở và chữ hiện lên khớp hoàn hảo (frame-accurate) với âm thanh.
+
+---
+
+## 5. TIMELINE BREAKDOWN (30 giây đầu)
+
+| Thời gian | Duration | Nội dung | Cỡ cảnh | Camera move | Transition vào | Transition ra |
+|-----------|----------|----------|---------|-------------|----------------|---------------|
+| 00:00 | 5s | Intro Logo | Center | Static | Fade in | Hard Cut |
+| 00:05 | 10s | Establishing Farm | Wide | Slow Pan Right | Hard Cut | Slide |
+| 00:15 | 15s | Old MacDonald hát | Wide | Static | Slide | Hard Cut |
+
+---
+
+## 6. VIDEO GENERATION / RECREATION PARAMETERS
+
+Nếu bạn muốn tái tạo phong cách này bằng AI Video (như Kling, Runway hoặc Sora), hãy sử dụng các tham số sau:
+
+```json
+{
+  "shot_description": "2D vector animation of a happy farmer and a pig on a farm",
+  "video_prompt": "High-quality 2D digital animation, children's nursery rhyme style, Super Simple Songs aesthetic. A cheerful farmer with a white beard and a pink pig are bouncing to the rhythm of music. Vibrant green hills and a red barn in the background. Flat vector illustration, clean lines, no gradients, parallax scrolling effect, bright colors, 4k, 60fps, smooth character rigging.",
+  "duration": "10s",
+  "camera_motion": "Static with subtle parallax background movement",
+  "style_keywords": ["2D Animation", "Vector Art", "Children Education", "Flat Design"]
+}
+```
+
+```json
+{
+  "shot_description": "Close up of a duck quacking with speech bubble",
+  "video_prompt": "Close-up shot of a cute 2D vector duck on a blue pond. The duck opens its beak to quack, synchronous with a speech bubble popping up saying 'QUACK'. Minimalist style, thick outlines, bright colors, playful animation, smooth frame transitions, white border outlines, high contrast.",
+  "duration": "5s",
+  "camera_motion": "Slow digital zoom-in",
+  "style_keywords": ["Cut-out animation", "Pop-up effect", "Vibrant"]
+}
+```
+
+**Lời khuyên hậu kỳ:** Để đạt được độ mượt như video gốc, hãy render ở 60fps và sử dụng kỹ thuật "Squash and Stretch" (Co dãn vật thể) khi nhân vật nhún nhảy. Điều này tạo nên sự sống động đặc trưng của hoạt hình phương Tây cao cấp.

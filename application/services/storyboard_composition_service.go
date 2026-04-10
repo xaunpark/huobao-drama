@@ -103,6 +103,14 @@ type SceneCompositionInfo struct {
 	AmbienceLevel   *string        `json:"ambience_level,omitempty"`
 	MusicMood       *string        `json:"music_mood,omitempty"`
 	MusicLevel      *string        `json:"music_level,omitempty"`
+	// Nursery Rhyme fields
+	LyricsText      *string        `json:"lyrics_text,omitempty"`
+	SectionType     *string        `json:"section_type,omitempty"`
+	VerseSubject    *string        `json:"verse_subject,omitempty"`
+	OverlayText     *string        `json:"overlay_text,omitempty"`
+	AnimationHint   *string        `json:"animation_hint,omitempty"`
+	IsCallback      *bool          `json:"is_callback,omitempty"`
+	CallbackShotNum *int           `json:"callback_shot_num,omitempty"`
 }
 func (s *StoryboardCompositionService) HasProductionShots(episodeID string) bool {
 	var count int64
@@ -286,6 +294,14 @@ func (s *StoryboardCompositionService) GetScenesForEpisode(episodeID string, vie
 			AmbienceLevel:   storyboard.AmbienceLevel,
 			MusicMood:       storyboard.MusicMood,
 			MusicLevel:      storyboard.MusicLevel,
+			// Nursery Rhyme fields
+			LyricsText:      storyboard.LyricsText,
+			SectionType:     storyboard.SectionType,
+			VerseSubject:    storyboard.VerseSubject,
+			OverlayText:     storyboard.OverlayText,
+			AnimationHint:   storyboard.AnimationHint,
+			IsCallback:      storyboard.IsCallback,
+			CallbackShotNum: storyboard.CallbackShotNum,
 		}
 
 		// 直接使用关联的角色信息

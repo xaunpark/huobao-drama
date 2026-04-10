@@ -452,6 +452,8 @@ export default {
     splitModePreserveTip: 'Preserve Mode: Keeps each marked block/timestamp in your script as a separate shot. Best for scripts already broken down into detailed shots.',
     splitModeBreakdownTip: 'Action Unit Mode: AI re-analyzes and breaks down the script by independent action units. Best for narrative prose scripts.',
     splitModeVisualUnitTip: 'AI Director Mode: Splits shots by visual change points with audio strategy. Supports: [Character Name] for dialogue, [CROWD] for crowd, [SFX] for sound effects. For precise control: use "// SHOT 01", "// SHOT 02" markers to define exact shot boundaries (optional params: duration, type, audio mode, e.g. // SHOT 01 | 6s | CU | narrator_only). AI will only enrich each shot with visual metadata without re-splitting.',
+    splitModeNurseryRhyme: 'Nursery Rhyme',
+    splitModeNurseryRhymeTip: 'Nursery Rhyme Mode: Designed for children\'s music videos (ages 0-5). Input timestamped lyrics with [VERSE N: Subject] section headers and (M:SS – M:SS) timestamps. AI creates literal, child-friendly visual illustrations synchronized to lyrics timing. Supports both Narrative (Wheels on the Bus) and Cumulative (Old MacDonald) song structures. Use [INSTRUMENTAL] tag for non-vocal sections.',
     batchTaskSubmitted: 'Batch generation task submitted!',
     batchGenerateFailed: 'Batch generation failed',
     batchCompleteSuccess: 'Batch generation completed! Successfully generated {count} scenes',

@@ -432,6 +432,8 @@ export default {
     splitModePreserveTip: '保留模式：将保持剧本中每个标记的段落/时间戳作为独立镜头，适用于已经按镜头详细拆分的剧本',
     splitModeBreakdownTip: '动作单元模式：AI将根据独立动作单位重新分解剧本，适用于叙述性剧本',
     splitModeVisualUnitTip: 'AI导演模式：按视觉变化点拆分镜头并标注音频策略。支持标记格式：[角色名] 对话，[CROWD] 群众，[SFX] 音效。精确控制：使用 "// SHOT 01"、"// SHOT 02" 标记定义镜头边界（可选参数：时长、景别、音频模式，如 // SHOT 01 | 6s | CU | narrator_only），AI只补充视觉元数据，不重新拆分。',
+    splitModeNurseryRhyme: '儿歌模式',
+    splitModeNurseryRhymeTip: '儿歌模式：专为儿童音乐视频设计（适合0-5岁）。输入带时间戳的歌词，使用 [VERSE N: 主题] 段落标记和 (M:SS – M:SS) 时间戳格式。AI将生成与歌词同步的、安全的、字面化的儿童友好型视觉插图。支持叙事型（如 Wheels on the Bus）和累积型（如 Old MacDonald）两种歌曲结构。使用 [INSTRUMENTAL] 标记纯乐器段落。',
     batchTaskSubmitted: '批量生成任务已提交！',
     batchGenerateFailed: '批量生成失败',
     batchCompleteSuccess: '批量生成完成！成功生成 {count} 个场景',

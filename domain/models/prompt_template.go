@@ -40,7 +40,8 @@ type PromptTemplatePrompts struct {
 	VideoConstraint     string `json:"video_constraint,omitempty"`
 	StylePrompt         string `json:"style_prompt,omitempty"`
 	VideoExtraction     string `json:"video_extraction,omitempty"`
-	VisualUnitBreakdown string `json:"visual_unit_breakdown,omitempty"` // Voice-over AI Director shot planning
+	VisualUnitBreakdown    string `json:"visual_unit_breakdown,omitempty"`    // Voice-over AI Director shot planning
+	NurseryRhymeBreakdown  string `json:"nursery_rhyme_breakdown,omitempty"`  // Nursery rhyme lyrics-synced shot planning
 }
 
 // PromptTypeToDefaultFile 将 prompt type key 映射到默认的 embed 文件名
@@ -58,5 +59,6 @@ var PromptTypeToDefaultFile = map[string]string{
 	"video_constraint":     "video_constraint_prefixes.txt",
 	"style_prompt":            "style_prompt.txt",
 	"video_extraction":        "video_extraction.txt",
-	"visual_unit_breakdown":   "storyboard_visual_unit.txt",
+	"visual_unit_breakdown":    "storyboard_visual_unit.txt",
+	"nursery_rhyme_breakdown":  "storyboard_nursery_rhyme.txt",
 }

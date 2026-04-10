@@ -140,6 +140,14 @@ type Storyboard struct {
 	AmbienceLevel   *string       `gorm:"size:10" json:"ambience_level"`                 // low | medium | high
 	MusicMood       *string       `gorm:"size:50" json:"music_mood"`                     // epic | tension | serene | ...
 	MusicLevel      *string       `gorm:"size:10" json:"music_level"`                    // low | medium | high
+	// Nursery Rhyme fields
+	LyricsText      *string       `gorm:"type:text" json:"lyrics_text"`                  // Lyrics text for this shot
+	SectionType     *string       `gorm:"size:30" json:"section_type"`                   // verse / chorus / bridge / intro / outro / instrumental
+	VerseSubject    *string       `gorm:"size:100" json:"verse_subject"`                 // "The Wheels", "The Pig"
+	OverlayText     *string       `gorm:"type:text" json:"overlay_text"`                 // On-screen text ("oink", "E-I-E-I-O")
+	AnimationHint   *string       `gorm:"type:text" json:"animation_hint"`               // "lip_sync, bounce, speech_bubble_pop"
+	IsCallback      *bool         `json:"is_callback"`                                   // Is this a callback/repeat shot?
+	CallbackShotNum *int          `json:"callback_shot_num"`                             // Reference to original shot number
 	CreatedAt        time.Time      `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt        time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
 	DeletedAt        gorm.DeletedAt `gorm:"index" json:"-"`
