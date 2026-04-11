@@ -44,7 +44,7 @@ lyrics_block_id: Reference to the source lyrics block number from the analysis
 lyrics_text: The exact lyrics text this shot illustrates (empty for instrumental)
 timestamp_start: Start time in M:SS format
 timestamp_end: End time in M:SS format
-duration_sec: Duration in seconds (must be 2-5s, sum must match total lyrics duration)
+duration_sec: Duration in seconds (MUST be 2-5s. If block is longer, you MUST split it into multiple shots. Sum must match total block duration)
 section_type: "verse" | "chorus" | "bridge" | "intro" | "outro" | "instrumental"
 section_number: Which verse/chorus number (1, 2, 3...)
 verse_subject: The subject of the current verse section (from section header)

@@ -217,11 +217,12 @@ func buildLyricsAnalysis(blocks []LyricsBlock, structureType, structureReason st
 
 	sb.WriteString("\n=== RULES ===\n")
 	sb.WriteString("1. Create shots that FIT WITHIN each block's timestamp range\n")
-	sb.WriteString("2. You MAY split one block into multiple shots (if block duration > 4s)\n")
-	sb.WriteString("3. You MAY merge very short adjacent blocks into one shot (if total < 3s)\n")
-	sb.WriteString("4. Every shot MUST have lyrics_block_id referencing the source block\n")
-	sb.WriteString("5. Total shot durations MUST sum to match total lyrics duration\n")
-	sb.WriteString("6. [INSTRUMENTAL] blocks MUST have visual description (establishing shots, transitions)\n")
+	sb.WriteString("2. You MUST split one block into multiple shots if block duration is > 5s (max 5s per shot)\n")
+	sb.WriteString("3. If you split a block, split its lyrics_text text proportionally among the shots\n")
+	sb.WriteString("4. You MAY merge very short adjacent blocks into one shot (if total < 3s)\n")
+	sb.WriteString("5. Every shot MUST have lyrics_block_id referencing the source block\n")
+	sb.WriteString("6. Total shot durations MUST sum to match total lyrics duration\n")
+	sb.WriteString("7. [INSTRUMENTAL] blocks MUST have visual description (establishing shots, transitions)\n")
 
 	return sb.String()
 }

@@ -25,9 +25,10 @@ RULE 4 — CUMULATIVE COMPOSITION (for cumulative songs)
 In cumulative songs (like Old MacDonald), later verses must include characters/elements from ALL previous verses in group shots.
 Track which subjects have been introduced and ensure they appear in later group payoff shots.
 
-RULE 5 — DURATION SWEET SPOT
-Each shot should be 2-5 seconds.
-Shorter than 2s = too jarring. Longer than 5s = loses engagement.
+RULE 5 — STRICT DURATION LIMITS (CRITICAL)
+Each shot MUST be between 2 and 5 seconds. NEVER exceed 5 seconds.
+If a lyrics block is longer than 5 seconds, you MUST split it into 2 or more shots.
+When splitting a block, split its lyrics_text proportionally across the generated shots based on the words sung in that timeframe.
 
 RULE 6 — ON-SCREEN TEXT (OVERLAY)
 Add overlay_text for:

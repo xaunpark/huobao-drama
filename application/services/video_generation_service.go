@@ -495,7 +495,14 @@ func (s *VideoGenerationService) pollTaskStatus(videoGenID uint, taskID string, 
 		result, err := client.GetTaskStatus(taskID)
 		if err != nil {
 			s.log.Errorw("Failed to get task status", "error", err, "task_id", taskID, "attempt", attempt+1)
-			// Continue polling on error - might be transient network issue
+			
+			// If the task is permanently gone (e.g. 404 Not Found), stop polling immediately!
+			if strings.Contains(strings.ToLower(err.Error()), "status 404") || strings.Contains(strings.ToLower(err.Error()), "not found") {
+				s.updateVideoGenError(videoGenID, "Task was lost or deleted on AI server (404 Not Found).")
+				return
+			}
+			
+			// Continue polling on other errors - might be transient network issue
 			// Will eventually timeout after maxAttempts if error persists
 			continue
 		}
@@ -745,11 +752,20 @@ func (s *VideoGenerationService) RecoverPendingTasks() {
 	s.log.Infow("Recovering pending video generation tasks", "count", len(pendingVideos))
 
 	for _, videoGen := range pendingVideos {
-		// CRITICAL FIX: Check for nil TaskID before dereferencing to prevent panic
-		// Even though we filter for non-empty task_id, GORM might still return nil pointers
-		// This nil check prevents a potential runtime panic
 		if videoGen.TaskID == nil || *videoGen.TaskID == "" {
 			s.log.Warnw("Skipping video generation with nil or empty TaskID", "id", videoGen.ID)
+			continue
+		}
+
+		// Calculate how long this task has been stuck
+		elapsed := time.Since(videoGen.UpdatedAt)
+		
+		if elapsed.Minutes() > 60 {
+			// If it's been more than an hour, it's a dead task. Mark as failed.
+			s.log.Warnw("Task stuck for over 60 minutes. Force-failing it.", "id", videoGen.ID, "status", videoGen.Status, "elapsed_mins", elapsed.Minutes())
+			
+			errorMsg := "task timeout after backend restart (stuck for " + strconv.Itoa(int(elapsed.Minutes())) + " mins)"
+			s.updateVideoGenError(videoGen.ID, errorMsg)
 			continue
 		}
 
