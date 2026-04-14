@@ -3565,6 +3565,8 @@ const getStatusText = (status: string) => {
     completed: "已完成",
     failed: "失败",
     upscaling: "提升画质中",
+    upscaled: "已提升画质",
+    upscale_failed: "提升画质失败",
   };
   return statusTextMap[status] || status;
 };
@@ -3878,7 +3880,7 @@ const loadStoryboardVideos = async (storyboardId: number) => {
 
     // 如果有进行中的任务，启动轮询
     const hasPendingOrProcessing = generatedVideos.value.some(
-      (v) => v.status === "pending" || v.status === "processing",
+      (v) => v.status === "pending" || v.status === "processing" || v.status === "upscaling",
     );
     if (hasPendingOrProcessing) {
       startVideoPolling();
@@ -3935,7 +3937,7 @@ const startVideoPolling = () => {
 
       // 如果没有进行中的任务，停止轮询
       const hasPendingOrProcessing = generatedVideos.value.some(
-        (v) => v.status === "pending" || v.status === "processing",
+        (v) => v.status === "pending" || v.status === "processing" || v.status === "upscaling",
       );
       if (!hasPendingOrProcessing) {
         stopVideoPolling();

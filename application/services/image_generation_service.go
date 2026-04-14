@@ -51,7 +51,7 @@ func truncateImageURL(url string) string {
 }
 
 func NewImageGenerationService(db *gorm.DB, cfg *config.Config, transferService *ResourceTransferService, localStorage *storage.LocalStorage, log *logger.Logger) *ImageGenerationService {
-	return &ImageGenerationService{
+	service := &ImageGenerationService{
 		db:              db,
 		aiService:       NewAIService(db, log),
 		transferService: transferService,
@@ -61,6 +61,10 @@ func NewImageGenerationService(db *gorm.DB, cfg *config.Config, transferService 
 		log:             log,
 		taskService:     NewTaskService(db, log),
 	}
+
+	go service.RecoverPendingTasks()
+
+	return service
 }
 
 // GetDB 获取数据库连接
@@ -312,7 +316,7 @@ func (s *ImageGenerationService) ProcessImageGeneration(imageGenID uint) {
 }
 
 func (s *ImageGenerationService) pollTaskStatus(imageGenID uint, client image.ImageClient, taskID string) {
-	maxAttempts := 360 // Increased to 30 mins (360 * 5s) for batch queues
+	maxAttempts := 120 // 10 mins (120 * 5s)
 	pollInterval := 5 * time.Second
 
 	for i := 0; i < maxAttempts; i++ {
@@ -321,6 +325,13 @@ func (s *ImageGenerationService) pollTaskStatus(imageGenID uint, client image.Im
 		result, err := client.GetTaskStatus(taskID)
 		if err != nil {
 			s.log.Errorw("Failed to get task status", "error", err, "task_id", taskID)
+			
+			// If the task is permanently gone (e.g. 404 Not Found), stop polling immediately!
+			if strings.Contains(strings.ToLower(err.Error()), "status 404") || strings.Contains(strings.ToLower(err.Error()), "not found") {
+				s.updateImageGenError(imageGenID, "Task was lost or deleted on AI server (404 Not Found).")
+				return
+			}
+			
 			continue
 		}
 
@@ -739,6 +750,39 @@ func (s *ImageGenerationService) GenerateImagesForScene(sceneID string) ([]*mode
 	}
 
 	return []*models.ImageGeneration{imageGen}, nil
+}
+
+func (s *ImageGenerationService) RecoverPendingTasks() {
+	var pendingImages []models.ImageGeneration
+	if err := s.db.Where("status = ? AND task_id IS NOT NULL AND task_id != ''", models.ImageStatusProcessing).Find(&pendingImages).Error; err != nil {
+		s.log.Errorw("Failed to load pending image tasks", "error", err)
+		return
+	}
+
+	s.log.Infow("Recovering pending image generation tasks", "count", len(pendingImages))
+
+	for _, imageGen := range pendingImages {
+		if imageGen.TaskID == nil || *imageGen.TaskID == "" {
+			continue
+		}
+
+		elapsed := time.Since(imageGen.UpdatedAt)
+		
+		if elapsed.Minutes() > 10 {
+			s.log.Warnw("Image task stuck for over 10 minutes. Force-failing it.", "id", imageGen.ID, "status", imageGen.Status, "elapsed_mins", elapsed.Minutes())
+			errorMsg := "task timeout after backend restart (stuck for " + strconv.Itoa(int(elapsed.Minutes())) + " mins)"
+			s.updateImageGenError(imageGen.ID, errorMsg)
+			continue
+		}
+
+		client, err := s.getImageClientWithModel(imageGen.Provider, imageGen.Model)
+		if err != nil {
+			s.log.Warnw("Failed to get client for image recovery", "id", imageGen.ID, "error", err)
+			continue
+		}
+
+		go s.pollTaskStatus(imageGen.ID, client, *imageGen.TaskID)
+	}
 }
 
 // BackgroundInfo 背景信息结构

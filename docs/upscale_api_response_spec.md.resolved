@@ -1,0 +1,236 @@
+# Flow-Tool Upscale API — Response Specification
+
+> **Context:** This document answers the 4 questions from the third-party Go backend team regarding upscale job status polling.  
+> **Source:** Direct analysis of `api/server.py`, `utils/job_queue.py`, `utils/job_dispatcher.py`.
+
+---
+
+## 🔴 Likely Root Cause (TL;DR)
+
+**Flow-Tool returns status values in UPPERCASE. If the Go backend does case-sensitive string comparison, it will miss both `SUCCESS` and `FAILED`.**
+
+| Go backend checks for | Flow-Tool actually returns | Match? |
+|---|---|---|
+| `"failed"`, `"error"` | `"FAILED"` | ❌ **NO** (case mismatch) |
+| `"success"`, `"completed"`, `"done"` | `"SUCCESS"` | ❌ **NO** (case mismatch) |
+| `error` field non-empty | `"error": "Generation failed: ..."` | ✅ YES |
+
+If the Go backend's `error` field check is working, it should catch failures. If jobs are still stuck, the `error` field check may also have issues (e.g., checking the wrong JSON path, or the JSON library deserializes `null` differently).
+
+---
+
+## Question 1: Exact JSON Responses for GET /v1/jobs/{job_id}
+
+### Response Model ([server.py:71-80](file:///c:/Users/dinht/.gemini/antigravity/scratch/flow_tool/api/server.py#L71-L80))
+
+```python
+class JobResponse(BaseModel):
+    job_id: str
+    status: str       # PENDING | PROCESSING | SUCCESS | FAILED
+    progress: int = 0
+    message: str = ""
+    result_urls: List[str] = []
+    error: Optional[str] = None      # null when no error
+    worker_id: Optional[str] = None
+    profile_id: Optional[str] = None
+```
+
+### Status Mapping ([server.py:1243-1249](file:///c:/Users/dinht/.gemini/antigravity/scratch/flow_tool/api/server.py#L1243-L1249))
+
+Internal (SQLite) → API Response:
+
+| Internal Status | API Status |
+|---|---|
+| `QUEUED` | `"PENDING"` |
+| `PROCESSING` | `"PROCESSING"` |
+| `COMPLETED` | `"SUCCESS"` |
+| `FAILED` | `"FAILED"` |
+| `CANCELLED` | `"FAILED"` |
+
+### Case A: Upscale đang chạy (QUEUED → PENDING)
+
+Immediately after `POST /v1/jobs/{id}/upscale`, before a profile picks it up:
+
+```json
+{
+  "job_id": "53619c5d",
+  "status": "PENDING",
+  "progress": 0,
+  "message": "In Queue: QUEUED",
+  "result_urls": [],
+  "error": null,
+  "worker_id": null,
+  "profile_id": "5f7ddcc2"
+}
+```
+
+### Case B: Upscale đang xử lý (PROCESSING)
+
+After the dispatcher assigns it to a profile:
+
+```json
+{
+  "job_id": "53619c5d",
+  "status": "PROCESSING",
+  "progress": 50,
+  "message": "Processing on profile 5f7ddcc2",
+  "result_urls": [],
+  "error": null,
+  "worker_id": "5f7ddcc2",
+  "profile_id": "5f7ddcc2"
+}
+```
+
+### Case C: Upscale thành công (COMPLETED → SUCCESS)
+
+```json
+{
+  "job_id": "53619c5d",
+  "status": "SUCCESS",
+  "progress": 100,
+  "message": "Generation completed successfully",
+  "result_urls": [
+    "http://localhost:8000/outputs/output_53619c5d.mp4",
+    "https://storage.googleapis.com/...actual_url..."
+  ],
+  "error": null,
+  "worker_id": "5f7ddcc2",
+  "profile_id": "5f7ddcc2"
+}
+```
+
+### Case D: Upscale thất bại (FAILED)
+
+```json
+{
+  "job_id": "53619c5d",
+  "status": "FAILED",
+  "progress": 0,
+  "message": "In Queue: FAILED",
+  "result_urls": [],
+  "error": "Generation failed: MEDIA_GENERATION_STATUS_FAILED",
+  "worker_id": null,
+  "profile_id": "5f7ddcc2"
+}
+```
+
+> [!IMPORTANT]
+> Khi failure là do 401 (token expired), job sẽ **KHÔNG** bị đánh FAILED. Thay vào đó, nó được re-queue lại thành `QUEUED` → API trả `"PENDING"` với `error: "Waiting for token refresh (401 Auto-requeue)"`.  
+> Xem [job_dispatcher.py:276-289](file:///c:/Users/dinht/.gemini/antigravity/scratch/flow_tool/utils/job_dispatcher.py#L276-L289).
+
+---
+
+## Question 2: Upscale có tạo job_id mới không?
+
+### ❌ KHÔNG. Upscale tái sử dụng CÙNG job_id.
+
+Source: [server.py:1567-1620](file:///c:/Users/dinht/.gemini/antigravity/scratch/flow_tool/api/server.py#L1567-L1620)
+
+```python
+@app.post("/v1/jobs/{job_id}/upscale")
+async def upscale_job(job_id: str):
+    # ... modifies the EXISTING job in-place ...
+    job.mode = "UPSCALE"
+    job.status = "QUEUED"
+    job.result = None          # ← Clears previous result
+    job.error = None           # ← Clears previous error
+    queue.update_job(job)      # ← Saves to same row in SQLite
+    
+    return {"success": True, "job_id": job_id, "message": "Upscale queued"}
+    #                          ^^^^^^^^ same job_id returned
+```
+
+**Hệ quả:**
+- ✅ Backend Go đang poll đúng job_id
+- ✅ Không cần tạo polling session mới
+- ⚠️ Sau khi gọi upscale, `result_urls` sẽ bị xóa (set `None`) cho đến khi upscale hoàn thành
+
+### Response của POST /v1/jobs/{id}/upscale:
+
+```json
+{
+  "success": true,
+  "job_id": "53619c5d",
+  "message": "Upscale queued"
+}
+```
+
+---
+
+## Question 3: Status upscale dùng giá trị gì?
+
+### Chính xác 4 giá trị UPPERCASE, không phân biệt generate hay upscale:
+
+| Trạng thái | API status value | Lưu ý |
+|---|---|---|
+| Vừa queue | `"PENDING"` | ⚠️ Không phải `"pending"`, `"processing"`, `"upscaling"` |
+| Đang xử lý | `"PROCESSING"` | |
+| Thành công | `"SUCCESS"` | ⚠️ Không phải `"success"`, `"completed"`, `"done"` |
+| Thất bại | `"FAILED"` | ⚠️ Không phải `"failed"`, `"error"` |
+
+> [!WARNING]
+> **Tất cả giá trị status đều là UPPERCASE.**  
+> Go backend cần so sánh case-insensitive hoặc convert `strings.ToUpper(status)` trước khi so sánh.
+
+### Recommended Go parsing logic:
+
+```go
+status := strings.ToUpper(resp.Status)
+
+switch {
+case status == "FAILED":
+    // Terminal failure
+    return markFailed(resp.Error)
+
+case status == "SUCCESS" && len(resp.ResultURLs) > 0:
+    // Completion
+    return markCompleted(resp.ResultURLs)
+
+case resp.Error != "" && resp.Error != "null":
+    // Error field present but status might not be FAILED yet (e.g., 401 auto-requeue)
+    log.Warnf("Job has error but status=%s: %s", status, resp.Error)
+    // Continue polling — this is a transient state
+
+default:
+    // PENDING or PROCESSING — continue polling
+    continue
+}
+```
+
+---
+
+## Question 4: Có endpoint riêng cho upscale status không?
+
+### ❌ KHÔNG. Dùng chung endpoint GET /v1/jobs/{job_id}.
+
+Không có endpoint như `GET /v1/jobs/{id}/upscale/status`.
+
+Cả generate lẫn upscale đều dùng chung:
+- `GET /v1/jobs/{job_id}` → trả về `JobResponse` với cùng format
+- Cách phân biệt: Khi upscale đang chạy, field `message` sẽ chứa `"In Queue: QUEUED"` hoặc `"Processing on profile ..."` 
+- Bạn **không cần** phân biệt — logic poll giống hệt nhau
+
+---
+
+## Tổng kết: Checklist fix cho Go Backend
+
+```diff
+  // BEFORE (broken - case sensitive)
+- if status == "failed" || status == "error" {
++ if strings.EqualFold(status, "FAILED") {
+      markFailed()
+  }
+
+- if status == "success" || status == "completed" || status == "done" {
++ if strings.EqualFold(status, "SUCCESS") {
+      markCompleted()
+  }
+
+  // Also check error field as safety net
++ if resp.Error != nil && *resp.Error != "" {
++     log.Warnf("Error detected: %s", *resp.Error)
++ }
+```
+
+> [!TIP]
+> **Defensive recommendation:** Always use `strings.EqualFold()` or `strings.ToUpper()` when comparing status strings from external APIs.

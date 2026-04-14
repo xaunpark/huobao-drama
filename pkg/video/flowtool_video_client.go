@@ -203,7 +203,9 @@ func (c *FlowToolVideoClient) GetTaskStatus(taskID string) (*VideoResult, error)
 	}
 
 	// Map Flow-Tool status to VideoResult
-	switch strings.ToLower(jobResp.Status) {
+	// CRITICAL: TrimSpace to handle potential whitespace in status strings
+	normalizedStatus := strings.ToLower(strings.TrimSpace(jobResp.Status))
+	switch normalizedStatus {
 	case "success", "completed", "done":
 		if len(jobResp.ResultURLs) > 0 && jobResp.ResultURLs[0] != "" {
 			result.Completed = true
@@ -230,6 +232,13 @@ func (c *FlowToolVideoClient) GetTaskStatus(taskID string) (*VideoResult, error)
 	default:
 		// queued, pending, processing → still in progress
 		result.Completed = false
+		// CRITICAL FIX: Propagate error field even when status is not "failed"
+		// Flow-Tool may return PENDING with error for 401 auto-requeue,
+		// or return an unexpected status with an error message.
+		// Without this, errors are silently swallowed and jobs get stuck.
+		if jobResp.Error != nil && *jobResp.Error != "" {
+			result.Error = *jobResp.Error
+		}
 	}
 
 	return result, nil

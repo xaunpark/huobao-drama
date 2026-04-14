@@ -686,7 +686,7 @@ const startUpscaleAll = async () => {
               isUpscaled = true
               taskStates[sb.id].video = 'hd'
               taskStates[sb.id].progress = 100
-            } else if (check.status === 'failed') {
+            } else if (check.status === 'failed' || check.status === 'upscale_failed') {
               throw new Error(check.error_msg || 'Upscaling failed')
             }
           }
@@ -705,7 +705,7 @@ const startUpscaleAll = async () => {
               isUpscaled = true
               taskStates[sb.id].video = 'hd'
               taskStates[sb.id].progress = 100
-            } else if (check.status === 'failed') {
+            } else if (check.status === 'failed' || check.status === 'upscale_failed') {
               throw new Error(check.error_msg || 'Upscaling failed')
             }
           }

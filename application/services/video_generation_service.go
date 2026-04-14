@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -464,21 +465,37 @@ func (s *VideoGenerationService) pollTaskStatus(videoGenID uint, taskID string, 
 		return
 	}
 
-	// Polling configuration: max 300 attempts with 10 second intervals
-	// Total maximum polling time: 300 * 10s = 50 minutes
+	// Polling configuration: max 200 attempts with 3 second intervals
+	// Total maximum polling time: 200 * 3s = 10 minutes (600s)
 	// This prevents infinite polling if the task never completes
-	maxAttempts := 300
-	interval := 10 * time.Second
+	maxAttempts := 200
+	interval := 3 * time.Second
+
+	// Track consecutive polls where error is present but status isn't terminal.
+	// Flow-Tool may return PENDING with error for 401 auto-requeue (transient).
+	// We tolerate up to 3 consecutive error polls before treating as permanent failure.
+	consecutiveErrors := 0
+	const maxConsecutiveErrors = 3
+
+	// Track consecutive polls where status is PENDING (job stuck in queue, never dispatched).
+	// Flow-Tool may queue jobs but never dispatch them if all workers are busy/failed.
+	// After ~45s of pure PENDING, we treat the job as stalled.
+	consecutivePending := 0
+	const maxConsecutivePending = 15 // 15 × 3s = ~45 seconds
 
 	for attempt := 0; attempt < maxAttempts; attempt++ {
-		// Sleep before each poll attempt to avoid overwhelming the API
-		// First iteration sleeps before the first check (after 0 attempts)
-		time.Sleep(interval)
-
 		var videoGen models.VideoGeneration
 		if err := s.db.First(&videoGen, videoGenID).Error; err != nil {
 			s.log.Errorw("Failed to load video generation", "error", err, "id", videoGenID)
 			return
+		}
+
+		// Initial sleep for Upscaling (shorter than generation to detect failures faster)
+		if attempt == 0 && videoGen.Status == models.VideoStatusUpscaling {
+			time.Sleep(10 * time.Second)
+		} else {
+			// Sleep before each poll attempt to avoid overwhelming the API
+			time.Sleep(interval)
 		}
 
 		// CRITICAL FIX: Check if status was manually changed (e.g., cancelled by user)
@@ -496,9 +513,15 @@ func (s *VideoGenerationService) pollTaskStatus(videoGenID uint, taskID string, 
 		if err != nil {
 			s.log.Errorw("Failed to get task status", "error", err, "task_id", taskID, "attempt", attempt+1)
 			
-			// If the task is permanently gone (e.g. 404 Not Found), stop polling immediately!
+			// If the task is permanently gone (e.g. 404 Not Found) or server is permanently crashing (500), stop polling immediately!
 			if strings.Contains(strings.ToLower(err.Error()), "status 404") || strings.Contains(strings.ToLower(err.Error()), "not found") {
 				s.updateVideoGenError(videoGenID, "Task was lost or deleted on AI server (404 Not Found).")
+				return
+			}
+			
+			// If Flow-tool hits 500 Internal error while checking task, it usually means the task is corrupted.
+			if strings.Contains(strings.ToLower(err.Error()), "status 500") || strings.Contains(strings.ToLower(err.Error()), "internal server error") {
+				s.updateVideoGenError(videoGenID, "AI Server encountered an internal error while processing this task (500).")
 				return
 			}
 			
@@ -523,22 +546,88 @@ func (s *VideoGenerationService) pollTaskStatus(videoGenID uint, taskID string, 
 
 		// Check if task failed with an error message
 		if result.Error != "" {
-			s.updateVideoGenError(videoGenID, result.Error)
-			return
+			normalizedErrStatus := strings.ToUpper(strings.TrimSpace(result.Status))
+
+			// If Flow-Tool explicitly marks job as FAILED/ERROR → terminal, fail immediately
+			if normalizedErrStatus == "FAILED" || normalizedErrStatus == "ERROR" {
+				s.log.Errorw("Job failed (terminal status from Flow-Tool)",
+					"id", videoGenID,
+					"flow_status", result.Status,
+					"error", result.Error)
+				s.updateVideoGenError(videoGenID, result.Error)
+				return
+			}
+
+			// Status is NOT terminal (e.g. PENDING with error = 401 auto-requeue).
+			// Allow a few retries before giving up.
+			consecutiveErrors++
+			consecutivePending = 0 // Reset pending counter — job is no longer just waiting
+			if consecutiveErrors >= maxConsecutiveErrors {
+				s.log.Errorw("Job error persisted across retries, marking as failed",
+					"id", videoGenID,
+					"flow_status", result.Status,
+					"error", result.Error,
+					"consecutive_errors", consecutiveErrors)
+				s.updateVideoGenError(videoGenID, result.Error)
+				return
+			}
+			s.log.Warnw("Job has error but status is not terminal, retrying",
+				"id", videoGenID,
+				"flow_status", result.Status,
+				"error", result.Error,
+				"consecutive_errors", consecutiveErrors,
+				"attempt", attempt+1)
+			continue
 		}
 
-		// Task still in progress - log and continue polling
-		s.log.Infow("Video generation in progress", "id", videoGenID, "attempt", attempt+1, "max_attempts", maxAttempts)
+		// No error — reset consecutive error counter
+		consecutiveErrors = 0
+
+		// Detect stale PENDING: job stuck in queue, never dispatched by Flow-Tool
+		// Flow-Tool returns "PENDING" when job is queued but not yet assigned to a worker.
+		// If all workers are busy or failed, the job will stay PENDING indefinitely.
+		normalizedStatus := strings.ToUpper(strings.TrimSpace(result.Status))
+		if normalizedStatus == "PENDING" {
+			consecutivePending++
+			if consecutivePending >= maxConsecutivePending {
+				s.log.Errorw("Job stalled in PENDING queue, marking as failed",
+					"id", videoGenID,
+					"flow_status", result.Status,
+					"consecutive_pending", consecutivePending,
+					"stalled_seconds", consecutivePending*int(interval.Seconds()))
+				s.updateVideoGenError(videoGenID, fmt.Sprintf("Job stalled in queue (PENDING for %d polls / ~%ds). Flow-Tool dispatcher may be stuck.", consecutivePending, consecutivePending*int(interval.Seconds())))
+				return
+			}
+		} else {
+			// Status is PROCESSING or something else active — job is being worked on, reset counter
+			consecutivePending = 0
+		}
+
+		// Task still in progress - log with Flow-Tool status for debugging
+		s.log.Infow("Video generation in progress",
+			"id", videoGenID,
+			"flow_status", result.Status,
+			"attempt", attempt+1,
+			"max_attempts", maxAttempts)
 	}
 
 	// CRITICAL FIX: Handle polling timeout gracefully
-	// After maxAttempts (50 minutes), mark task as failed if still not completed
+	// After maxAttempts (10 minutes), mark task as failed if still not completed
 	// This prevents indefinite polling and resource waste
 	s.updateVideoGenError(videoGenID, fmt.Sprintf("polling timeout after %d attempts (%.1f minutes)", maxAttempts, float64(maxAttempts*int(interval))/60.0))
 }
 
 func (s *VideoGenerationService) completeVideoGeneration(videoGenID uint, videoURL string, duration *int, width *int, height *int, firstFrameURL *string) {
 	var localVideoPath *string
+
+	// Check if it was upscaling to selectively bypass ffmpeg later
+	isUpscale := false
+	var oldVideoGen models.VideoGeneration
+	if err := s.db.First(&oldVideoGen, videoGenID).Error; err == nil {
+		if oldVideoGen.Status == models.VideoStatusUpscaling {
+			isUpscale = true
+		}
+	}
 
 	// 下载视频到本地存储并保存相对路径到数据库
 	if s.localStorage != nil && videoURL != "" {
@@ -557,9 +646,34 @@ func (s *VideoGenerationService) completeVideoGeneration(videoGenID uint, videoU
 		}
 	}
 
+	if localVideoPath != nil {
+		absPath := s.localStorage.GetAbsolutePath(*localVideoPath)
+		fileInfo, err := os.Stat(absPath)
+
+		// Set dynamic file size limit based on task type
+		var minSize int64 = 51200 // 50 KB (Ngưỡng an toàn cho video gen ngắn)
+		if isUpscale {
+			minSize = 1048576 // 1 MB (Ngưỡng đặc trị cho video upscale 1080p)
+		}
+
+		if err == nil && fileInfo.Size() < minSize {
+			s.log.Errorw("Downloaded video file is too small (likely corrupted)", "id", videoGenID, "size", fileInfo.Size(), "local_path", *localVideoPath, "is_upscale", isUpscale)
+			
+			errorMsg := "Tác vụ trả về file trống hoặc lỗi định dạng (<50KB)"
+			if isUpscale {
+				errorMsg = "Tác vụ trả về file trống hoặc lỗi định dạng (<1MB)"
+			}
+			
+			s.updateVideoGenError(videoGenID, errorMsg)
+			os.Remove(absPath)
+			return
+		}
+	}
+
 	// 如果视频已下载到本地，探测真实时长
 	// 特别是当 AI 服务返回的 duration 为 0 或 nil 时，必须探测
-	shouldProbe := localVideoPath != nil && s.ffmpeg != nil && (duration == nil || *duration == 0)
+	// Bỏ qua FFmpeg nếu tác vụ là Upscale
+	shouldProbe := localVideoPath != nil && s.ffmpeg != nil && (duration == nil || *duration == 0) && !isUpscale
 	if shouldProbe {
 		absPath := s.localStorage.GetAbsolutePath(*localVideoPath)
 		if probedDuration, err := s.ffmpeg.GetVideoDuration(absPath); err == nil {
@@ -576,7 +690,7 @@ func (s *VideoGenerationService) completeVideoGeneration(videoGenID uint, videoU
 				"id", videoGenID,
 				"local_path", *localVideoPath)
 		}
-	} else if localVideoPath != nil && s.ffmpeg != nil && duration != nil && *duration > 0 {
+	} else if localVideoPath != nil && s.ffmpeg != nil && duration != nil && *duration > 0 && !isUpscale {
 		// 即使有 duration，也验证一下（可选）
 		absPath := s.localStorage.GetAbsolutePath(*localVideoPath)
 		if probedDuration, err := s.ffmpeg.GetVideoDuration(absPath); err == nil {
@@ -613,14 +727,10 @@ func (s *VideoGenerationService) completeVideoGeneration(videoGenID uint, videoU
 		"local_path": localVideoPath,
 	}
 
-	// check if it was upscaling before setting to complete
-	var oldVideoGen models.VideoGeneration
 	targetStatus := models.VideoStatusCompleted
-	if err := s.db.First(&oldVideoGen, videoGenID).Error; err == nil {
-		if oldVideoGen.Status == models.VideoStatusUpscaling {
-			targetStatus = models.VideoStatusUpscaled
-			updates["is_upscaled"] = true // Keep for backward compatibility
-		}
+	if isUpscale {
+		targetStatus = models.VideoStatusUpscaled
+		updates["is_upscaled"] = true // Keep for backward compatibility
 	}
 	updates["status"] = targetStatus
 
@@ -760,9 +870,9 @@ func (s *VideoGenerationService) RecoverPendingTasks() {
 		// Calculate how long this task has been stuck
 		elapsed := time.Since(videoGen.UpdatedAt)
 		
-		if elapsed.Minutes() > 60 {
-			// If it's been more than an hour, it's a dead task. Mark as failed.
-			s.log.Warnw("Task stuck for over 60 minutes. Force-failing it.", "id", videoGen.ID, "status", videoGen.Status, "elapsed_mins", elapsed.Minutes())
+		if elapsed.Minutes() > 10 {
+			// If it's been more than 10 minutes, it's a dead task. Mark as failed.
+			s.log.Warnw("Task stuck for over 10 minutes. Force-failing it.", "id", videoGen.ID, "status", videoGen.Status, "elapsed_mins", elapsed.Minutes())
 			
 			errorMsg := "task timeout after backend restart (stuck for " + strconv.Itoa(int(elapsed.Minutes())) + " mins)"
 			s.updateVideoGenError(videoGen.ID, errorMsg)
