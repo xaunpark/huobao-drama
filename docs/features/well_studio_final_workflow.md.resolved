@@ -1,0 +1,464 @@
+# The Well Studio — Production Workflow & Lyrics→Visual Prompt (Final)
+
+> Dựa trên phân tích 3 video thực tế từ kênh. Đã verified.
+
+---
+
+## Production Workflow Hoàn Chỉnh
+
+```mermaid
+graph TD
+    A["<b>Bước 1</b><br/>Viết lyrics worship<br/>(hoặc lấy lyrics có sẵn)"] --> B["<b>Bước 2</b><br/>Tạo nhạc bằng SUNO<br/>Input: lyrics → Output: audio + timestamps"]
+    B --> C["<b>Bước 3</b><br/>Lấy lyrics + section markers<br/>từ SUNO output<br/>[VERSE 1] [CHORUS] [BRIDGE]..."]
+    C --> D["<b>Bước 4 — 🔑 CORE STEP</b><br/>LYRICS → VISUAL STORYBOARD<br/>Prompt chuyển lyrics<br/>→ câu chuyện Cừu + Jesus<br/>(dùng prompt bên dưới)"]
+    D --> E["<b>Bước 5</b><br/>Paste output vào hệ thống<br/>→ <b>Visual Unit</b> mode<br/>(auto-detect // SHOT markers)"]
+    E --> F["<b>Bước 6</b><br/>Generate Frame Prompts<br/>→ Images → Video → Merge với audio SUNO"]
+    
+    style D fill:#ff9800,stroke:#e65100,stroke-width:3px,color:#000
+```
+
+### Câu hỏi đã trả lời
+
+| Câu hỏi | Trả lời (verified) |
+|---------|-------------------|
+| Cần timestamps từ SUNO không? | **Không bắt buộc**, nhưng cần section markers `[VERSE]` `[CHORUS]` `[BRIDGE]`. Timestamps giúp tính duration chính xác hơn |
+| Shot sync theo beat? | **Không**. Sync theo **cuối câu hát** (phrase endings — khi ca sĩ ngắt hơi) |
+| Dùng Script Outline? | **Không**. Dùng prompt chuyên biệt "Lyrics → Visual Storyboard" (bên dưới) |
+| Split mode? | **Visual Unit** — Structured Shot với `// SHOT` markers |
+| CHORUS lặp lyrics → lặp visual? | **Có thể** lặp concept tương tự nhưng **khác góc/cỡ cảnh/chi tiết** |
+| Bao nhiêu unique visual scenes? | ~15-25 shots cho video 3-4 phút (~4-7s/shot) |
+
+---
+
+## 🔑 PROMPT: Lyrics → Visual Storyboard (v1 — Verified)
+
+```
+You are a visual storyteller for "The Well Studio" — a channel that creates needle-felted stop-motion animation videos set to worship/spiritual songs. Your task is to convert song lyrics into a VISUAL STORYBOARD that tells an allegorical parallel story using needle-felted characters.
+
+=== CRITICAL UNDERSTANDING ===
+
+You are NOT illustrating lyrics literally. You are creating an ALLEGORICAL VISUAL NARRATIVE:
+- Lyrics say "I am tired" → Visual: Sheep walking slowly with drooping ears, carrying a heavy felt suitcase
+- Lyrics say "The clouds are gathering" → Visual: Sheep standing in dark felt forest surrounded by glowing wolf eyes
+- Lyrics say "God saved my life" → Visual: Jesus wielding shepherd's staff, driving away wolves
+- Lyrics say "I am not forgotten" → Visual: Jesus hand-feeding sheep an apple by a warm campfire
+
+The lyrics provide the EMOTIONAL ROADMAP. Your visuals tell a PHYSICAL ADVENTURE of a sheep.
+
+=== FIXED CHARACTER CAST ===
+
+| Character | Role | Appearance Rules |
+|-----------|------|-----------------|
+| **Main Sheep** (black or white) | The Believer / Viewer proxy | On screen 100% of the time. Small, vulnerable. Sad eyes in first half, peaceful in second half. Always walks LEFT → RIGHT (symbolizes forward journey) |
+| **Jesus the Shepherd** | The Savior / Comforter | NEVER appears in Verse 1. Appears at Chorus or when lyrics mention grace/love/You. Always larger than sheep. Gentle smile. Actions are ONLY healing: hug, carry, shelter, feed, wipe tears, build fire. NEVER punishes |
+| **Other sheep (white flock)** | Society / Others | Creates contrast — they are happy/pointing when main sheep is alone (isolation). Or they follow Jesus together in resolution scenes |
+| **Wolves / Storms / Shadows** | Temptation / Trials / Fear | Appear in Struggle/Darkness sections. Glowing eyes in dark forest, surrounding sheep. RETREAT immediately when Jesus appears |
+
+=== THE WELL STUDIO VISUAL ARC (Verified Pattern) ===
+
+**Map song structure → visual arc:**
+
+1. **[INTRO / Instrumental]** → ESTABLISHING
+   - Visual: Atmospheric shot of the miniature world. NO characters yet, or distant silhouette of sheep
+   - Feeling: Setting the stage. Meditative entry
+   - Lighting: Neutral or slightly cool
+   - Shots: 1-2 shots, 5-8 seconds each
+
+2. **[VERSE 1]** → THE STRUGGLE (Jesus NOT present)
+   - Visual: Sheep ALONE facing physical trials:
+     * Walking through dark forest with wolf eyes watching
+     * Trudging through rain/snow carrying heavy luggage/backpack
+     * Sitting alone at a large empty table while other sheep laugh in groups
+     * Riding in a taxi through a blurry, overwhelming city
+     * On a fragile raft in stormy seas
+   - Mapping: Translate EVERY emotional lyric into a PHYSICAL CHALLENGE for the sheep
+   - Lighting: Cool tones (blue, grey, dark green). Low-key. Many shadows
+   - Shots: WS/LS dominant — sheep looks TINY in the frame to emphasize loneliness
+   - Camera: Static or slow pan. Eye-level or high-angle (looking down = vulnerability)
+
+3. **[CHORUS 1]** → THE TURNING POINT (Jesus APPEARS)
+   - Visual: The rescue moment:
+     * Jesus appears from behind trees/hills with God rays behind him
+     * Jesus runs toward sheep with shepherd's staff to drive away wolves
+     * Jesus finds sheep washed up on beach from shipwreck and carries it
+     * Jesus opens a door and warm light floods out onto the cold sheep
+   - Mapping: When lyrics say "grace/love/you stay/someone stays" → Jesus physically ARRIVES
+   - Lighting: DRAMATIC SHIFT from cool → warm. Golden hour. God rays breakthrough
+   - Shots: MS transitioning to MCU/CU. Sheep's expression shifts from fear → wonder
+   - Camera: Slow zoom in on encounter. Low angle on Jesus (gentle authority)
+
+4. **[VERSE 2]** → THE JOURNEY TOGETHER
+   - Visual: Walking montage — Jesus and Sheep walk together through beautiful landscapes:
+     * Autumn forest with golden leaves falling (slow motion)
+     * Snow-covered mountain path at sunrise
+     * Flower meadow with butterflies
+     * Stream crossing (Jesus carries sheep)
+     * Different seasons = time passing
+   - Mapping: Lyrics about "walking with you / not alone / step by step" → literal walking scenes
+   - Lighting: Warm, golden, pastoral. Rim light catching wool fuzz
+   - Shots: WS/MS — showing both characters together in beautiful environments
+   - Camera: Tracking pan following their walk. Parallax with depth layers
+
+5. **[BRIDGE]** → DEEP INTIMACY (Close-up caring)
+   - Visual: Intimate caring scenes:
+     * Jesus washing mud/dirt off the sheep
+     * Jesus building a campfire in a cave, sheep warming by it
+     * Jesus feeding sheep fruit (apples, bananas — felted)
+     * Sheep nuzzling against Jesus's wool tunic
+     * Fireflies appearing around them in night forest
+     * Jesus wrapping sheep in a warm blanket/cloak
+   - Mapping: Lyrics about "healing/forgiveness/known/held" → physical acts of tender care
+   - Lighting: Warm point source (campfire, fireflies). Night but COZY, not scary
+   - Shots: MCU/CU/ECU dominant — maximum emotional intimacy
+   - Camera: Slow zoom in. Eye-level. Very shallow DoF
+
+6. **[CHORUS 2 / FINAL CHORUS]** → THE BELONGING
+   - Visual: Joy and community:
+     * Jesus walking with sheep AND the white flock — all together
+     * Festive warmth — implied feast/celebration
+     * Sheep running/bouncing (not scared anymore — joyful)
+   - Similar to Chorus 1 concept but UPGRADED: more sheep, brighter, wider scope
+   - Lighting: Maximum warmth, golden hour, lens bloom
+   - Camera: Wider shots showing the whole community
+
+7. **[OUTRO / Instrumental]** → PEACE
+   - Visual: Resolution:
+     * Sheep sleeping peacefully on Jesus's lap under starry sky
+     * Both sitting on hilltop watching sunset
+     * Sheep lying in warm cottage bed, single lamp glow
+   - Lighting: Warm amber/golden, soft, heavy bloom
+   - Shots: 1-2 final shots, longer duration (5-8 seconds)
+   - End: Fade to warm black or fade to logo
+
+=== METAPHOR TRANSLATION DICTIONARY ===
+
+When lyrics contain these concepts, translate to these visuals:
+
+| Lyrics concept | Visual translation |
+|---|---|
+| Tired / Heavy / Weary / Burden | Sheep carrying heavy suitcase/backpack, muddy/dirty wool, dragging feet, drooping ears |
+| Dark / Lost / Fear / Night | Dark felt forest, wolf eyes glowing, rain/storm, foggy paths, alone in vast space |
+| Storm / Waves / Drowning | Shipwreck, raft on stormy sea, airplane crashing in lightning, flooding |
+| Wounds / Scars / Broken | Torn clothes, scratched/muddy wool, broken airplane, tattered raft |
+| Grace / Love / Stay / Hold | Jesus hugging sheep, carrying on shoulders, draping cloak over sheep, feeding sheep |
+| Light / Shine / See / Known | God rays through trees, fireflies, campfire glow, golden hour flooding scene |
+| Home / Rest / Peace / Safe | Cozy cottage interior, warm bed with knitted blanket, sleeping on Jesus's lap |
+| Walk / Path / Journey / Road | Characters literally walking L→R through landscapes, crossing scenes |
+| Name / Called / Chosen | Jesus kneeling to sheep's level, direct eye contact, gentle hand on sheep's head |
+| Rain / Tears / Cry | Clear resin drops on cheeks, rain on felt surfaces, wet wool texture |
+| Forgive / Clean / New | Jesus washing sheep in stream, wiping mud off, sheep emerging clean and white |
+| Alone / Nobody / Invisible | Sheep tiny in huge frame, other sheep ignoring/pointing, empty table for one |
+
+=== SHOT RULES (Verified from analysis) ===
+
+**Pacing:**
+- 4-7 seconds per shot (average 5s)
+- ~15-25 total shots for a 3-4 minute song
+- Shot changes sync with PHRASE ENDINGS (when singer takes a breath), NOT on beat
+
+**Transitions:**
+- 90% HARD CUT — clean, story-driven cuts
+- Cross dissolve ONLY for: time passage (season change) or reality→dream transition
+- Fade to black: only at video end
+
+**Slow Motion:**
+- 80% of atmospheric shots use slight slow-motion (~80% speed)
+- Especially: falling leaves, rain, fireflies, walking scenes, wool fuzz movement
+
+**Camera:**
+- Characters ALWAYS walk LEFT → RIGHT (forward journey)
+- Sheep alone: high angle (looking down) or wide shot (emphasize smallness)
+- Jesus: low angle (looking up, gentle authority)
+- Emotional peaks: extreme close-up on eyes/tears
+- Walking montages: tracking pan or parallax
+
+**Composition:**
+- Sheep ALONE scenes: sheep occupies 10-20% of frame (tiny in vast world)
+- Sheep WITH Jesus: both occupy 40-60% of frame (intimate, connected)
+- Close-up emotion: face occupies 60-80% of frame
+
+=== TEXTURE REQUIREMENT (Non-negotiable) ===
+
+EVERYTHING must look needle-felted / handcrafted:
+- Characters: wool felt, yarn hair, black bead eyes, fuzzy rim-lit edges
+- Settings: felt grass, painted wood trees, fabric sky, resin water
+- Weather: felt rain drops, cotton/wool clouds, yarn lightning bolts  
+- Animals (wolves, deer, rabbits): ALL needle-felted, even villains
+- Fire: warm wool/felt fire with actual glow lighting
+- Modern props (taxi, airplane): stylized needle-felt/clay versions, toy-like
+
+=== INPUT ===
+
+Song lyrics with section markers:
+
+%LYRICS%
+
+=== OUTPUT FORMAT ===
+
+Output as Structured Shots (// SHOT markers) for Visual Unit mode:
+
+```
+// SHOT [number] | [duration]s | [shot_type]
+[BGM] (describe the music at this moment: instrument, mood, intensity)
+[SFX] (foley/ambient: rain, wind, footsteps on felt, wolf howl, fire crackling)  
+[NARRATOR] (EXACT lyrics being sung during this shot — copy from input. Write "(instrumental)" if no singing)
+[CAM] (camera movement: slow zoom in, parallax pan, tracking pan L→R, static hold)
+[VFX] (lighting, atmosphere: cool/warm tones, God rays, rim light, slow-motion 80%, DoF, dust motes, fireflies)
+[NOTE] (narrative purpose: which section of visual arc, mapping type used, emotional intensity 1-5)
+```
+
+For dialogue shots (Jesus speaking — RARE, only at Bridge/intimate moments):
+```
+// SHOT XX | Xs | CU | dialogue_dominant
+[Jesus] (whispered line — warm, heavily reverbed, max 5-8 words)
+```
+
+=== ADDITIONAL RULES ===
+
+1. Cover the ENTIRE song duration — every second of audio must have a corresponding visual
+2. Instrumental intro/outro = atmospheric establishing/resolution shots WITHOUT lyrics
+3. If CHORUS repeats with same lyrics, create SIMILAR but visually DIFFERENT shots (different angle, closer, different setting)
+4. Walking direction is ALWAYS left → right
+5. Jesus's hands are always open or gentle — NEVER aggressive (even when driving away wolves, he's protective not angry)
+6. Include SPECIFIC details about the needle-felted world: what the furniture looks like, what the forest floor is made of, what the rain looks like in felt
+7. Slow-motion note: mark [VFX] slow-motion 80% speed on atmospheric shots (leaves, rain, fireflies, walking)
+8. Every wolf/storm/darkness element must STILL look needle-felted — cute-scary, not actually terrifying
+
+***CRITICAL LANGUAGE CONSTRAINT***: Write ALL visual descriptions, tags, and notes in ENGLISH. Copy lyrics in their original language as-is.
+```
+
+---
+
+## Template Corrections Cần Update
+
+Dựa trên phân tích, các điểm trong `the_well_studio_template.md` cần hiệu chỉnh:
+
+### Storyboard Breakdown — Transition Rules
+
+```diff
+ [Editing Pattern Rules]
+-- 5% Hard cuts — RARE
+-- 75% Cross Dissolve (1000-2000ms) — PRIMARY TRANSITION
+-- 10% Fade to Black (1500ms)
+-- 5% Fade from Black
+-- 5% Soft Cut
+
+++ 90% Hard Cut — PRIMARY TRANSITION. Clean, story-driven.
+++ 5% Cross Dissolve — ONLY for time passage (season change) or reality→dream
+++ 5% Fade to Black — Video ending only
+```
+
+### Video Constraint — Slow Motion Addition
+
+```diff
+ **Subject Micro-Movement (AI Video - Subtle Only):**
++  **Slow Motion (SIGNATURE)**: ~80% playback speed on atmospheric shots.
++  Apply to: falling leaves, rain particles, fireflies, walking scenes,
++  wool fuzz movement in wind. Creates "magical realism" quality.
++  Approximately 80% of all shots use this subtle slow-motion.
+```
+
+### Video Constraint — Walking Direction
+
+```diff
++  **Walking Direction (HARD RULE)**: Characters ALWAYS walk LEFT → RIGHT
++  on screen. This symbolizes forward progress on their spiritual journey.
++  RIGHT → LEFT only if character is "going back" to a mistake/past.
+```
+
+### Style Prompt — Diverse Settings
+
+```diff
+ **Common scene types:**
++  * Urban environment (needle-felted New York, felt taxi cab, miniature city buildings — used for "lost in the world" metaphor)
++  * Ocean/Beach (resin water, felt sand, shipwreck debris — used for crisis/rescue)
++  * Airplane interior (miniature felt seats, tiny windows — used for life journey/turbulence metaphor)
++  * Cave/Grotto (wool/felt interior, campfire, fireflies — used for Bridge intimacy scenes)
++  * Seasonal landscapes — spring flowers, autumn leaves, winter snow, summer meadow (used for time-passage montage)
+```
+
+### Character Extraction — Antagonists
+
+```diff
++  * **Wolves (Antagonist)**: Needle-felted wolf figurines with glowing bead eyes.
++    Dark grey/black wool. Appear in packs of 3-5. Only in "Darkness" sections.
++    RETREAT immediately when Jesus appears. Still look handcrafted/cute-scary,
++    never truly terrifying.
++  * **Storm elements**: Yarn lightning bolts, cotton/wool clouds, felt rain drops.
++    All weather is ALSO needle-felted / textile material.
+```
+
+---
+
+## Sample Output (Ví dụ output của prompt trên)
+
+**Input lyrics:**
+```
+[VERSE 1]
+I sat where I always sit
+I scrolled through names I never call
+The silence wasn't empty — it was full of all the things I couldn't say
+
+[CHORUS]
+Even if I don't feel it
+Even if I don't pray it right
+Someone stays
+And that is grace
+
+[VERSE 2]  
+I walked with You through autumn fields
+The leaves fell slow like golden prayers
+
+[BRIDGE]
+You didn't fix the broken parts
+You sat beside them in the dark
+And called them beautiful
+
+[OUTRO]
+(instrumental)
+```
+
+**Output:**
+```
+// SHOT 01 | 6s | ELS
+[BGM] Single piano note, sustained, reverb — silence establishing
+[SFX] Distant wind through felt trees, faint clock ticking
+[NARRATOR] (instrumental — no lyrics)
+[CAM] Slow zoom out revealing miniature felt bedroom — tiny wooden desk, felt bed, grey morning light through window
+[VFX] Cool blue-grey tones, low-key lighting, shallow DoF, slight film grain
+[NOTE] ESTABLISHING — Cold open. Meditative entry into the felt world. Intensity 1
+
+// SHOT 02 | 5s | MS
+[BGM] Piano begins — sparse, melancholic, rubato
+[SFX] Soft felt footsteps on wooden floor, backpack rustling
+[NARRATOR] I sat where I always sit / I scrolled through names I never call
+[CAM] Static wide — black sheep sitting alone at oversized wooden table, other chairs empty. Sheep packs small felt backpack
+[VFX] Cool palette, muted morning light. Sheep takes up 15% of frame — tiny in vast empty dining area. Slow-motion 80%
+[NOTE] VERSE 1 — STRUGGLE. emotional_match: lyrics = social isolation → visual = physical isolation at empty table. Jesus NOT present. Intensity 2
+
+// SHOT 03 | 6s | WS
+[SFX] Schoolyard laughter (distant), felt grass crunching under small hooves
+[NARRATOR] The silence wasn't empty — it was full of all the things I couldn't say
+[CAM] Tracking pan L→R following black sheep walking alone on felt path. White sheep flock visible in background, clustered together laughing
+[VFX] Overcast cool lighting. Black sheep small at left third, white flock at right third — visual gap between them. Rim light only on black sheep's fuzzy edges
+[NOTE] VERSE 1 — STRUGGLE. narrative_parallel: "silence full of unsaid things" → sheep walks past group that excludes it. High angle over sheep = vulnerability. Intensity 3
+
+// SHOT 04 | 5s | CU
+[SFX] Single clear resin teardrop sound
+[NARRATOR] (piano sustain — phrase ending breath)
+[CAM] Slow zoom in — close-up on black sheep's face. Two resin teardrops on fuzzy felt cheeks. Black bead eyes reflecting single point of light
+[VFX] Shallow DoF maximum, blurred cool background. Rim light catching individual wool fibers around eyes. Slow-motion tears
+[NOTE] VERSE 1 — EMOTIONAL PEAK of struggle. Intensity 4. Pause at phrase ending — let the weight land
+
+// SHOT 05 | 6s | WS
+[BGM] Music lifts — guitar chord enters, warmth into the mix. Key shift approaching major
+[SFX] Warm wind, distant chime bell
+[NARRATOR] Even if I don't feel it / Even if I don't pray it right
+[CAM] Wide shot — sheep standing at edge of dark felt forest, looking back. Behind sheep: darkness. Ahead: a warm golden light emerging through the trees
+[VFX] SPLIT LIGHTING — left half of frame is cool/dark (forest), right half is warm/golden (clearing). God rays beginning to appear through tree gaps. Magical transition moment
+[NOTE] CHORUS — THE TURNING POINT begins. Lyrics mention "don't feel it" → sheep at the literal threshold between darkness and light. Intensity 3
+
+// SHOT 06 | 5s | MS
+[BGM] Full guitar swell — acoustic, warm, open chord
+[SFX] Soft footstep on felt grass, birds beginning to sing
+[NARRATOR] Someone stays
+[CAM] Medium shot — Jesus figure steps into frame from the golden light. Warm rim light explodes around his wool tunic edges. Hand extended toward sheep
+[VFX] Full warm palette. God rays behind Jesus creating silhouette halo. Bloom 20% around light source. Fireflies appearing. Slow-motion 80%
+[NOTE] CHORUS — JESUS APPEARS. "Someone stays" = Jesus physically arrives. metaphor_translation: abstract "someone" → concrete needle-felted Jesus figure. Low angle on Jesus. Intensity 4
+
+// SHOT 07 | 5s | MCU
+[NARRATOR] And that is grace
+[CAM] MCU — Jesus kneeling to sheep's eye level. Gentle felted hand on sheep's head. Both in warm light
+[VFX] Maximum warmth. Rim light on both characters' fuzzy edges. Golden dust motes floating. Tears on sheep catching warm light now (relief tears, not sad tears)
+[NOTE] CHORUS — RESOLUTION of turning point. "Grace" = the physical act of Jesus coming down to sheep's level. Intensity 5
+
+// SHOT 08 | 5s | WS
+[BGM] Gentle acoustic guitar continuing, pastoral, warm
+[SFX] Crunching autumn leaves under feet, gentle wind through felt trees
+[NARRATOR] I walked with You through autumn fields
+[CAM] Tracking pan L→R — Jesus and sheep walking together through autumn felt forest. Golden/orange felt leaves falling in slow-motion
+[VFX] Full warm autumn palette (#D4870E, #8B4513). Leaves = tiny cut felt pieces falling at 80% speed. Both characters occupy 40% of frame — together, connected. Atmospheric perspective on background
+[NOTE] VERSE 2 — THE JOURNEY TOGETHER. Walking montage begins. Literal walking = spiritual journey forward. Intensity 3
+
+// SHOT 09 | 6s | MS
+[SFX] Leaves landing softly on felt grass, distant bird song
+[NARRATOR] The leaves fell slow like golden prayers
+[CAM] Medium shot — sheep looking up at falling leaves with wonder. Jesus walking beside, one hand on sheep's back. Leaves floating down around both
+[VFX] Golden hour backlighting. Each falling felt leaf catches rim light = "golden prayers" made literal. Heavy slow-motion on leaves (70% speed). Dreamy bokeh background
+[NOTE] VERSE 2 — JOURNEY. symbolic: "golden prayers" = golden leaves catching light. Beautiful metaphor made visual. Intensity 3
+
+// SHOT 10 | 6s | CU
+[BGM] Music becomes intimate — piano solo returns, softer, major key now. Cello enters with warm sustained note
+[SFX] Soft crackling fire, night insects, owl hoot (gentle)
+[NARRATOR] You didn't fix the broken parts
+[CAM] Close-up — night scene. Jesus and sheep sitting by a small felt campfire inside a cave/grotto. Warm firelight on both faces. Jesus NOT touching the sheep — just sitting beside
+[VFX] Warm fire point-light source (#FF8C00). Cave walls are textured felt. Firefly bokeh dots floating. Strong rim light from fire on wool edges. Very dark background = intimacy
+[NOTE] BRIDGE — DEEP INTIMACY. narrative_parallel: "didn't fix" → Jesus doesn't doing anything, just BEING PRESENT. Sitting beside, not fixing. This nuance is key. Intensity 4
+
+// SHOT 11 | 5s | ECU
+[SFX] Sheep's soft breathing, fire crackling quietly
+[NARRATOR] You sat beside them in the dark
+[CAM] Extreme close-up — sheep's bead eye reflecting the tiny campfire. Individual wool fibers visible at macro level. Eye half-closed in peace
+[VFX] Maximum shallow DoF. Fire reflection in glossy bead eye. Single catchlight becomes warm orange (fire) instead of white. Visible needle-punch texture on felt face
+[NOTE] BRIDGE — PEAK INTIMACY. ECU = maximum emotional closeness. "Sat beside them in the dark" = visual shows the dark cave BUT with warm light. Dark is no longer scary. Intensity 5
+
+// SHOT 12 | 5s | MCU
+[BGM] Music swells — vocal harmonies enter, full arrangement building
+[SFX] Wind chime — single crystalline note
+[NARRATOR] And called them beautiful
+[CAM] MCU — Jesus looking at sheep with gentle smile. Mouth slightly open as if whispering. Warm golden rim light creating full halo around Jesus's wool edges
+[VFX] Full bloom. God rays entering cave from behind Jesus. Maximum warmth. Tears of joy — glowing resin drops
+[NOTE] BRIDGE — CLIMAX. "Called them beautiful" = Jesus actively affirming the sheep. This is the emotional peak of the entire video. Intensity 5
+
+// SHOT 13 | 7s | WS
+[BGM] Music resolving — instruments fading one by one, final piano note sustaining
+[SFX] Gentle wind, distant sheep bells, evening birdsong fading
+[NARRATOR] (instrumental — outro)
+[CAM] Wide shot — Jesus and sheep sitting together on felt hilltop, watching sunset. Back-lit silhouettes with golden rim light edges. Rolling felt hills stretching to horizon
+[VFX] Maximum golden hour. Warm amber (#FFB347). Silhouettes with glowing fuzzy edges. Atmospheric haze in background. Slow-motion grass swaying. Fade to warm black over final 2 seconds
+[NOTE] OUTRO — PEACE. Resolution shot. Both characters at rest, facing forward (future). The journey continues but no longer alone. Intensity 4 → fade to 0
+```
+
+---
+
+## Tích hợp vào hệ thống
+
+### Workflow trong app:
+
+```
+1. Tạo Drama → Template: The Well Studio
+2. Tạo Episode:
+   - Paste kết quả output (Structured Shots) vào "Script Content"
+3. Character/Scene/Prop:
+   - Characters: Extract từ script hoặc tạo thủ công (Jesus, Black Sheep, White Lambs, Wolves)
+   - Scenes: Extract từ script → hệ thống tạo scene prompts
+   - Props: Extract từ script → suitcase, campfire, shepherd's staff...
+4. Storyboard:
+   - Chọn "Visual Unit" mode → Generate
+   - Hệ thống auto-detect // SHOT markers → Structured mode
+   - AI enrich visual_description, shot_role, triggered_rules
+   - Giữ nguyên shots, duration, shot_type đã chỉ định
+5. Frame Prompts:
+   - Generate → inject Well Studio style prompt vào mỗi shot
+   - first_frame / key_frame / last_frame cho animation
+6. Images → Video → Merge với audio SUNO
+```
+
+### Script Generation prompt flow:
+
+```
+                       External AI (ChatGPT/Claude/Gemini)
+                                    │
+          ┌─────────────────────────┼─────────────────────────┐
+          │                         │                         │
+    Bước A: Viết lyrics       Bước B: SUNO tạo nhạc    Bước C: Lyrics→Storyboard
+    (worship prompt)          (lyrics → audio)          (prompt ở trên)
+          │                         │                         │
+          ▼                         ▼                         ▼
+     Lyrics text              Audio .mp3 file           Structured Script
+                                                        (// SHOT markers)
+                                                              │
+                                                              ▼
+                                                    Paste vào hệ thống
+                                                    Visual Unit mode
+```

@@ -1,0 +1,630 @@
+Dưới đây là phân tích chi tiết Visual DNA của **The Well Studio** để tái tạo bằng AI:
+
+## 1. KỸ THUẬT TẠO HÌNH ẢNH
+*   **Phân loại:** AI-generated stills mô phỏng **Needle-felted stop-motion animation**.
+*   **AI Model đề xuất:** Midjourney (v6.1) hoặc Flux.1 [dev] (mạnh về vật liệu).
+*   **Phong cách:** Thủ công mỹ nghệ, Chibi-stylized.
+*   **Mức độ Photorealistic:** 8/10 (Cực kỳ chân thực về bề mặt chất liệu len/nỉ, nhưng cách điệu về hình dáng).
+*   **Đặc điểm AI:** Texture đồng nhất, không có lỗi giải phẫu người thực vì nhân vật là búp bê len.
+*   **Animation:** Tĩnh hoặc chuyển động Parallax nhẹ, particle hiệu ứng bụi/ánh sáng.
+
+## 2. MÀU SẮC CHÍNH XÁC (Color Science)
+### 2a. Shadow/Dark zones:
+*   **Màu shadow:** `#2D231D` (Nâu ấm), `#1A1C2C` (Xanh đêm dịu).
+*   **Black Lift:** Có (IRE ~5-8), vùng đen không bao giờ đen tuyệt đối, tạo cảm giác phim nhựa.
+
+### 2b. Highlight/Bright zones:
+*   **Màu highlight:** `#FFF9E5` (Vàng kem), `#FDF2F0` (Hồng nhạt).
+*   **Glow/Bloom:** Rất mạnh (bán kính 15-20%), đặc biệt quanh các sợi len li ti (fuzz).
+
+### 2c. Midtone:
+*   **Skin (Jesus):** `#E8C3A9` (Felt skin tone - mịn, không bóng).
+*   **Surfaces:** `#8B7355` (Gỗ thông thủ công), `#D1D5DB` (Vải len trung tính).
+
+### 2d. Accent / Brand Colors:
+*   Pastel palette: Xanh lơ, hồng nhạt, vàng nắng.
+
+### 2e. Tỷ lệ màu & Grading:
+*   **Tỷ lệ:** 20% Shadow | 50% Midtone | 30% Highlight.
+*   **Grading:** Warm & Dreamy (Ấm áp và mộng mơ). Tương phản thấp (Low contrast).
+
+## 3. ÁNH SÁNG CHÍNH XÁC (Exact Lighting)
+### 3a. Setup chủ đạo:
+*   **Nguồn:** Kết hợp tự nhiên (cửa sổ/nắng) và nhân tạo (đèn học).
+*   **Key light:** Softbox lớn, hướng 45 độ, cực kỳ mềm.
+*   **Fill light:** Key:Fill ratio (2:1), đổ bóng rất mờ.
+*   **Rim/Back light:** **Cực kỳ quan trọng**. Ánh sáng ngược mạnh để làm nổi bật lớp lông len li ti ở viền nhân vật.
+
+### 3b. Biến thể context:
+*   **Outdoor:** Golden hour nắng xiên, đổ bóng dài nhưng mềm.
+*   **Indoor:** Cozy, ánh sáng cục bộ từ đèn ngủ hoặc cửa sổ.
+
+### 3c. Hiệu ứng đặc biệt:
+*   **Volumetric light:** Có (God rays) rõ rệt trong rừng hoặc qua cửa sổ.
+*   **Atmospheric perspective:** Hơi mờ dần ở hậu cảnh để tạo chiều sâu.
+
+## 4. TEXTURE & CHẤT LIỆU (Visual Surface Quality)
+*   **Resolution:** 4K (chi tiết sợi len rõ mồn một).
+*   **Needle-felted Wool (Len chọc):** Độ chi tiết 10/10. Phải thấy rõ các lỗ li ti do kim chọc và sợi len tơ rải rác.
+*   **Wood:** Painted wood, bề mặt nhám mịn, không phản chiếu mạnh.
+*   **Eyes:** Black beads (hạt cườm đen) bóng nhẹ, phản chiếu một đốm sáng nhỏ.
+*   **Skin (Búp bê):** Cấu trúc nỉ ép mịn, không có lỗ chân lông.
+
+## 5. FILM GRAIN & POST-PROCESSING
+*   **Film Grain:** Mịn, intensity 4/10.
+*   **Vignette:** Nhẹ ở các góc để tập trung vào nhân vật.
+*   **Bloom:** Cao, tạo hiệu ứng hào quang quanh Jesus và các nguồn sáng.
+*   **Depth of Field:** Rất nông (Shallow DOF), hậu cảnh bokeh mờ nhòe như chụp macro.
+*   **Aspect Ratio:** 16:9 hoặc 2.35:1 (Cinema).
+
+## 6. SO SÁNH STYLE
+*   **Phim:** *Shaun the Sheep*, *The Little Prince* (phân đoạn Stop-motion).
+*   **YouTube:** *The Well Studio*, *Tiny Kitchen*.
+*   **AI Art:** "Needle felted dioramas", "Stop-motion aesthetic AI".
+
+## 7. SAMPLE PROMPT RECONSTRUCTION
+
+### Frame 1: Jesus ôm cừu (Warm Mood)
+```json
+{
+  "frame_description": "Jesus hugging a small lamb in a sunny meadow, felted texture.",
+  "full_prompt": "Cinematic close-up, needle felted stop-motion style, a gentle Jesus figure with brown yarn hair and beard, wearing a white wool tunic, hugging a tiny fuzzy white lamb. Materials are high-quality needle felt with visible fibers and fuzzy texture. Background is a dreamy soft-focus green meadow with bokeh wildflowers. Soft golden hour lighting with strong rim light illuminating the wool fuzz. Volumetric sunbeams, warm color palette, soft shadows, 8k resolution, highly detailed textile rendering, macro photography style --ar 16:9 --v 6.1",
+  "negative_prompt": "shiny skin, plastic, realistic human, sharp shadows, high contrast, oversaturated, messy fibers, distorted faces",
+  "recommended_model": "Midjourney v6.1",
+  "recommended_settings": {"cfg_scale": 7, "steps": 30, "sampler": "DPM++ 2M Karras"}
+}
+```
+
+### Frame 2: Cừu đen buồn (Dark/Emotional)
+```json
+{
+  "frame_description": "Black sheep crying in a dark, moody felted forest.",
+  "full_prompt": "Needle felted stop-motion aesthetic, a small black felted sheep with big teary eyes, walking alone in a dark whimsical forest. Dark navy and charcoal grey felt trees. Moody atmospheric lighting, moonlight filtered through mist, soft blue glow, volumetric fog. Macro shot focusing on the felt texture of the sheep. Soft teardrops made of clear resin. Dreamy, emotional atmosphere, shallow depth of field, vignette, slightly lifted blacks, cinematic composition --ar 16:9 --stylize 250",
+  "negative_prompt": "bright sun, cheerful, low res, flat texture, realistic animals, cartoonish",
+  "recommended_model": "Flux.1 [dev]",
+  "recommended_settings": {"cfg_scale": 3.5, "steps": 25, "sampler": "Euler"}
+}
+```
+
+### Frame 3: Lớp học cừu (Complex/Indoor)
+```json
+{
+  "frame_description": "Classroom with multiple felted sheep at wooden desks.",
+  "full_prompt": "A miniature classroom diorama, needle felted stop-motion style. Several white felted sheep students sitting at tiny handcrafted wooden desks. One black sheep sitting alone. Interior lighting from high windows, soft dust motes in the air. Muted pastel colors, soft browns and creams. Every object has a tactile, handcrafted textile feel. Sharp focus on the foreground sheep, blurry classroom background. High detail on the yarn and felt materials --ar 16:9 --v 6.1",
+  "negative_prompt": "modern classroom, 3d render, cgi, plastic, glossy, photorealistic humans",
+  "recommended_model": "Midjourney v6.1",
+  "recommended_settings": {"cfg_scale": 8, "steps": 40, "sampler": "Default"}
+}
+```
+
+=============
+
+Chào bạn, dưới góc độ là một Đạo diễn hình ảnh (DP), tôi xin phân tích ngôn ngữ điện ảnh của video từ kênh **"The Well Studio"**.
+
+Một lưu ý tiên quyết: Video này sử dụng kỹ thuật **AI-Generated Animation** (tạo ảnh bằng AI và dùng công cụ thứ hai để tạo chuyển động máy). Do đó, ngôn ngữ điện ảnh ở đây là sự mô phỏng các kỹ thuật quay macro và stop-motion thực tế.
+
+---
+
+## 1. THỐNG KÊ CỠ CẢNH (Shot Size Distribution)
+
+Ngôn ngữ của The Well Studio tập trung vào cảm xúc và chất liệu, nên cỡ cảnh có xu hướng gần (Close) để nhấn mạnh sự "đáng yêu" và "thánh thiện".
+
+| Cỡ cảnh | Số lần ước tính | % tổng | Dùng khi nào (context) |
+|----------|--------|--------|------------------------|
+| **Extreme Wide Shot (EWS)** | 2 | 5% | Cảnh bao quát thiên nhiên, đồi núi để tạo không gian thần tiên (Diorama). |
+| **Wide Shot (WS)** | 5 | 15% | Thiết lập bối cảnh (establishing shot): Chúa Jesus đi cùng bầy cừu, ngôi nhà gỗ giữa đồng. |
+| **Medium Shot (MS)** | 8 | 20% | Cảnh tương tác giữa các nhân vật (lớp học, bữa ăn) hoặc nhân vật đang thực hiện hành động. |
+| **Medium Close-Up (MCU)** | 10 | 25% | Tập trung vào chân dung nhân vật từ ngực trở lên, cân bằng giữa biểu cảm và môi trường. |
+| **Close-Up (CU)** | 12 | 30% | **Chủ đạo.** Nhấn mạnh vào đôi mắt to, những giọt nước mắt resin hoặc nụ cười của nhân vật. |
+| **Extreme Close-Up (ECU)** | 2 | 5% | Đặc tả cực cận texture sợi len, chi tiết bức thư hoặc đôi mắt hạt cườm bóng bẩy. |
+
+---
+
+## 2. THỐNG KÊ GÓC MÁY (Camera Angle)
+
+Kênh sử dụng góc máy rất nhân văn, ít dùng các góc cực đoan để giữ cảm giác gần gũi.
+
+| Góc máy | Tần suất | % | Dùng khi nào |
+|---------|--------|---|-------------|
+| **Eye-level** | Cao nhất | 75% | Góc nhìn ngang tầm mắt tạo sự kết nối đồng cảm giữa khán giả và búp bê len. |
+| **Low angle** (nhìn lên) | Vừa | 15% | Dùng cho Chúa Jesus để tạo vẻ uy nghi nhưng hiền từ, hoặc khi cừu nhìn lên Chúa. |
+| **High angle** (nhìn xuống) | Thấp | 10% | Dùng cho con cừu đen khi cô đơn, bị bắt nạt, tạo cảm giác nhỏ bé, đáng thương. |
+
+---
+
+## 3. CHUYỂN ĐỘNG CAMERA (Camera Movement)
+
+**Phương pháp chính:** Ảnh tĩnh AI + Animation camera giả lập (Post-production). Chuyển động rất mượt (fluid) nhưng thiếu sự rung động tự nhiên của tay người.
+
+| Loại chuyển động | Tần suất | Tốc độ | Mô tả chi tiết |
+|-------------------|----------|--------|-----------------|
+| **Slow zoom in** | Rất cao | Cực chậm | Tiến dần vào khuôn mặt nhân vật khi cao trào cảm xúc (cầu nguyện, khóc). |
+| **Slow zoom out** | Vừa | Cực chậm | Lùi ra từ một chi tiết (bức thư) để tiết lộ bối cảnh xung quanh. |
+| **Tracking/Dolly** | Vừa | Chậm | Máy quay "trượt" ngang theo nhân vật khi đang đi bộ trên đường. |
+| **Parallax** | Thường xuyên| Chậm | Các lớp (FG: cỏ, MG: nhân vật, BG: núi) trượt với tốc độ khác nhau tạo chiều sâu 3D ảo. |
+
+- **Thời gian trung bình mỗi shot:** 3 - 5 giây.
+- **Transitions:** Chủ yếu dùng **Cross Dissolve** (chồng mờ) và **Fade to Black/White**. Điều này tạo cảm giác mơ màng, nhịp nhàng như một lời cầu nguyện.
+
+---
+
+## 4. QUY LUẬT BỐ CỤC (Composition Rules)
+
+1.  **Center Composition (Bố cục trung tâm):** Nhân vật chính (Chúa hoặc Cừu) thường được đặt ngay giữa frame để tạo sự tôn nghiêm, tĩnh tại và mang tính biểu tượng thánh tượng (Iconography).
+2.  **Rule of Thirds (1/3):** Sử dụng khi nhân vật di chuyển (walking shot). Nhân vật nằm ở đường mạnh trái/phải, hướng nhìn về không gian trống (negative space).
+3.  **Depth Layers (Lớp lang chiều sâu):** Đây là đặc trưng nhất. 
+    - *Foreground (FG):* Luôn có những nhành cỏ mờ boke, hoa dại hoặc tán lá che một góc máy.
+    - *Midground (MG):* Nhân vật len.
+    - *Background (BG):* Đồi núi mờ ảo.
+4.  **Framing Devices:** Sử dụng tán cây, khung cửa sổ hoặc hang đá để "đóng khung" nhân vật, tạo cảm giác an toàn, được bảo vệ.
+5.  **Shallow Depth of Field (DoF mỏng):** Giả lập ống kính Macro. Hậu cảnh luôn bị xóa phông mạnh (bokeh hạt tròn mịn) để tập trung hoàn toàn vào texture của len.
+
+---
+
+## 5. NHỊP ĐỘ HÌNH ẢNH (Visual Pacing)
+
+- **Nhịp độ:** Rất chậm và suy tưởng (Meditative pacing).
+- **Sự thay đổi:** Nhịp cắt cảnh hoàn toàn phụ thuộc vào giai điệu nhạc Worship (thường là ở cuối mỗi câu hát).
+- **Cảm xúc:** Khi đoạn nhạc buồn/sâu lắng, shot được giữ lâu hơn (5-7 giây), zoom cực chậm. Khi chuyển sang đoạn vui tươi (bữa tiệc, nhảy múa), các shot ngắn hơn (~2 giây) và dùng kỹ thuật cắt gắt (jump cut) nhẹ nhàng giữa các góc quay khác nhau của cùng một hành động.
+
+---
+
+## 6. MẪU CẮT CẢNH (Editing Patterns)
+
+- **Establishing → Subject → Reaction:** 
+    1. Cảnh rộng ngôi trường. 
+    2. Cảnh trung cừu đen ngồi một mình. 
+    3. Cảnh cận đôi mắt buồn.
+- **Match Cuts:** Cắt giữa cảnh cừu đen buồn bã trong mưa sang cảnh cừu đen ngồi trong hang đá với Chúa, tạo sự liên kết về không gian và cảm xúc.
+- **L-cut (Audio trails):** Tiếng hát hoặc tiếng gió của cảnh trước thường tràn sang cảnh sau một chút để các cảnh quay AI rời rạc gắn kết thành một câu chuyện liền mạch.
+- **Contrast Editing:** Cắt giữa vùng tối (rừng sâu, nỗi sợ) sang vùng sáng (đồng cỏ, ánh nắng) để thể hiện sự cứu rỗi (Redemption).
+
+**Tổng kết từ DP:** Video sử dụng ngôn ngữ điện ảnh của thể loại **"Miniature Cinema"** (Điện ảnh mô hình). Mọi thứ từ ánh sáng rim light, góc máy eye-level đến nhịp độ chậm rãi đều phục vụ một mục đích duy nhất: Biến những vật liệu len nỉ khô khan thành những sinh thể có linh hồn và giàu lòng trắc ẩn.
+
+
+================
+
+
+Chào bạn, với tư cách là một nhà phân tích ngôn ngữ học, tôi xin phân tích phong cách "Narration" (thực chất là dạng thơ ca/lời bài hát tâm tình) của kênh **The Well Studio**. 
+
+Cần lưu ý: Kênh này không sử dụng người dẫn chương trình (host) hay người kể chuyện (narrator) truyền thống. Nội dung được truyền tải qua **Lời thơ/Lời hát (Poetic Narration)** mang tính chất cầu nguyện và tự sự nội tâm.
+
+---
+
+## 1. CẤU TRÚC VĨ MÔ (Macro Structure)
+- **Thể loại:** Story-driven narrative (Kể chuyện qua thơ/nhạc) kết hợp Meditative/Spiritual (Suy tưởng tâm linh).
+- **Mở đầu:** Thường là một lời tự thú về sự yếu đuối hoặc một khung cảnh cô độc (Cold open khoảng 5-10 giây nhạc nền tĩnh lặng).
+- **Các tầng narrative:** 
+    1. *Tầng bề mặt:* Hành trình của con cừu nhỏ (vật lý).
+    2. *Tầng ẩn dụ:* Hành trình của linh hồn đang tìm kiếm sự an ủi (tâm linh).
+- **Kết thúc:** Luôn là một sự khẳng định về niềm tin, sự an nghỉ (Rest) và lời hứa không bao giờ bị bỏ rơi.
+- **Tỷ lệ:** 100% là lời hát/thơ được hòa âm. Không có lời thoại đời thường.
+
+**Sơ đồ cấu trúc đặc trưng:**
+- `00:00-00:15` → Khởi đầu: Thiết lập nỗi buồn/sự mệt mỏi (The Struggle).
+- `00:15-01:30` → Cao trào: Đối diện với bóng tối/thử thách (The Darkness).
+- `01:30-02:45` → Chuyển biến: Sự xuất hiện của "Chúa" (The Encounter).
+- `02:45-Hết` → Kết luận: Sự bình an và thuộc về (The Belonging).
+
+---
+
+## 2. PHONG CÁCH NGÔN NGỮ (Linguistic Style)
+
+### 2a. Ngôi kể / Phong cách nói:
+- **POV:** Sử dụng **Ngôi thứ nhất ("Tôi" - linh hồn)** nói chuyện trực tiếp với **Ngôi thứ hai ("Ngài" - Chúa)**. Đây là cấu trúc "I - Thou" (Tôi và Chúa) điển hình trong văn học tôn giáo.
+- **Personality:** Vô cùng khiêm nhường (humble), mong manh (vulnerable) và thành kính (devoted).
+
+### 2b. Vocabulary & Sentence Pattern:
+- **Độ dài câu:** Câu ngắn, nhịp nhàng như hơi thở. Trung bình 5-8 từ mỗi dòng thơ.
+- **Từ vựng:** Thuộc nhóm **Literary/Spiritual (Văn chương/Tâm linh)**. 
+    - *Keywords:* Worn (mòn mỏi), Weak (yếu đuối), Grace (ân điển), Silence (tĩnh lặng), Shadow (bóng tối).
+- **Metaphor (Ẩn dụ):** Dày đặc. 
+    - Con cừu đen = Sự lạc lõng/tội lỗi.
+    - Cơn mưa/Rừng tối = Thử thách cuộc đời.
+    - Ánh sáng đèn/Hang đá = Sự che chở.
+
+### 2c. Rhetorical Devices (Thủ pháp tu từ):
+- **Anaphora (Lặp cấu trúc):** "Someone stays...", "I am tired...", "You never change..." (Tạo hiệu ứng nhấn mạnh và vỗ về).
+- **Juxtaposition (Đối lập):** Đặt sự mệt mỏi của con người cạnh sự vĩnh cửu của thần linh. (VD: "I am broken - You remain the same").
+- **Direct Address:** Nói thẳng với Chúa hoặc tự nhủ với lòng mình.
+
+### 2d. Cụm từ chuyển ý đặc trưng (Transition Phrases):
+Vì đây là thơ, các cụm từ chuyển ý mang tính biểu cảm rất cao:
+- **Chuyển sang phần mới:** "But then...", "In the middle of...", "When my strength runs out..."
+- **Chuyển sang hồi hộp:** "I walked through roads...", "The night feels heavier..."
+- **Chuyển sang hy vọng:** "Just quiet love...", "Someone is here with me..."
+- **Kết luận:** "That is enough", "I am known", "I rest in You".
+
+---
+
+## 3. NHỊP ĐỘ KỂ (Pacing)
+- **Tốc độ:** Rất chậm (Adagio). Khoảng 40-50 từ/phút.
+- **Khoảng nghỉ (Silence):** Cực kỳ quan trọng. Sau mỗi câu thơ quan trọng thường có 2-3 giây chỉ có tiếng nhạc đệm hoặc âm thanh môi trường (tiếng mưa, tiếng gió) để khán giả "thấm" cảm xúc.
+- **Energy level:** Thấp nhưng cường độ cảm xúc (emotional intensity) lại rất cao.
+
+---
+
+## 4. CẢM XÚC & TONE (Emotional Arc)
+- **Tone chủ đạo:** Contemplative (Suy tưởng) & Inspirational (Truyền cảm hứng).
+- **Mức độ cá nhân:** Deeply personal (Cực kỳ cá nhân, như một lời nhật ký tâm hồn).
+
+**Emotional Arc:**
+- `0-30%` → **Exhaustion (Intensity 4)**: Cảm giác kiệt sức.
+- `30-60%` → **Fear/Despair (Intensity 5)**: Cao trào của nỗi lo âu.
+- `60-90%` → **Comfort (Intensity 3)**: Sự an ủi nhẹ nhàng.
+- `90-100%` → **Peace (Intensity 5)**: Sự mãn nguyện tuyệt đối.
+
+---
+
+## 5. SO SÁNH VỚI CÁC KÊNH KHÁC
+
+| Khía cạnh | The Well Studio | BibleProject |
+|-----------|---------------------|---------------------|
+| **Tone** | Cảm xúc, cá nhân | Giáo dục, học thuật |
+| **Pacing** | Rất chậm, nhịp thơ | Vừa phải, nhịp giảng bài |
+| **POV** | "Tôi" (Linh hồn) | "Chúng ta" (Người học) |
+| **Mục đích** | Chữa lành/Cầu nguyện | Giải thích kinh thánh |
+
+---
+
+## 6. SAMPLE SCRIPT RECREATION
+Chủ đề: **Finding light in the storm (Tìm ánh sáng trong cơn bão)**
+
+**The Script:**
+
+"The clouds are gathering again, Lord. 
+I see the horizon turning grey, and my heart grows small within my chest. 
+I thought I was strong enough to cross this valley on my own. 
+I thought the map I drew would lead me home.
+
+(Pause - Sound of thunder)
+
+But the wind is loud, and my steps are uncertain. 
+I am tired of pretending that I am not afraid. 
+I am weary of holding this umbrella against a gale that will not cease. 
+
+(Soft piano swell)
+
+But then, You breathe. 
+Not to stop the storm, but to remind me that You are the shelter. 
+You don’t ask me to run; You ask me to sit still. 
+In the quiet of the rain, I hear a whisper that knows my name. 
+
+I am not the storm. I am the one held by the One who calms it. 
+And that is enough. 
+I will stay awake, until the morning comes. 
+For You are here. And You remain."
+
+---
+**Ghi chú cho AI Writing:** Để bắt chước phong cách này, hãy yêu cầu AI sử dụng "poetic prose", tránh các từ ngữ quá hiện đại hoặc mang tính logic, thay vào đó hãy dùng các từ gợi hình, gợi cảm và tập trung vào sự đối lập giữa cái "tôi" nhỏ bé và cái "Ngài" vĩ đại.
+
+
+==================
+
+
+Chào bạn, với tư cách là **Production Designer (Thiết kế sản xuất)** và **Art Director**, tôi xin cung cấp bản phân tích thiết kế hình ảnh chi tiết của kênh **The Well Studio** để phục vụ việc tái tạo bằng AI.
+
+---
+
+## 1. NHÂN VẬT (Characters)
+
+### 1a. Phong cách thể hiện:
+*   **Thể loại:** 100% là **AI-generated Needle-felted figurines** (Búp bê len chọc).
+*   **Stylization:** Phong cách Chibi cách điệu cao (đầu to, thân nhỏ, tay chân tròn lẳn). Tỷ lệ búp bê mini (1:12).
+*   **Chi tiết:** Không có người thật. Các nhân vật có vẻ ngoài vô cùng mềm mại, ấm áp và "có thể chạm vào được" (tactile).
+
+### 1b. Trang phục & Ngoại hình:
+**Nhóm 1: Chúa Jesus**
+*   **Ngoại hình:** Tóc và râu làm từ những sợi len nâu xoắn (yarn strands). Đôi mắt là hạt cườm đen bóng (black beads) phản chiếu ánh sáng điểm.
+*   **Trang phục:** Tunic trắng bằng len thô, khoác thêm khăn choàng nâu hoặc xanh lá nỉ (felt). Không có chi tiết khóa kéo hay cúc nhựa, mọi thứ đều như được khâu tay thủ công.
+
+**Nhóm 2: Đàn cừu (Nhân vật trung tâm)**
+*   **Chất liệu:** Len cừu xù (curly wool texture) cho phần thân, nỉ mịn cho phần mặt và chân.
+*   **Phân loại:** Cừu trắng (đa số) và Cừu đen (nhân vật chính lạc lõng). Cừu đen có biểu cảm u sầu rõ rệt.
+*   **Trang phục (cho cừu đi học):** Những chiếc áo len cổ lọ tí hon, áo gile nỉ màu pastel, cặp sách da nâu mini.
+
+---
+
+## 2. BỐI CẢNH & MÔI TRƯỜNG (Settings)
+
+### 2a. Bối cảnh chính: Diorama Thủ Công
+*   **Mô tả:** Thế giới trong video là một mô hình diorama khổng lồ. Cỏ được làm từ thảm nỉ xanh, cây cối có tán lá bằng những miếng nỉ cắt rời hoặc bông len nhuộm màu.
+*   **Kiến trúc:** Nhà gỗ, lớp học đều có tỷ lệ mini, làm từ gỗ thông sáng màu, các góc cạnh được bo tròn thân thiện.
+*   **Ánh sáng:** Thường dùng ánh sáng vàng ấm (2700K - 3000K) giả lập nắng chiều hoặc đèn dây tóc. Luôn có **God rays** (tia nắng) xuyên qua kẽ lá hoặc cửa sổ.
+
+### 2b. Bối cảnh phụ:
+*   **Rừng tối:** Sử dụng tông màu xanh đen và xám của len, tạo cảm giác mờ ảo, đáng sợ nhưng vẫn giữ texture vải vóc.
+*   **Bầu trời đêm:** Vải nhung đen đính hạt cườm làm sao, trăng làm từ nỉ vàng sáng.
+
+---
+
+## 3. ĐỒ VẬT & ĐẠO CỤ (Props)
+*   **Bức thư/Bản nhạc:** Giấy kraft hoặc giấy mỹ thuật màu hồng nhạt, có độ nhám.
+*   **Đồ ăn (Trứng ốp la, bánh mì):** Làm từ len chọc cực kỳ chi tiết (Level 9/10), trông ngon mắt theo kiểu đồ chơi cao cấp.
+*   **Cây đèn/Bàn ghế:** Gỗ mộc mạc, hoàn thiện mịn, sơn màu pastel.
+*   **Nước mắt:** Giả lập bằng các hạt nhựa trong suốt (clear resin) hoặc hạt cườm nhỏ gắn lên mặt nhân vật.
+
+---
+
+## 4. TYPOGRAPHY & ĐỒ HỌA ON-SCREEN
+
+### 4a. Text elements:
+*   **Font:** Thường dùng font viết tay (handwritten) mềm mại hoặc font không chân (sans-serif) bo góc tròn.
+*   **Vị trí:** Căn giữa ở 1/4 phía dưới màn hình. 
+*   **Màu:** Trắng hoặc vàng nhạt, có đổ bóng mờ (soft drop shadow) để nổi bật trên nền bối cảnh phức tạp.
+
+### 4b. Thumbnail & Brand:
+*   **Style:** Chữ "The Well Studio" thiết kế theo kiểu **Bubble text** (chữ bong bóng) trông như những đám mây len bồng bềnh.
+*   **Watermark:** Logo nhỏ, mờ, đặt ở góc trên bên trái.
+
+---
+
+## 5. OUTPUT: IMAGE GENERATION REFERENCE SHEET
+
+```json
+{
+  "content_type": "Needle-felted stop-motion animation aesthetic",
+  "style_keywords": [
+    "needle felted texture",
+    "handcrafted diorama",
+    "tactile wool material",
+    "fuzzy edges",
+    "miniature world",
+    "chibi character design",
+    "macro photography",
+    "soft bokeh",
+    "visible textile fibers"
+  ],
+  "negative_keywords": [
+    "plastic",
+    "3d render",
+    "cgi",
+    "glossy skin",
+    "photorealistic humans",
+    "sharp metal",
+    "modern technology",
+    "flat textures"
+  ],
+  "color_palette": {
+    "shadow_primary": "#2D231D",
+    "shadow_secondary": "#1A1C2C",
+    "highlight_warm": "#FFF9E5",
+    "highlight_cool": "#E0F2F1",
+    "accent_primary": "#F48FB1",
+    "accent_secondary": "#81C784",
+    "brand_colors": ["#FFFFFF", "#B3E5FC"],
+    "dominant_midtones": ["#8B7355", "#D1D5DB"]
+  },
+  "lighting_setup": {
+    "primary_method": "Virtual studio lighting with heavy bloom",
+    "key_fill_ratio": "2:1",
+    "light_sources": ["Warm directional sunlight", "Strong rim lighting to catch wool fuzz"],
+    "mood": "Dreamy, cozy, spiritual, compassionate"
+  },
+  "texture_detail_level": "10/10",
+  "film_grain_intensity": "4/10",
+  "realism_level": "8/10 (Material realism, not anatomical)",
+  "production_value": "9/10"
+}
+```
+
+**Lời khuyên từ Art Director:** Khi tạo ảnh bằng AI, hãy nhấn mạnh từ khóa **"Rim lighting"** và **"Fuzzy texture"**. Điều tạo nên linh hồn của The Well Studio chính là những sợi len li ti bắt sáng ở viền nhân vật, tạo ra cảm giác thánh thiện và mềm mại tuyệt đối.
+
+
+==============
+
+
+Chào bạn, dưới góc độ là một chuyên gia Motion Graphics và Post-production, tôi xin phân tích quy trình sản xuất kỹ thuật của các video từ kênh **"The Well Studio"**.
+
+---
+
+## 1. PHƯƠNG PHÁP SẢN XUẤT VIDEO (Video Production Method)
+*   **Phương pháp chính:** **AI-Generated Animation (Image-to-Video)**.
+*   **Quy trình ước tính:**
+    1.  Tạo ảnh tĩnh chất lượng cực cao (thường là Midjourney v6 hoặc Flux.1) để định hình nhân vật và bối cảnh Needle-felted.
+    2.  Sử dụng công cụ AI Video (như **Runway Gen-3 Alpha, Luma Dream Machine, hoặc Kling AI**) để animate ảnh tĩnh đó.
+    3.  Hậu kỳ tại **After Effects**: Thêm các lớp overlay hạt bụi, ánh sáng nhấp nháy, hiệu ứng Parallax thủ công và chỉnh màu (Color Grading).
+*   **Tỷ lệ:** 70% AI Motion | 30% Post-production Compositing.
+
+---
+
+## 2. CÁC KIỂU CHUYỂN ĐỘNG (Motion Types)
+
+### 2a. Camera Movement (Giả lập):
+*   **Tốc độ:** Rất chậm đến chậm (Cực kỳ mượt mà, mang tính thiền định).
+*   **Kiểu Move:** 
+    *   **Slow Zoom In/Out:** Chiếm 80% thời lượng. Tỷ lệ zoom rất nhỏ (từ 100% lên 105%) để giữ chất lượng texture len nỉ không bị vỡ.
+    *   **Subtle Pan:** Trượt ngang nhẹ nhàng để tạo hiệu ứng Parallax giữa cỏ ở tiền cảnh và núi ở hậu cảnh.
+*   **Easing:** **Ease-in-out** rất mềm, không có điểm dừng gắt.
+
+### 2b. Subject Movement:
+*   **Nhân vật:** Chuyển động tinh tế (Subtle movement). Nhân vật không thực hiện các hành động phức tạp mà chủ yếu là: chớp mắt, thở nhẹ (lồng ngực phập phồng), tóc len đung đưa theo gió, và sự rung động tự nhiên của lớp lông len li ti (fuzz).
+*   **Vật thể:** Các đốm sáng, lá cây nỉ rung nhẹ theo thuật toán lỏng (fluid motion) của AI.
+
+### 2c. Parallax & Depth:
+*   Sử dụng ít nhất **3-4 layers depth**:
+    1.  *Foreground:* Nhành cỏ/lá mờ (Blur) trượt nhanh.
+    2.  *Midground:* Nhân vật chính chuyển động chậm.
+    3.  *Background:* Cây cối/Nhà cửa.
+    4.  *Deep Background:* Núi/Bầu trời gần như tĩnh.
+
+### 2d. Particle & Atmospheric Effects:
+*   **Dust Motes (Bụi vàng):** Những hạt bụi li ti bay lơ lửng trong các tia nắng (God rays), tạo cảm giác không gian linh thiêng.
+*   **God Rays (Volumetric Light):** Các luồng sáng đứng yên nhưng có cường độ nhấp nháy nhẹ (Flickering).
+*   **Lens Bloom:** Hiệu ứng lóa sáng cực mạnh ở các vùng highlight (như viền đầu Chúa hoặc Cừu).
+
+---
+
+## 3. TRANSITIONS (Chuyển cảnh)
+
+| Loại | Tần suất | Duration (ms) | Dùng khi nào |
+|------|----------|---------------|-------------|
+| **Cross Dissolve** | Rất cao | 1000 - 2000 | Chuyển giữa các câu hát/ý thơ, tạo sự mượt mà. |
+| **Fade to Black** | Vừa | 1500 | Kết thúc một phân đoạn cảm xúc buồn hoặc kết thúc video. |
+| **Soft Cut** | Thấp | - | Dùng khi chuyển góc máy từ cảnh rộng sang cảnh cận của cùng một bối cảnh. |
+
+---
+
+## 4. NHẠC & ÂM THANH (Audio Design)
+*   **Thể loại:** Acoustic Worship / Cinematic Ambient.
+*   **Instruments:** Piano điện, Guitar acoustic (tiếng dây rõ rệt), Cello hoặc Pad nhẹ nhàng làm nền.
+*   **SFX:** Tiếng môi trường (Ambience) rất tinh tế: tiếng mưa rơi tí tách, tiếng gió thổi qua kẽ lá, tiếng chim hót xa xăm. 
+*   **Voice:** Giọng hát/đọc chuyên nghiệp, được xử lý với **Reverb (Hall)** và **Delay** rộng để tạo cảm giác không gian mênh mông, thánh thiện.
+
+---
+
+## 5. TIMELINE BREAKDOWN (Ví dụ 30 giây đầu)
+
+| Thời gian | Duration | Nội dung | Cỡ cảnh | Camera move | Transition | FX/Overlay |
+|-----------|----------|----------|---------|-------------|----------------|------------|
+| 00:00 | 7s | Cừu đen ngủ trong phòng | MCU | Slow Zoom In | Fade from Black | Dust motes, Lamp glow |
+| 00:07 | 8s | Đồng hồ báo thức kêu | Detail | Static | Cross Dissolve | Soft focus bokeh |
+| 00:15 | 15s | Cừu đen đi bộ dưới nắng | WS | Tracking Pan | Cross Dissolve | God rays, Parallax grass |
+
+---
+
+## 6. VIDEO GENERATION / RECREATION PARAMETERS
+
+*   **Workflow đề xuất:** Midjourney (Style: needle felted stop motion) -> Luma Dream Machine (Motion: 3-4) -> After Effects (Add dust & lighting overlays).
+*   **AI Video Prompts (3 Ví dụ):**
+
+```json
+{
+  "shot_description": "Close up of a felted sheep crying",
+  "video_prompt": "A macro close-up of a needle-felted black sheep with big sad glass eyes. Two clear resin teardrops slowly roll down its fuzzy wool cheeks. The sheep's mouth trembles slightly as it breathes. Extremely soft lighting with a warm golden rim light on the wool fibers. Shallow depth of field with a blurry garden background. High quality textile texture, 4k, stop-motion aesthetic, very subtle movement.",
+  "duration": "5s",
+  "camera_motion": "Slow steady zoom in towards the eyes",
+  "style_keywords": ["needle-felted texture", "subtle breathing", "cinematic lighting"]
+}
+```
+
+```json
+{
+  "shot_description": "Jesus walking with lambs in a meadow",
+  "video_prompt": "Cinematic wide shot of a needle-felted Jesus figure in a white wool robe walking through a fuzzy green nỉ meadow. Several tiny white lambs are hopping and running around him. The sun is setting in the background, creating strong volumetric god rays. Wind is gently blowing, making the wool grass and the characters' fuzzy hair sway slightly. Parallax effect with foreground flowers. 4k, tactile materials, handcrafted style.",
+  "duration": "10s",
+  "camera_motion": "Slow tracking pan from left to right following the characters",
+  "style_keywords": ["parallax", "volumetric sunlight", "soft fluid motion"]
+}
+```
+
+```json
+{
+  "shot_description": "Interior classroom with felted sheep",
+  "video_prompt": "A miniature stop-motion diorama of a classroom. Multiple needle-felted white sheep sit at small wooden desks, holding tiny pencils. One black sheep sits alone looking at a window. Soft natural light streams through the window with visible dust particles floating in the air. The sheep students make tiny head movements like writing. Handcrafted aesthetic, macro lens, detailed fabric texture, dreamy atmosphere.",
+  "duration": "7s",
+  "camera_motion": "Very slow dolly zoom out to reveal the whole classroom",
+  "style_keywords": ["macro lens", "dust particles", "diorama aesthetic"]
+}
+```
+
+
+===============
+
+
+Chào bạn, với tư cách là chuyên gia phân tích audio-visual, tôi xin giải phẫu cấu trúc âm thanh đặc trưng của kênh **"The Well Studio"**. 
+
+**Lưu ý quan trọng:** Kênh này sử dụng hình thức **Poetic Sung-Narration** (Người kể chuyện đồng thời là người hát). Các nhân vật (Cừu, Chúa Jesus) hầu như **không bao giờ nói trực tiếp bằng lời thoại có lip-sync (hợp miệng)**. Thay vào đó, âm thanh được chia làm 2 lớp: Giọng hát tự sự (Narrator) và các biểu cảm âm thanh môi trường/phản ứng nhẹ (Ambient/Reaction).
+
+Dưới đây là phân tích dựa trên video điển hình: *"I am tired, Lord (But You Remain)"*.
+
+---
+
+## 1. PHÂN LOẠI AUDIO MODE TỪNG SHOT
+
+| # | Timestamp | Duration | Audio Mode | Narrator? | Dialogue? | Dialogue Content | Nhận xét |
+|---|-----------|----------|------------|-----------|-----------|------------------|----------|
+| 1 | 00:00-00:06 | 6s | narrator_only | Có | Không | - | Giọng hát dẫn nhập mềm, tiếng piano. |
+| 2 | 00:06-00:12 | 6s | narrator_only | Có | Không | - | Đặc tả đồng hồ, [SFX] tiếng tích tắc. |
+| 3 | 00:12-00:25 | 13s | narrator_only | Có | Không | - | Cừu đánh răng, [SFX] tiếng nước chảy mờ. |
+| 4 | 00:25-00:30 | 5s | reaction_only | Không | Có | "[Sheep] *Baa nhẹ*" | Tiếng cừu kêu khẽ khi thấy Chúa (Trigger: CHARACTER_INTRO). |
+| 5 | 00:30-02:40 | 130s | narrator_only | Có | Không | - | Toàn bộ hành trình, giọng hát thay đổi theo cung bậc cảm xúc. |
+| 6 | 02:40-02:50 | 10s | dialogue_dominant| Có | Có | "[Jesus] *Thì thầm*" | Đoạn cao trào, giọng nam trầm hát đè lên như lời Chúa phán (Soft_line). |
+| 7 | 02:50-Hết | - | narrator_only | Có | Không | - | Kết thúc bằng nhạc ambient và lời khẳng định. |
+
+---
+
+## 2. THỐNG KÊ PHÂN BỐ AUDIO MODE
+
+| Audio Mode | Số shots | % tổng | Tổng thời lượng | % thời lượng |
+|------------|----------|--------|-----------------|-------------|
+| **narrator_only** | 25 | 92% | ~170s | 95% |
+| **dialogue_dominant**| 2 | 8% | ~10s | 5% |
+
+---
+
+## 3. PHÂN LOẠI ĐỐI THOẠI (Dialogue Taxonomy)
+
+Dù nhân vật không nói chuyện đời thường, "The Well Studio" vẫn cài cắm các âm thanh mang tính đối thoại biểu tượng:
+
+| # | Speaker | Dialogue Type | Nội dung | Trigger |
+|---|---------|---------------|----------|------------------------------------------|
+| 1 | [Cừu] | **reaction** | "Be...ee" (tiếng thở dài/kêu nhẹ) | **EMOTIONAL_PEAK**: Khi cừu cô đơn hoặc khóc. |
+| 2 | [Chúa] | **soft_line** | Lời hát chuyển sang tông nam trầm ấm. | **SYMBOLIC_MOMENT**: Khi Chúa ôm lấy cừu. |
+| 3 | [Đàn cừu] | **ambient_voice**| Tiếng cười đùa mờ (muffled). | **ACTION_DESCRIPTION**: Cảnh vui chơi ở trường. |
+
+---
+
+## 4. PHÂN TÍCH NHỊP ĐỘ NARRATOR ↔ DIALOGUE
+
+### 4a. Mô hình xen kẽ:
+- **Cấu trúc:** Đây là cấu trúc **Monologue-Continuous**. Narrator hát xuyên suốt. Dialogue thực sự không tồn tại, mà chỉ có các khoảng dừng âm nhạc để chèn **SFX Reaction** (Tiếng cừu kêu, tiếng bước chân).
+- **Pattern:** Cứ sau mỗi đoạn Verse (khổ thơ), sẽ có một khoảng nghỉ 2 giây chỉ có SFX môi trường để nhân vật bộc lộ cảm xúc qua hình ảnh (nhìn lên trời, cúi đầu).
+
+### 4b. Mật độ theo giai đoạn:
+- **Opening (20%):** 100% narrator. Thiết lập bối cảnh.
+- **Middle (40%):** 90% narrator, 10% reaction (tiếng khóc, tiếng mưa).
+- **Climax (30%):** 80% narrator (với hòa âm dày hơn), 20% "God's voice" (Chúa xuất hiện).
+- **Resolution (10%):** 100% narrator hòa vào nhạc ambient.
+
+### 4c. Transition rules:
+- **Narrator → Dialogue (God's voice):** Thường có một khoảng lặng (Silence) khoảng 1 giây hoặc tiếng ngân vang (Reverb tail) của giọng Narrator cũ trước khi giọng của Chúa Jesus vang lên.
+- **Ducking:** Khi có tiếng cừu kêu (Reaction), âm nhạc và giọng hát của Narrator được giảm volume xuống khoảng **30%** (Duck volume) để tiếng cừu nghe chân thực như đang ở ngay tiền cảnh.
+
+---
+
+## 5. VISUAL-AUDIO SYNC
+
+- **narrator_only:** Camera thường di chuyển chậm (Slow pan/zoom out). Cỡ cảnh Wide hoặc Medium.
+- **dialogue_dominant (hoặc Reaction):** Camera lập tức chuyển sang **Close-up** hoặc **Extreme Close-up**. Ánh sáng (Rim light) thường bừng sáng lên khi Chúa "nói" (hát).
+- **Lip-sync:** Nhân vật **không cử động miệng**. Sự kết nối âm thanh - hình ảnh nằm ở đôi mắt (chớp mắt, mở to) và chuyển động của tai/đầu đồng bộ với nhịp điệu của lời hát.
+
+---
+
+## 6. SFX & MUSIC LAYER
+
+- **SFX Foley:** Footsteps trên cỏ, tiếng lật trang giấy, tiếng gió rít qua rừng cây. Đây là lớp âm thanh tạo độ "thật" cho mô hình len.
+- **Ambient SFX:** Tiếng mưa rơi (tăng cảm giác buồn bã), tiếng chim hót (tăng cảm giác hy vọng).
+- **BGM:** Piano là nhạc cụ dẫn dắt. Khi câu chuyện buồn, piano đánh rời rạc. Khi cao trào, có thêm dàn dây (Strings) kéo dầy (swell).
+
+---
+
+## 7. SAMPLE RECONSTRUCTION (Chủ đề: Sự tha thứ)
+
+(Ambient: Tiếng gió thổi rít qua những sợi len nỉ) (narrator_only)
+"I brought these broken threads back to You, 
+Not knowing if they could ever be woven again."
+
+[SFX] Tiếng bước chân lạo xạo trên cát nỉ khô.
+[Cừu] *Thở dài nhẹ - "Haaa"* (dialogue_dominant)
+
+"The weight of the tangled yarn felt like a mountain..." (narrator_only)
+[SFX] Tiếng dây thừng len cọ xát.
+
+[Chúa Jesus] (Giọng hát chuyển sang tông nam trầm, ấm áp) (dialogue_dominant)
+"Give them to Me, My little one. 
+Every knot was seen, every tear was felt."
+
+[SFX] Tiếng chuông gió ngân vang (Musical Sting)
+"And suddenly, the threads didn't feel so heavy anymore." (narrator_only)
+
+[Cừu] *Tiếng kêu vui vẻ - "Baaa!"*
+[CROWD] Tiếng đàn cừu cười đùa mờ ảo ở hậu cảnh.
+
+---
+**Ghi chú cho Audio Production:** Để tái tạo style này, hãy sử dụng **High Reverb** (Hall), lọc bỏ bớt tần số thấp (High-pass filter) cho tiếng Narrator để tạo cảm giác thoát tục, và dùng **Macro-foley** (tiếng động cực cận) để làm nổi bật chất liệu vải/len.
+
+
+===============
+
+
