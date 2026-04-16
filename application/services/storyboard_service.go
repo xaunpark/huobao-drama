@@ -1634,11 +1634,6 @@ func (s *StoryboardService) generateVideoPrompt(sb Storyboard) string {
 		parts = append(parts, fmt.Sprintf("Action: %s", sb.Action))
 	}
 
-	// 1.5 Character visual descriptions (for visual consistency across shots)
-	if sb.CharacterDescs != "" {
-		parts = append(parts, fmt.Sprintf("Characters in scene: %s", sb.CharacterDescs))
-	}
-
 	// 2. 结果（动作的最终视觉状态 - 紧跟Action以保持叙事连贯）
 	if sb.Result != "" {
 		parts = append(parts, fmt.Sprintf("Result: %s", sb.Result))
