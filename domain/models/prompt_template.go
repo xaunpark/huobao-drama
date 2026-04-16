@@ -42,6 +42,7 @@ type PromptTemplatePrompts struct {
 	VideoExtraction     string `json:"video_extraction,omitempty"`
 	VisualUnitBreakdown    string `json:"visual_unit_breakdown,omitempty"`    // Voice-over AI Director shot planning
 	NurseryRhymeBreakdown  string `json:"nursery_rhyme_breakdown,omitempty"`  // Nursery rhyme lyrics-synced shot planning
+	MVMakerGamingHorror    string `json:"mv_maker_gaming_horror,omitempty"`   // MV Maker: Gaming horror genre prompt
 }
 
 // PromptTypeToDefaultFile 将 prompt type key 映射到默认的 embed 文件名
@@ -61,4 +62,5 @@ var PromptTypeToDefaultFile = map[string]string{
 	"video_extraction":        "video_extraction.txt",
 	"visual_unit_breakdown":    "storyboard_visual_unit.txt",
 	"nursery_rhyme_breakdown":  "storyboard_nursery_rhyme.txt",
+	"mv_maker_gaming_horror":   "storyboard_mv_gaming_horror.txt",
 }

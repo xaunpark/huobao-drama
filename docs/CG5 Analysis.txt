@@ -1,0 +1,580 @@
+Dưới đây là phân tích Visual DNA chi tiết, được rút gọn 50% độ dài theo yêu cầu, tập trung vào dữ liệu định lượng và tóm tắt cấp cao.
+
+## 1. KỸ THUẬT TẠO HÌNH ẢNH
+- **Phương pháp:** 3D render/CGI kết hợp Motion Graphics (typography).
+- **Camera:** Virtual camera mô phỏng ống kính điện ảnh (cinematic lens).
+- **AI Model:** N/A (Sản phẩm 3D thủ công, không phải AI).
+- **Phong cách:** Mascot Horror / Dark Fantasy 3D Animation.
+- **Mức độ photorealistic:** 6/10 (Tạo hình cách điệu nhưng dùng vật liệu PBR và ánh sáng chân thực).
+- **AI artifacts:** Không có.
+- **Chuyển động:** Động 100% (animation nhân vật, camera pan, glitch effects).
+- **Face-cam:** N/A.
+
+## 2. MÀU SẮC CHÍNH XÁC
+### 2a. Bảng màu Shadow/Dark zones
+- Màu shadow chính: `#0A0B1A` (Xanh tím than thẫm).
+- Màu shadow phụ: `#111111` (Đen nhám).
+- Blacks lift: Có, nâng nhẹ khoảng 5-10 IRE tạo hiệu ứng mờ sương (fog/haze).
+
+### 2b. Bảng màu Highlight/Bright zones
+- Màu highlight chính: `#FFCC00` (Vàng neon text), `#00FFFF` (Cyan rimlight).
+- Glow/bloom: Có, bloom mạnh quanh text vàng và mắt phát sáng. Bán kính lớn.
+- Roll-off: Mềm mại, khuếch tán vào sương mù.
+
+### 2c. Bảng màu Midtone
+- Skin tones: N/A (Nhân vật là đồ chơi).
+- Dominant midtone: `#3A404A` (Kim loại lạnh), `#552233` (Vải bẩn/máu khô).
+
+### 2d. Bảng màu Accent / Brand Colors
+- Accent chính: `#FF9900` (Cam chữ), `#FF0033` (Đỏ sậm máu/đèn báo).
+- Palette nhất quán: Đen thẫm + Ánh sáng Neon tương phản (Vàng/Đỏ/Tím).
+
+### 2e. Tỷ lệ màu trong frame
+- Shadow: 70% | Midtone: 20% | Highlight: 10%.
+- Tổng thể: Low-key (Tối, u ám).
+- Color grading: Split-toned (Shadow lạnh/xanh tím - Highlight ấm/vàng neon).
+
+## 3. ÁNH SÁNG CHÍNH XÁC
+### 3a. Setup ánh sáng chủ đạo
+- Nguồn sáng: Nhân tạo 100% (Đèn studio ảo, đèn hắt từ dưới lên).
+- Key light: Hướng từ dưới (under-lighting tạo cảm giác kinh dị) hoặc góc hẹp. Hard light.
+- Fill light: Rất yếu. Tỷ lệ độ tương phản cao (ước tính 8:1).
+- Rim light: Rất mạnh, thường dùng màu Tím/Cyan/Đỏ để tách nhân vật khỏi nền đen.
+
+### 3b. Biến thể ánh sáng
+- Indoor tĩnh: Đèn huỳnh quang hỏng, chớp tắt, ánh sáng spotlight hắt vào một góc.
+- Cận cảnh nhân vật: Ánh sáng gắt chiếu thẳng mặt (như đèn pin) chìm trong bóng tối mù mịt.
+
+### 3c. Hiệu ứng đặc biệt
+- Volumetric light/God rays: Rất đậm đặc, kết hợp sương mù (fog).
+- Lens flare: Ít, chủ yếu là Glitch/Chromatic Aberration.
+- Depth / Haze: Xa bị mờ hoàn toàn bởi lớp sương mù.
+- Bóng đổ: Soft edge do tán xạ qua sương.
+
+## 4. TEXTURE & CHẤT LIỆU
+### 4a. Tổng thể
+- Resolution: Ước tính 1080p/4K upscale.
+- Sharpness: Intentionally soft (làm mềm chủ đích bằng nhiễu hạt, DoF và glow).
+
+### 4b. Các bề mặt/vật liệu chính
+- Nhựa vỡ (Búp bê Poppy): Mức 9/10. Có độ phản quang (specular), xước dăm, nứt nẻ.
+- Lông thú bết (Huggy Wuggy, Critters): Mức 8/10. Lông vón cục, bám bẩn, cháy xém.
+- Vải / Chỉ khâu: Mức 8/10. Thô ráp, sờn rách, các đường chỉ khâu chắp vá rõ rệt.
+- Kim loại rỉ sét (Nền): Mức 7/10. Cũ kỹ, xỉn màu, bám dầu mỡ/máu.
+
+## 5. FILM GRAIN & POST-PROCESSING
+- Film grain: Có, digital noise hạt nhỏ. Intensity 5/10 (tập trung vùng tối).
+- Chromatic aberration: Có, xuất hiện nhiều ở rìa khung hình và trong hiệu ứng glitch.
+- Vignette: Rất mạnh.
+- Distortion: Có méo viền (barrel) nhẹ mô phỏng ống kính góc rộng cận cảnh.
+- Bloom: Cường độ cao cho text và nguồn sáng neon.
+- Depth of field (DoF): Rất mỏng (shallow) ở các góc cận.
+
+## 6. SO SÁNH STYLE
+- Phim/Game: *Poppy Playtime*, *Five Nights at Freddy's*, phim hoạt hình *9* (Shane Acker).
+- YouTube: CG5 (các MV khác), The Living Tombstone, Mob Entertainment.
+- Art style: Mascot Horror, Grunge CGI, Neon Dark Fantasy.
+
+## 7. SAMPLE PROMPT RECONSTRUCTION
+
+```json
+[
+  {
+    "frame_description": "Cận cảnh búp bê sứ đáng sợ bị nứt nẻ, treo lơ lửng trong không gian tối với ánh sáng tím neon.",
+    "full_prompt": "Cinematic 3D render, close-up of a creepy cracked porcelain doll with messy red pigtails, stitched body parts, heavily damaged and weathered. Hanging by robotic wires in a dark, grimy industrial room. Strong purple and cyan rim lighting, volumetric fog, dark blue shadows. Mascot horror aesthetic, shallow depth of field, subtle chromatic aberration, eerie glowing eyes, photorealistic textures, 8k resolution.",
+    "negative_prompt": "human, bright, cheerful, flat lighting, 2d, cartoon, clean, low quality, oversaturated.",
+    "recommended_model": "Midjourney v6",
+    "recommended_settings": {"cfg_scale": 6.0, "steps": 30, "sampler": "Euler a"}
+  },
+  {
+    "frame_description": "Quái vật hề rùng rợn bằng vải, nụ cười rộng đầy răng, đứng trong sương mù.",
+    "full_prompt": "Mascot horror 3D animation still, terrifying jester toy creature with a massive sharp-toothed grin, single glowing yellow eye. Dirty stitched fabric, frayed hat. Emerging from thick volumetric dark blue fog. Under-lit key light casting dramatic shadows, glowing neon text 'I CAN MAKE YOU BETTER' floating around it in jagged yellow font. Glitch effects, heavy film grain, vignette.",
+    "negative_prompt": "cute, daylight, smooth texture, anime, realistic human, boring lighting.",
+    "recommended_model": "Stable Diffusion XL",
+    "recommended_settings": {"cfg_scale": 7.0, "steps": 40, "sampler": "DPM++ 2M Karras"}
+  },
+  {
+    "frame_description": "Màn hình máy tính cổ điển hiển thị một con mắt tím khổng lồ trong góc tối.",
+    "full_prompt": "Retro 1990s CRT monitor sitting in a pitch-black, grimy metallic alcove. The screen displays a single, massive, glowing purple cosmic eye. Screen glare, CRT scanlines, digital glitch artifacts. Ambient light only emitting from the glowing monitor, casting a soft purple hue on the surrounding rusty metal walls. Creepypasta aesthetic, deep shadows, cinematic composition, high contrast.",
+    "negative_prompt": "modern monitor, brightly lit room, daylight, natural elements, smooth plastic, low detail.",
+    "recommended_model": "Midjourney v6",
+    "recommended_settings": {"cfg_scale": 5.5, "steps": 30, "sampler": "Euler a"}
+  }
+]
+```
+
+=========
+
+
+Dưới đây là phân tích ngôn ngữ điện ảnh (Cinematography & Editing) dựa trên các frame được cung cấp, đã được tóm tắt 50% độ dài theo yêu cầu:
+
+## 1. THỐNG KÊ CỠ CẢNH (Shot Size Distribution)
+
+| Cỡ cảnh | Số lần | % tổng | Dùng khi nào (context) |
+|----------|--------|--------|------------------------|
+| Medium Shot (MS) | Nhiều | 40% | Thể hiện nhân vật đang hát/tương tác, thấy được ngôn ngữ cơ thể. |
+| Medium Close-Up (MCU) | Khá | 20% | Bắt biểu cảm khuôn mặt (Jester cười, ánh mắt búp bê). |
+| Close-Up (CU) | Khá | 15% | Nhấn mạnh chi tiết kinh dị (răng nhọn, mắt mờ, vết khâu). |
+| Text/Title Card | Rất nhiều | 20% | Typography lời bài hát được tích hợp thẳng vào không gian 3D. |
+| Insert/POV Shot | Ít | 5% | Cảnh góc nhìn thứ nhất (hai bàn tay đặt lên kính). |
+
+## 2. THỐNG KÊ GÓC MÁY (Camera Angle)
+
+| Góc máy | Số lần | % | Dùng khi nào |
+|---------|--------|---|-------------|
+| Low angle (nhìn lên) | Nhiều | 50% | Tôn sự to lớn, áp đảo, đáng sợ của quái vật (Jester, Huggy Wuggy). |
+| Eye-level | Khá | 25% | Các cảnh đối thoại, tương tác ngang hàng (cô gái và Poppy). |
+| High angle (nhìn xuống) | Ít | 10% | Thể hiện sự nhỏ bé, yếu ớt của nạn nhân (đồ chơi trong lồng). |
+| Worm's eye (sát đất) | Ít | 10% | Cảnh nhân vật bò trườn hoặc nằm ngang trên mặt đất. |
+| POV (first person) | Ít | 5% | Tạo sự nhập vai, tuyệt vọng khi bị nhốt/truy đuổi. |
+
+## 3. CHUYỂN ĐỘNG CAMERA (Camera Movement)
+**Phương pháp chính:** Animation camera (Camera ảo trong không gian 3D).
+
+| Loại chuyển động | Tần suất | Tốc độ | Mô tả chi tiết |
+|-------------------|----------|--------|-----------------|
+| Slow push-in | Thường xuyên | Chậm | Tăng sự căng thẳng khi nhân vật đang hát hoặc đe dọa. |
+| Pan / Tilt | Trung bình | Vừa | Theo dõi nhân vật lướt qua hoặc ngước nhìn con quái vật khổng lồ. |
+| Handheld (fake) | Ít | Nhanh | Giả lập độ rung để tăng tính chân thực/hỗn loạn ở các đoạn cao trào. |
+| 3D Typography motion| Liên tục | Đa dạng| Chữ văng ra, bay lơ lửng, hoặc dán vào tường chuyển động theo camera. |
+
+- **Thời gian trung bình mỗi shot:** 1-3 giây (nhịp điệu MV ca nhạc).
+- **Transitions:** Chủ yếu là Hard Cut (Cắt gắt theo nhịp beat) và Glitch transition (Nhiễu sóng VHS giả lập).
+
+## 4. QUY LUẬT BỐ CỤC (Composition Rules)
+- **Vị trí chủ thể:** Chủ yếu Center (Chính giữa) để nhường không gian 2 bên cho 3D Typography (lời bài hát).
+- **Depth layers:** Rõ rệt 3 layers. FG: Chữ/cầm vật cản; MG: Nhân vật chính; BG: Môi trường tối/sương mù.
+- **Negative space:** Dùng rất nhiều không gian tối xung quanh để nhồi nhét chữ nổi.
+- **Framing devices:** Nhân vật thường bị đóng khung bởi song sắt (lồng), cửa sổ, hoặc viền màn hình CRT.
+
+**Top 2 Bố cục lặp lại:**
+1. **Center Subject + Floating Text:** Nhân vật ở giữa, chữ 3D bay xung quanh bao bọc khung hình.
+2. **Extreme Angle:** Góc cực thấp hoặc cực cao để tạo sự chênh lệch quyền lực.
+
+## 5. NHỊP ĐỘ HÌNH ẢNH (Visual Pacing)
+- **Thời lượng ước tính:** Rất nhanh. Shot ngắn nhất <1 giây (jump cuts, glitch). Dài nhất ~4-5 giây.
+- **Nhịp thay đổi:** Thay đổi hoàn toàn theo nhịp điệu (beat) của âm nhạc và lời bài hát.
+- **Intense beats:** Cắt cảnh liên tục, camera rung lắc, góc máy Dutch angle.
+- **Buildup/Dialogue:** Camera đẩy chậm vào mặt nhân vật (slow push-in), giữ nguyên shot lâu hơn để build tension.
+
+## 6. MẪU CẮT CẢNH (Editing Patterns)
+- **Lyric-driven editing:** Cắt cảnh đúng ngay khoảnh khắc chuyển câu hát hoặc nhấn mạnh một từ quan trọng (chữ to đập vào màn hình).
+- **Smash cuts:** Chuyển đột ngột từ không gian rộng sang cận cảnh chi tiết kinh dị (mắt, răng).
+- **Shot/Reverse shot:** Dùng trong cảnh bàn ăn hoặc tương tác giữa Jester và đám đồ chơi nhỏ.
+- **Glitch sequence:** Dùng nhiễu kỹ thuật số (digital artifacts) làm cầu nối chuyển cảnh giữa các chiều không gian/ảo giác.
+
+
+===============
+
+
+Dựa trên dữ liệu thực tế từ video (đây là một **Video Âm Nhạc / MV Bài Hát Lore** của kênh CG5, không phải video YouTube thông thường dạng nói/thuyết minh), dưới đây là phân tích ngôn ngữ học được điều chỉnh để phù hợp với kịch bản lời bài hát (lyrics script), rút gọn 50% tập trung vào dữ liệu cốt lõi:
+
+## 1. CẤU TRÚC VĨ MÔ (Macro Structure)
+- **Thể loại:** Story-driven narrative / Musical MV (Nerdcore / Fan song).
+- **Mở đầu:** Cold open bằng Intro âm nhạc kết hợp Title Card (credits), ngay lập tức vào Verse 1 bằng một lời mời gọi thao túng ("I made us a home...").
+- **Các phần:** Được chia theo cấu trúc bài hát tiêu chuẩn (Verse - Pre-Chorus - Chorus - Bridge - Outro).
+- **Tầng Narrative:** 1 tầng duy nhất – Góc nhìn của các quái vật/đồ chơi trực tiếp đối thoại với nhân vật chính (người xem).
+- **Sơ đồ cấu trúc:**
+  - `00:00-00:09` → Intro / Credits.
+  - `00:09-00:32` → Verse 1 & Pre-Chorus (Sự thao túng của Jester).
+  - `00:33-00:53` → Chorus 1 (Cao trào đe dọa "sửa chữa").
+  - `00:54-01:04` → Verse 2 (Góc nhìn của Poppy).
+  - `01:05-01:28` → Chorus 2 (Lặp lại sự đe dọa).
+  - `01:29-01:58` → Bridge (Tuyệt vọng, điên loạn, thay đổi nhịp).
+  - `01:59-02:10` → Buildup (Sự vĩ cuồng - "I'm your god").
+  - `02:11-Hết` → Final Chorus & Outro.
+
+## 2. PHONG CÁCH NGÔN NGỮ (Linguistic Style)
+### 2a. Ngôi kể / Phong cách nói
+- **Ngôi kể:** Thứ nhất số ít/nhiều ("I", "We") nói trực tiếp với ngôi thứ hai ("You" - Khán giả/Người chơi).
+- **Voices:** Đa giọng điệu (Multi-voice) đại diện cho các nhân vật khác nhau nhưng chung một lý tưởng.
+- **Personality:** Thao túng, vĩ cuồng, nguy hiểm, có phần tuyệt vọng và điên loạn (Psychopathic).
+
+### 2b. Vocabulary & Sentence Pattern
+- **Độ dài câu:** Rất ngắn (4-8 từ), tuân thủ nhịp điệu (meter) của âm nhạc.
+- **Từ vựng:** Casual nhưng chèn các từ vựng mang tính học thuật/khoa học đen tối tạo sự tương phản (semi-formal/dark sci-fi).
+  - *VD:* "Reanimation", "Outlier", "Equation", "Immortal perfection".
+- **Ẩn dụ (Metaphors):** Rất nhiều. So sánh không gian kinh dị với sự cứu rỗi.
+  - *VD:* "Paradise" (ám chỉ nhà máy hoang tàn), "Fix you" (ám chỉ việc giết/biến đổi).
+
+### 2c. Rhetorical Devices (Thủ pháp tu từ)
+- **Câu hỏi tu từ:** *Tần suất cao.* (VD: "Do I have to fix you?")
+- **Repetition (Lặp lại):** *Cốt lõi của bài hát.* (VD: "I can make you better, I can make you right", "Tell me who I am, I'll be good").
+- **Juxtaposition (Đối lập):** Đặt khái niệm tốt đẹp cạnh sự kinh dị (VD: "New life" qua "Reanimation").
+- **Direct Address:** Liên tục gọi trực tiếp nạn nhân ("Child", "Dear").
+
+### 2d. Transition Phrases (Bản lề Lyrical)
+*Vì là bài hát, các cụm từ chuyển ý đóng vai trò là "lời dẫn" giữa các đoạn nhạc:*
+- Chuyển sang đe dọa: "So if you...", "Or do I have to..."
+- Chuyển tiếp kết quả (Pre-Chorus): "'Cause once I do..."
+- Chuyển sang giải pháp độc hại (Chorus): "I can make you...", "Maybe now..."
+- Chuyển sang trạng thái tuyệt vọng (Bridge): "Tell me...", "Don't put me in..."
+- Chuyển sang sự vĩ cuồng: "This is the start of..."
+
+## 3. NHỊP ĐỘ KỂ (Narration/Presentation Pacing)
+- **Tốc độ:** Phụ thuộc vào BPM của bài hát (khoảng 100-120 BPM, nhịp độ trung bình-nhanh).
+- **Pacing changes:**
+  - *Chậm lại/Nghỉ:* Các đoạn đầu Verse để tạo sự bí ẩn.
+  - *Nhanh/Dồn dập:* Đoạn điệp khúc (Chorus) thể hiện sự tấn công.
+  - *Hỗn loạn:* Đoạn Bridge ("Don't put me in the box") nhịp dồn dập, lặp từ liên tục, mô phỏng cơn hoảng loạn/glitch.
+
+## 4. CẢM XÚC & TONE (Emotional Arc)
+- **Tone chủ đạo:** Sinister (Tà ác), Manic (Cuồng loạn), Megalomaniacal (Vĩ cuồng).
+- **Sự thay đổi cảm xúc:** Càng về cuối càng mất kiểm soát.
+- **Emotional Arc:**
+  - `00:09` → Manipulative (Thao túng) → Intensity: 2 → Giọng điệu êm ái, dỗ dành giả tạo.
+  - `00:32` → Aggressive (Hung hăng) → Intensity: 4 → Điệp khúc bùng nổ ý định thực sự.
+  - `01:29` → Desperate/Insane (Tuyệt vọng/Điên loạn) → Intensity: 5 → Nhịp điệu vỡ vụn, van xin/đe dọa lẫn lộn.
+  - `02:04` → Megalomaniacal (Vĩ cuồng) → Intensity: 5+ → Xưng thần, kiểm soát hoàn toàn.
+
+## 5. SO SÁNH VỚI CÁC KÊNH/CREATOR QUEN BIẾT
+*(So sánh trong ngách nội dung Nerdcore/Lore Songs)*
+
+| Khía cạnh | CG5 (Video này) | Kênh tương đồng nhất |
+|-----------|---------------------|---------------------|
+| Tone | Manic, Catchy Dark | **The Living Tombstone** (FNAF songs) |
+| Pacing | Dance/Rock hybrid | **DAGames** (Build Our Machine) |
+| Lyrical Style | Character-driven, Lore | **TryHardNinja** |
+| Emotional involvement | Theatrical, Aggressive | **JT Music** |
+
+## 6. SAMPLE SCRIPT RECREATION
+*(Viết lại một đoạn Lyrics/Script mô phỏng CHÍNH XÁC cấu trúc đoản cú, vần điệu, sự thao túng, từ vựng ẩn dụ kinh dị và nhịp điệu cảm xúc của video này. Chủ đề: Một Animatronic bị hỏng đang "chào đón" bảo vệ ca đêm mới).*
+
+**(Verse 1: Manipulative & Calm)**
+Welcome to the stage, my friend.
+The shift is starting, don't pretend.
+You check the cameras, lock the doors,
+But we've been waiting through the floors.
+I built a sanctuary here...
+So dry your eyes and shed the fear.
+
+**(Pre-Chorus: Turning Sinister)**
+You think the monitor will save you, child?
+Don't fight the metal, let it run wild.
+Why do you cling to fragile bone?
+When I can place you on a throne?
+'Cause once the clock strikes... you are mine.
+
+**(Chorus: Aggressive & Manic)**
+I can put you back together!
+Screws and wires last forever!
+I can rip away the pain,
+Wash the organic down the drain!
+Maybe now you'll see the truth,
+Trapped inside the smiling booth.
+I'll stitch the suit around your face!
+
+**(Bridge: Glitching & Desperate)**
+Let me inside.
+Let me inside.
+Don't close the door, don't try to hide.
+A machine is what they made me!
+A machine is what they made me!
+Now witness my immortal design!
+
+
+===========
+
+
+Dưới đây là phân tích chi tiết dưới góc độ Thiết kế Sản xuất (Production Design) & Art Direction, tập trung tuyệt đối vào các yếu tố thực tế xuất hiện trong MV 3D CGI này:
+
+## 1. NHÂN VẬT & THỰC THỂ (Characters)
+
+### 1a. Phong cách thể hiện:
+- **Loại hình:** 100% 3D Animation (CGI). Không có người thật.
+- **Mức độ Realism:** 7/10. Hình dáng mang tính cách điệu cao (Mascot Horror / Toy design), nhưng **chất liệu bề mặt (textures) lại cực kỳ chân thực** (photorealistic PBR materials).
+
+### 1b. Thiết kế ngoại hình (Theo nhóm):
+**Nhóm 1: Quái vật Khổng lồ / Kẻ thao túng (Jester, Huggy Wuggy, CatNap)**
+- **Chất liệu:** Lông thú (fur) bết dính bẩn thỉu, vải sờn rách, nhựa xước dăm, kim loại rỉ sét.
+- **Mức độ detail/weathering:** Rất cao (9/10). Bề mặt cháy xém, nứt nẻ, có các vết rách để lộ cấu trúc khung xương kim loại (endoskeleton) hoặc ruột bông bên trong.
+- **Phụ kiện:** Mũ hề (Jester hat) rách nát, các cánh tay robot nhện ghim vào lưng mang theo kim tiêm và lưỡi dao.
+
+**Nhóm 2: Nạn nhân / Đồ chơi hỏng (Poppy, Smiling Critters, Búp bê nhỏ)**
+- **Chất liệu:** Gốm sứ nứt, nhựa bóng loáng nhưng bám bụi đen, vải nhung sờn.
+- **Trạng thái:** Bị tháo rời, chắp vá gượng ép (đầu con này khâu vào thân con khác), cụt chi, treo lơ lửng bằng dây thép.
+
+### 1c. Biểu cảm & Body Language:
+- **Biểu cảm:** Nụ cười ngoác miệng bất động (frozen manic smile), mắt trợn trừng hoặc rỗng tuếch. Tương phản tạo ra sự rùng rợn (Uncanny Valley).
+- **Ánh mắt:** Nhìn chằm chằm trực tiếp vào ống kính (phá vỡ bức tường thứ 4, đe dọa người xem).
+- **Posing:** Cử động giật cục, vặn vẹo (glitchy/spasmodic) hoặc treo lơ lửng vô hồn.
+
+## 2. BỐI CẢNH & MÔI TRƯỜNG (Settings & Environments)
+
+### 2a. Bối cảnh chính (Khu công nghiệp ngầm / Playtime Co.):
+- **Loại không gian:** Môi trường 3D giả lập nhà máy bỏ hoang, tối tăm, ngột ngạt (claustrophobic).
+- **Kiến trúc:** Khối hộp cứng nhắc, tường bọc thép tấm, đinh tán, cửa sắt rỉ sét, hành lang hẹp, trần nhà không nhìn rõ vì sương mù.
+- **Ánh sáng:** Đèn huỳnh quang hỏng chớp tắt, spotlight hắt từ dưới lên, và ánh sáng phát ra từ chính mắt/phụ kiện của quái vật.
+- **Background:** Bị làm mờ hoặc chìm hoàn toàn vào sương mù khối (Volumetric fog) màu xanh đen.
+
+### 2b. Bối cảnh phụ:
+- **Bên trong lồng sắt:** Không gian chật hẹp, những thanh sắt to bản che khuất góc nhìn. Dùng để nhấn mạnh sự giam cầm.
+- **Bàn tiệc ảo giác:** Bàn dài phủ khăn, ghế bọc nỉ tím, ánh sáng tím mờ ảo. Dùng cho cảnh buildup vĩ cuồng.
+
+## 3. ĐỒ VẬT & ĐẠO CỤ (Objects & Props)
+
+- **Cánh tay Robot (Robotic appendages):** (Chi tiết: 9/10). Gồm các khớp nối kim loại, dây cáp, mũi kim tiêm, kìm sắc nhọn. Rendering chân thực, rỉ sét, bám dầu mỡ. Vai trò: Chức năng (để mổ xẻ/khâu vá đồ chơi).
+- **Lồng sắt (Iron Cages):** (Chi tiết: 8/10). Kim loại thô, xước xát, phản chiếu ánh sáng mờ. Vai trò: Giam giữ.
+- **Màn hình CRT (Retro Monitor):** (Chi tiết: 9/10). Màn hình cong lồi, vỏ nhựa xỉn màu thập niên 90. Hiển thị "con mắt vũ trụ" với nhiễu sóng (scanlines). Nguồn phát sáng chính trong cảnh.
+
+## 4. TYPOGRAPHY & ĐỒ HỌA ON-SCREEN
+
+### 4a. Text elements (Lyric Typography - Yếu tố cốt lõi):
+- **Phân loại:** Lời bài hát xuất hiện liên tục (Kinetic Typography).
+- **Tích hợp:** Text không nằm trên lớp UI tĩnh mà **tồn tại trong không gian 3D** (bị sương mù che phủ, phản chiếu ánh sáng môi trường, có depth of field).
+- **Font chữ:** Grunge, distressed, brush-script xước xát (giống nét cọ sơn hoặc vết cào).
+- **Màu sắc:** Vàng Neon, Cam, Đỏ tươi, Tím. Có cường độ phát sáng mạnh (glow/bloom effect) hắt sáng lên nhân vật xung quanh.
+- **Animation:** Text văng ra theo nhịp nhạc, rung lắc, glitch, thu phóng đột ngột.
+
+### 4b. Graphic & Brand elements:
+- **Logo:** Logo CG5 và Mob Entertainment xuất hiện 3D ở đầu video với phong cách Neon vỡ hạt.
+- **Effects:** Hiệu ứng nhiễu sóng VHS, chromatic aberration, và film bẩn được phủ lên toàn bộ frame như một filter.
+
+## 5. OUTPUT: IMAGE GENERATION REFERENCE SHEET
+
+```json
+{
+  "content_type": "Mascot Horror 3D Animation / Dark Fantasy Cinematic Render",
+  "style_keywords": [
+    "mascot horror",
+    "abandoned toy factory",
+    "grungy 3D CGI",
+    "volumetric dark fog",
+    "kinetic typography floating in space",
+    "creepy glowing toys",
+    "stitched fabric and cracked porcelain",
+    "retro industrial machinery"
+  ],
+  "negative_keywords": [
+    "human beings",
+    "photorealistic humans",
+    "bright daylight",
+    "clean modern UI",
+    "flat 2D vector",
+    "cute",
+    "cheerful"
+  ],
+  "color_palette": {
+    "shadow_primary": "#0A0B1A",
+    "shadow_secondary": "#111111",
+    "highlight_warm": "#FFCC00",
+    "highlight_cool": "#00FFFF",
+    "accent_primary": "#FF9900",
+    "accent_secondary": "#7D12FF",
+    "brand_colors": ["#FFFFFF", "#FF0033"],
+    "dominant_midtones": ["#3A404A", "#552233"]
+  },
+  "lighting_setup": {
+    "primary_method": "virtual_studio_mixed",
+    "key_fill_ratio": "8:1",
+    "light_sources": [
+      "harsh under-lighting spotlight",
+      "glowing neon typography",
+      "luminescent character eyes"
+    ],
+    "mood": "claustrophobic, sinister, manic"
+  },
+  "texture_detail_level": "9/10",
+  "film_grain_intensity": "6/10",
+  "realism_level": "7/10",
+  "production_value": "9/10"
+}
+```
+
+==============
+
+
+Dưới đây là phân tích chuyên sâu về Motion Graphics & Post-Production, được rút gọn 50% độ dài tập trung vào thông tin cốt lõi.
+
+## 1. PHƯƠNG PHÁP SẢN XUẤT VIDEO
+- **Phương pháp chính:** 100% Full 3D Animation (CGI) kết hợp 3D Motion Graphics (Kinetic Typography).
+- **Phần mềm dự đoán:** 
+  - 3D Animation: Blender / Unreal Engine.
+  - Compositing & Motion Graphics: Adobe After Effects (dùng plugin xử lý 3D text, Glow, và Glitch).
+
+## 2. CÁC KIỂU CHUYỂN ĐỘNG (Motion Types)
+### 2a. Camera Movement (Camera Ảo)
+- **Tốc độ:** Chuyển đổi liên tục giữa rất chậm (buildup) và nhanh (cảnh hù dọa/beat drop).
+- **Zoom/Push:** Push-in liên tục vào chủ thể.
+- **Tracking/Pan:** Pan ngang hẹp bám theo nhân vật.
+- **Camera Shake:** Giả lập độ rung cầm tay (handheld) khi nhân vật la hét/hành động mạnh.
+- **Easing:** Ease-in-out cho các đoạn chậm; Linear/No-easing cho các pha cắt cảnh gắt.
+
+### 2b. Subject Movement
+- **Nhân vật:** Chuyển động full 3D (Animation/Mocap). Cử động giật cục, vặn vẹo, không tự nhiên (creepy movement).
+- **Text/Graphics:** Animated 100%. Lời bài hát bay vào, nảy (bounce), vỡ vụn, hoặc dính chặt vào tường trong không gian 3D.
+
+### 2c. Parallax / Depth Effects
+- **Depth of field (DoF):** Xử lý DoF 3D chân thực. Hậu cảnh mờ mịt, Text thỉnh thoảng trôi ngang qua vùng out-of-focus (tiền cảnh).
+
+### 2d. Particle & Atmospheric Effects
+- Khói/sương khối (Volumetric fog) dày đặc, chuyển động cuộn lờ mờ.
+- Hạt bụi lơ lửng (dust particles) bắt sáng từ các nguồn sáng.
+- Hiệu ứng nhiễu sóng VHS (Glitch/Tracking noise) chớp nhoáng.
+- Quang sai màu (Chromatic Aberration) gắt ở viền.
+
+### 2e. Speed Effects
+- Tốc độ thực (Real-time) đồng bộ với BPM của bài hát. Không dùng slow-mo hay time-lapse.
+
+## 3. TRANSITIONS (Chuyển cảnh)
+
+| Loại | Tần suất | Duration | Dùng khi nào |
+|------|----------|---------------|-------------|
+| Hard cut | Rất cao | 0ms | Chuyển cảnh chính xác theo từng nhịp beat của nhạc. |
+| Custom (Glitch Cut) | Trung bình | 200-500ms | Chuyển đổi góc nhìn giữa các quái vật, kèm theo hình ảnh nhiễu sóng kỹ thuật số. |
+| Fade from black | Thấp | ~1000ms | Chỉ dùng ở phần mở đầu (Intro). |
+
+## 4. NHẠC & ÂM THANH (Audio Design)
+### 4a. Nhạc nền
+- **Thể loại:** Electronic Rock / Nerdcore.
+- **Đặc điểm:** Nhịp beat dồn dập, bass mạnh. Cấu trúc bài hát định hình hoàn toàn nhịp điệu cắt cảnh của video.
+
+### 4b. Sound Effects (SFX)
+- Rất ít SFX độc lập. Các âm thanh cơ khí, nhiễu sóng, tiếng gầm gừ được mix thẳng vào bản nhạc (như một nhạc cụ).
+
+### 4c. Voice
+- Giọng hát (Singing vocals) được xử lý hậu kỳ nặng: EQ, Distortion, Pitch-shift (trầm xuống cho quái vật), Reverb tạo không gian rộng. Sync khẩu hình chuẩn với nhân vật 3D.
+
+## 5. TIMELINE BREAKDOWN (Ước tính 30s đầu)
+
+| Thời gian | Duration | Nội dung | Cỡ cảnh | Camera move | Transition vào | Transition ra | FX/Overlay |
+|-----------|----------|----------|---------|-------------|----------------|---------------|------------|
+| 00:00 | 9s | Credit / Tên bài hát | Title | Tĩnh | Fade in | Hard cut | Glitch, Fog |
+| 00:09 | 11s | Jester nói "I made us a home" | MCU | Slow Push-in | Hard cut | Hard cut | Fog, 3D Text |
+| 00:20 | 7s | Poppy xuất hiện | MS | Slow Tilt up | Hard cut | Glitch cut | 3D Text |
+| 00:27 | 3s | Jester đe dọa sát ống kính | ECU | Handheld shake | Glitch cut | Hard cut | Chromatic Aberration |
+
+## 6. VIDEO GENERATION / RECREATION PARAMETERS
+**Workflow Post-Production (After Effects):**
+- Import chuỗi ảnh 3D. Phủ lớp `Deep Glow` cho các chi tiết sáng.
+- Thêm `Optics Compensation` tạo méo viền ống kính góc rộng.
+- Dùng plugin `Twitch` hoặc thư viện VHS overlays cho hiệu ứng Glitch.
+
+**AI Video Prompts (Kling / Runway Gen-3):**
+
+```json
+[
+  {
+    "shot_description": "Cận cảnh quái vật hề Jester mỉm cười rùng rợn trong sương mù.",
+    "video_prompt": "Cinematic 3D animation. Close-up shot of a terrifying, stitched jester toy with a wide sharp-toothed grin and one glowing yellow eye. The camera slowly pushes in. Thick dark volumetric fog surrounds it. The lighting is harsh under-lighting. Smooth, unsettling subtle movements. High quality, dark fantasy horror.",
+    "duration": "5s",
+    "camera_motion": "Slow push in",
+    "style_keywords": ["3D CGI", "Mascot horror", "Volumetric fog", "Unsettling"]
+  },
+  {
+    "shot_description": "Văn bản phát sáng 3D lơ lửng trong không gian nhà máy bỏ hoang.",
+    "video_prompt": "First-person perspective moving slowly forward through a dark, rusty, abandoned industrial hallway. Thick blue fog obscures the ceiling. Large, jagged, glowing yellow neon text floats directly in the 3D space in front of the camera. Photorealistic textures, shallow depth of field, subtle film grain and chromatic aberration.",
+    "duration": "4s",
+    "camera_motion": "Slow forward tracking",
+    "style_keywords": ["Floating typography", "Industrial setting", "Neon glow", "Depth of field"]
+  },
+  {
+    "shot_description": "Màn hình CRT nhiễu sóng trong góc tối.",
+    "video_prompt": "Static shot of a retro 1990s CRT monitor placed in a dark, grimy metallic alcove. The screen glows intensely with purple light, displaying an animated cosmic eye. Heavy VHS scanlines, static noise, and screen flickering. The purple light illuminates the surrounding rusty walls. Creepy analog horror aesthetic.",
+    "duration": "3s",
+    "camera_motion": "Static",
+    "style_keywords": ["CRT monitor", "VFX glitch", "Analog horror", "Glowing screen"]
+  }
+]
+```
+
+
+============
+
+
+Chào bạn, tôi là chuyên gia phân tích audio-visual. Video này là một MV ca nhạc (Music Video) mang tên **"Wrong Side Out"** của CG5 phối hợp với Mob Entertainment (nhà phát triển *Poppy Playtime*). 
+
+Vì đây là MV, vai trò "Narrator" (Người kể chuyện) được thay thế bằng **Lead Vocalist** (Giọng hát chính - nhập vai nhân vật Jester), và "Dialogue" là các đoạn **Interjections/Lines** (lời thoại/tiếng kêu của nhân vật phụ). Dưới đây là bảng giải phẫu chi tiết:
+
+---
+
+## 1. PHÂN LOẠI AUDIO MODE TỪNG SHOT (Trích đoạn tiêu biểu)
+
+| # | Timestamp | Duration | Audio Mode | Narrator? (Singer) | Dialogue? | Dialogue Content | Nhận xét |
+|---|-----------|----------|------------|-----------|-----------|------------------|----------|
+| 1 | 00:00-00:09 | 9s | ambient_only | Không | Không | (Music only) | Đoạn giới thiệu logo, tạo không khí u ám. |
+| 2 | 00:10-00:20 | 10s | narrator_only | Có | Không | (Lời hát chính) | Giới thiệu nhân vật Jester và bối cảnh. |
+| 3 | 00:25-00:27 | 2s | dialogue_dominant | Có | Có | (Tiếng cười/ghê rợn) | Jester nói lồng vào tiếng hát. |
+| 4 | 00:28-00:32 | 4s | narrator_only | Có | Không | "...fix you" | Cận cảnh Jester hăm dọa. |
+| 5 | 00:44-00:47 | 3s | dialogue_dominant | Có (Poppy) | Có | "I can make you better" | Chuyển sang giọng hát của Poppy (nhân vật khác). |
+| 6 | 01:29-01:40 | 11s | dialogue_dominant | Không | Có | "Tell me who I am... I'll be good" | Đoạn cao trào với lời thoại van nài của các đồ chơi. |
+| 7 | 01:41-01:58 | 17s | narrator_only | Có | Không | (Montage hành động) | Nhịp độ cực nhanh, không thoại, chỉ có hình ảnh và nhạc. |
+| 8 | 02:46-02:55 | 9s | ambient_only | Không | Không | (Static/Eye blink) | Kết thúc với hình ảnh con mắt trên máy tính. |
+
+---
+
+## 2. THỐNG KÊ PHÂN BỐ AUDIO MODE
+
+| Audio Mode | Số shots (ước tính) | % tổng | Tổng thời lượng | % thời lượng |
+|------------|----------|--------|-----------------|-------------|
+| narrator_only (Lead Song) | 45 | 70% | ~125s | 72% |
+| dialogue_dominant (Interjections) | 12 | 20% | ~35s | 20% |
+| ambient_only (Intro/Outro) | 5 | 10% | ~14s | 8% |
+
+---
+
+## 3. PHÂN LOẠI ĐỐI THOẠI (Dialogue Taxonomy)
+
+| # | Timestamp | Speaker | Dialogue Type | Nội dung | Trigger |
+|---|-----------|---------|---------------|----------|------------------------------------------|
+| 1 | 01:29 | [SMILING CRITTERS] | **full_dialogue** | "Tell me who I am / Don't put me in the box" | **EMOTIONAL_PEAK**: Cao trào nỗi sợ hãi của nạn nhân. |
+| 2 | 01:32 | [JESTER] | **soft_line** | "But a child's what they made you" | **CONFLICT**: Jester đáp trả bằng sự mỉa mai. |
+| 3 | 01:41-01:54 | [MONSTERS] | **reaction** | (Tiếng gầm, tiếng rít) | **ACTION_DESCRIPTION**: Khi các quái vật Huggy, Mommy xuất hiện. |
+| 4 | 02:09 | [JESTER] | **quote** | "AND I'M YOUR GOD!" | **SYMBOLIC_MOMENT**: Khẳng định quyền lực tối thượng. |
+
+---
+
+## 4. PHÂN TÍCH NHỊP ĐỘ (Pacing Pattern)
+
+### 4a. Mô hình xen kẽ:
+- **Pattern:** Thường là 4-8 bar nhạc (vocal chính) xen kẽ với 1 shot dialogue ngắn hoặc tiếng cười.
+- **Chuỗi liên tục:** Đoạn hát dài nhất kéo dài khoảng 25s. Đoạn thoại liên tục dài nhất là 11s (phần Bridge ở 01:29).
+
+### 4b. Mật độ dialogue theo giai đoạn:
+
+| Giai đoạn | Timestamp | narrator_only % | dialogue_dominant % | Nhận xét |
+|-----------|-----------|-----------------|---------------------|----------|
+| Opening (20%) | 00:00-00:35 | 85% | 15% | Giới thiệu chậm, Jester chiếm thế chủ động. |
+| Middle (40%) | 00:35-01:28 | 70% | 30% | Xuất hiện thêm Poppy và các nhân vật khác. |
+| Climax (30%) | 01:29-02:20 | 50% | 50% | Hỗn loạn, nhiều tiếng kêu và thoại đè lên nhạc. |
+| Resolution (10%) | 02:21-02:55 | 60% | 40% | Kết thúc bằng sự đe dọa thầm lặng. |
+
+### 4c. Transition rules:
+- **Narrator → Dialogue:** Thường chuyển qua các từ khóa gợi mở như "Fix you", "Equation" hoặc một nốt nhạc cao vút (Stinger).
+- **Ducking:** Âm lượng nhạc nền giảm khoảng **30%** khi đoạn thoại "Tell me who I am" xuất hiện để khán giả nghe rõ lời van nài.
+
+---
+
+## 5. VISUAL-AUDIO SYNC
+
+- **Cỡ cảnh:** Khi hát chính (Narrator mode), thường dùng Medium hoặc Wide shot để thấy chuyển động cơ thể. Khi có Dialogue/Reaction (đặc biệt là Jester cười), camera **Close-up** vào khuôn mặt hoặc đôi mắt rực sáng.
+- **Lip-sync:** Cực kỳ chính xác với từng âm tiết, kể cả các đoạn gằn giọng.
+- **Character visibility:** Nhân vật luôn xuất hiện khi nói thoại. Khi không thoại, họ chuyển sang hành động bạo lực (chém, bắt giữ) đồng bộ với nhịp trống (kick/snare).
+
+---
+
+## 6. SFX & MUSIC LAYER
+
+- **SFX:** 
+    - **Glitch SFX:** Xuất hiện khi có hiệu ứng nhiễu hình ảnh (00:32).
+    - **Metallic clangs:** Tiếng kim loại va chạm khi Jester sử dụng cánh tay máy.
+    - **Foley:** Tiếng bước chân nặng nề của Huggy Wuggy (01:41).
+- **BGM:** Nhạc điện tử (Electronic/Industrial Horror) chạy xuyên suốt, nhịp BPM nhanh tạo cảm giác hối thúc.
+
+---
+
+## 7. SAMPLE RECONSTRUCTION (Tái tạo cấu trúc)
+
+Dưới đây là kịch bản mẫu cho một video chủ đề **"Xưởng búp bê ma ám"** áp dụng đúng nhịp điệu của MV trên:
+
+Chào mừng đến với xưởng sản xuất nụ cười, nơi mọi nỗi đau đều được khâu kín lại. (narrator_only)
+
+[Búp bê 1] Làm ơn... đừng cắt chỉ của tôi! (dialogue_dominant)
+
+Đừng sợ, tôi chỉ đang giúp bạn "hoàn hảo" hơn thôi mà. (dialogue_dominant)
+[Jester] *Tiếng cười ma quái* (reaction)
+
+[SFX] Tiếng kéo cắt kim loại "Xoẹt... Xoẹt"
+[CROWD] Tiếng hàng ngàn con búp bê đồng thanh: "CHÚNG TÔI MUỐN RA NGOÀI!"
+
+Nhìn vào mắt tôi đi, bạn thấy gì? Một cuộc đời mới hay một cơn ác mộng vĩnh hằng? (narrator_only)

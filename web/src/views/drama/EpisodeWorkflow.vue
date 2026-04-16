@@ -822,17 +822,29 @@
                       <el-icon style="margin-right: 4px;"><Mic /></el-icon>
                       {{ $t('workflow.splitModeNurseryRhyme') }}
                     </el-radio-button>
+                    <el-radio-button value="mv_maker">
+                      <el-icon style="margin-right: 4px;"><VideoCamera /></el-icon>
+                      {{ $t('workflow.splitModeMVMaker') }}
+                    </el-radio-button>
                   </el-radio-group>
+                  <div v-if="shotSplitMode === 'mv_maker'" style="margin-top: 8px;">
+                    <span style="font-size: 13px; color: var(--el-text-color-secondary); margin-right: 8px;">
+                      {{ $t('workflow.mvGenreProfile') }}:
+                    </span>
+                    <el-select v-model="mvGenreProfile" size="small" style="width: 280px;">
+                      <el-option value="gaming_horror" :label="$t('workflow.mvGenreGamingHorror')" />
+                    </el-select>
+                  </div>
                 </div>
                 <div v-if="shotSplitMode !== 'auto'" style="margin-bottom: 12px;">
                   <el-alert
-                    :type="shotSplitMode === 'preserve' ? 'success' : shotSplitMode === 'visual_unit' ? 'warning' : shotSplitMode === 'nursery_rhyme' ? 'warning' : 'info'"
+                    :type="shotSplitMode === 'preserve' ? 'success' : shotSplitMode === 'visual_unit' ? 'warning' : shotSplitMode === 'nursery_rhyme' ? 'warning' : shotSplitMode === 'mv_maker' ? 'danger' : 'info'"
                     :closable="false"
                     style="display: inline-block; max-width: 500px;"
                   >
                     <template #title>
                       <span style="font-size: 12px;">
-                        {{ shotSplitMode === 'preserve' ? $t('workflow.splitModePreserveTip') : shotSplitMode === 'visual_unit' ? $t('workflow.splitModeVisualUnitTip') : shotSplitMode === 'nursery_rhyme' ? $t('workflow.splitModeNurseryRhymeTip') : $t('workflow.splitModeBreakdownTip') }}
+                        {{ shotSplitMode === 'preserve' ? $t('workflow.splitModePreserveTip') : shotSplitMode === 'visual_unit' ? $t('workflow.splitModeVisualUnitTip') : shotSplitMode === 'nursery_rhyme' ? $t('workflow.splitModeNurseryRhymeTip') : shotSplitMode === 'mv_maker' ? $t('workflow.splitModeMVMakerTip') : $t('workflow.splitModeBreakdownTip') }}
                       </span>
                     </template>
                   </el-alert>
@@ -971,6 +983,9 @@
                 </el-dropdown-item>
                 <el-dropdown-item command="nursery_rhyme">
                   <el-icon><Mic /></el-icon> {{ $t('workflow.splitModeNurseryRhyme') }}
+                </el-dropdown-item>
+                <el-dropdown-item command="mv_maker">
+                  <el-icon><VideoCamera /></el-icon> {{ $t('workflow.splitModeMVMaker') }}
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -1499,6 +1514,7 @@ import {
   Close,
   ScaleToOriginal,
   Box,
+  VideoCamera,
 } from "@element-plus/icons-vue";
 import { dramaAPI } from "@/api/drama";
 import { generationAPI } from "@/api/generation";
@@ -2367,7 +2383,8 @@ const batchGenerateSceneImages = async () => {
 
 const taskProgress = ref(0);
 const taskMessage = ref("");
-const shotSplitMode = ref("auto"); // "auto" | "preserve" | "breakdown"
+const shotSplitMode = ref("auto"); // "auto" | "preserve" | "breakdown" | "visual_unit" | "nursery_rhyme" | "mv_maker"
+const mvGenreProfile = ref("gaming_horror"); // MV Maker genre profile
 let pollTimer: any = null;
 
 const generateShots = async () => {
@@ -2402,10 +2419,12 @@ const generateShots = async () => {
     );
 
     // 创建异步任务
+    const genreProfile = shotSplitMode.value === 'mv_maker' ? mvGenreProfile.value : undefined;
     const response = await generationAPI.generateStoryboard(
       episodeId,
       selectedTextModel.value,
       shotSplitMode.value,
+      genreProfile,
     );
 
     taskMessage.value = response.message || "任务已创建";

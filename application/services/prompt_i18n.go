@@ -420,6 +420,21 @@ func (p *PromptI18n) WithDramaNurseryRhymeSystemPrompt(dramaID uint) string {
 	return p.resolvePrompt(dramaID, "nursery_rhyme_breakdown")
 }
 
+// WithDramaMVMakerSystemPrompt resolves MV maker system prompt for a specific genre
+func (p *PromptI18n) WithDramaMVMakerSystemPrompt(dramaID uint, promptKey string) string {
+	resolved := p.resolvePrompt(dramaID, promptKey)
+	if resolved != "" {
+		return resolved
+	}
+	// Fallback: try loading from MVGenrePromptMap
+	genre := strings.TrimPrefix(promptKey, "mv_maker_")
+	if fileName, ok := MVGenrePromptMap[genre]; ok {
+		return prompts.Get(fileName)
+	}
+	// Ultimate fallback: use gaming_horror
+	return prompts.Get("storyboard_mv_gaming_horror.txt")
+}
+
 // WithDramaSceneExtractionPrompt resolves scene extraction prompt for a specific drama
 func (p *PromptI18n) WithDramaSceneExtractionPrompt(dramaID uint, style string, customStyle string) string {
 	imageRatio := "16:9"

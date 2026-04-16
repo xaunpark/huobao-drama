@@ -66,10 +66,12 @@ type NurseryRhymeShot struct {
 
 // Regex patterns for lyrics parsing
 var (
-	// Section header: [VERSE 1: The Wheels] or [CHORUS] or [BRIDGE] etc.
-	nurseryHeaderPattern = regexp.MustCompile(`(?i)^\[(?:(VERSE|CHORUS|BRIDGE|INTRO|OUTRO)\s*(\d*))\s*(?::\s*(.+?))?\]$`)
+	// lyricsHeaderPattern matches section headers for both nursery rhyme and MV modes
+	// Supports: VERSE, CHORUS, PRE-CHORUS, BRIDGE, INTRO, OUTRO, DROP, BREAKDOWN, HOOK
+	// Examples: [VERSE 1: The Wheels], [CHORUS], [PRE-CHORUS], [DROP], [BRIDGE 2]
+	lyricsHeaderPattern = regexp.MustCompile(`(?i)^\[(?:(VERSE|CHORUS|PRE-CHORUS|PRE_CHORUS|BRIDGE|INTRO|OUTRO|DROP|BREAKDOWN|HOOK)\s*(\d*))\s*(?::\s*(.+?))?\]$`)
 	// Timestamp: (0:05 – 0:11) or (0:05 - 0:11) or (00:05 – 00:11) or (1:05 – 1:11)
-	nurseryTimestampPattern = regexp.MustCompile(`^\((\d{1,2}:\d{2})\s*[–\-]\s*(\d{1,2}:\d{2})\)\s*(.*)$`)
+	lyricsTimestampPattern = regexp.MustCompile(`^\((\d{1,2}:\d{2})\s*[–\-]\s*(\d{1,2}:\d{2})\)\s*(.*)$`)
 	// Instrumental tag: [INSTRUMENTAL]
 	instrumentalTag = regexp.MustCompile(`(?i)\[INSTRUMENTAL\]`)
 )
@@ -115,8 +117,8 @@ func parseLyricsInput(script string) ([]LyricsBlock, error) {
 		}
 
 		// Check for section header: [VERSE 1: The Wheels]
-		if headerMatch := nurseryHeaderPattern.FindStringSubmatch(line); headerMatch != nil {
-			sectionType := strings.ToLower(headerMatch[1])
+		if headerMatch := lyricsHeaderPattern.FindStringSubmatch(line); headerMatch != nil {
+			sectionType := strings.ToLower(strings.ReplaceAll(headerMatch[1], "-", "_")) // PRE-CHORUS → pre_chorus
 			sectionNum := 1
 			if headerMatch[2] != "" {
 				if n, err := strconv.Atoi(headerMatch[2]); err == nil {
@@ -132,7 +134,7 @@ func parseLyricsInput(script string) ([]LyricsBlock, error) {
 		}
 
 		// Check for timestamp line: (0:05 – 0:11) lyrics text
-		if tsMatch := nurseryTimestampPattern.FindStringSubmatch(line); tsMatch != nil {
+		if tsMatch := lyricsTimestampPattern.FindStringSubmatch(line); tsMatch != nil {
 			startTS := tsMatch[1]
 			endTS := tsMatch[2]
 			content := strings.TrimSpace(tsMatch[3])
@@ -294,10 +296,10 @@ func detectNurseryRhymeInput(script string) bool {
 
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
-		if nurseryTimestampPattern.MatchString(line) {
+		if lyricsTimestampPattern.MatchString(line) {
 			timestampCount++
 		}
-		if nurseryHeaderPattern.MatchString(line) {
+		if lyricsHeaderPattern.MatchString(line) {
 			headerCount++
 		}
 	}

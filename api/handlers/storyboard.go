@@ -29,10 +29,11 @@ func NewStoryboardHandler(db *gorm.DB, cfg *config.Config, log *logger.Logger) *
 func (h *StoryboardHandler) GenerateStoryboard(c *gin.Context) {
 	episodeID := c.Param("episode_id")
 
-	// 接收可选的 model 和 split_mode 参数
+	// 接收可选的 model, split_mode 和 genre_profile 参数
 	var req struct {
-		Model     string `json:"model"`
-		SplitMode string `json:"split_mode"` // "auto" (default), "preserve", "breakdown"
+		Model        string `json:"model"`
+		SplitMode    string `json:"split_mode"`    // "auto" (default), "preserve", "breakdown", "visual_unit", "nursery_rhyme", "mv_maker"
+		GenreProfile string `json:"genre_profile"` // "gaming_horror" (default for mv_maker), "gaming_parody", "general"
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		// 如果没有提供body或者解析失败，使用默认值
@@ -44,7 +45,7 @@ func (h *StoryboardHandler) GenerateStoryboard(c *gin.Context) {
 	}
 
 	// 调用生成服务，该服务已经是异步的，会返回任务ID
-	taskID, err := h.storyboardService.GenerateStoryboard(episodeID, req.Model, req.SplitMode)
+	taskID, err := h.storyboardService.GenerateStoryboard(episodeID, req.Model, req.SplitMode, req.GenreProfile)
 	if err != nil {
 		h.log.Errorw("Failed to generate storyboard", "error", err, "episode_id", episodeID)
 		response.InternalError(c, err.Error())

@@ -110,7 +110,7 @@ type VoiceoverShot struct {
 	SceneID    *uint  `json:"scene_id"`
 }
 
-func (s *StoryboardService) GenerateStoryboard(episodeID string, model string, splitMode string) (string, error) {
+func (s *StoryboardService) GenerateStoryboard(episodeID string, model string, splitMode string, genreProfile string) (string, error) {
 	// 从数据库获取剧集信息
 	var episode struct {
 		ID            string
@@ -222,7 +222,7 @@ func (s *StoryboardService) GenerateStoryboard(episodeID string, model string, s
 
 	// 启动后台goroutine处理AI调用和后续逻辑
 	dramaIDUint, _ := strconv.ParseUint(episode.DramaID, 10, 32)
-	go s.processStoryboardGeneration(task.ID, episodeID, uint(dramaIDUint), model, effectiveSplitMode, scriptContent, characterList, sceneList, propList)
+	go s.processStoryboardGeneration(task.ID, episodeID, uint(dramaIDUint), model, effectiveSplitMode, genreProfile, scriptContent, characterList, sceneList, propList)
 
 	// 立即返回任务ID
 	return task.ID, nil
@@ -251,7 +251,7 @@ func detectTimestampPattern(script string) bool {
 }
 
 // processStoryboardGeneration 后台处理故事板生成
-func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID string, dramaID uint, model, splitMode, scriptContent, characterList, sceneList, propList string) {
+func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID string, dramaID uint, model, splitMode, genreProfile, scriptContent, characterList, sceneList, propList string) {
 	// 更新任务状态为处理中
 	if err := s.taskService.UpdateTaskStatus(taskID, "processing", 10, "准备生成分镜头..."); err != nil {
 		s.log.Errorw("Failed to update task status", "error", err, "task_id", taskID)
@@ -259,6 +259,18 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID string
 	}
 
 	s.log.Infow("Processing storyboard generation", "task_id", taskID, "episode_id", episodeID, "split_mode", splitMode)
+
+	// Route to mv_maker mode if selected
+	if splitMode == "mv_maker" {
+		effectiveGenre := genreProfile
+		if effectiveGenre == "" {
+			effectiveGenre = "gaming_horror" // default genre
+		}
+		s.log.Infow("Using MV_MAKER mode — lyrics-synced genre-specific shot planning",
+			"task_id", taskID, "genre_profile", effectiveGenre)
+		s.processMVMakerGeneration(taskID, episodeID, dramaID, model, effectiveGenre, scriptContent, characterList, sceneList, propList)
+		return
+	}
 
 	// Route to nursery_rhyme mode if selected
 	if splitMode == "nursery_rhyme" {

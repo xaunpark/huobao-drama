@@ -8,8 +8,8 @@ export const generationAPI = {
     return request.post<{ task_id: string; status: string; message: string }>('/generation/characters', data)
   },
 
-  generateStoryboard(episodeId: string, model?: string, splitMode?: string) {
-    return request.post<{ task_id: string; status: string; message: string }>(`/episodes/${episodeId}/storyboards`, { model, split_mode: splitMode || 'auto' })
+  generateStoryboard(episodeId: string, model?: string, splitMode?: string, genreProfile?: string) {
+    return request.post<{ task_id: string; status: string; message: string }>(`/episodes/${episodeId}/storyboards`, { model, split_mode: splitMode || 'auto', genre_profile: genreProfile })
   },
 
   getTaskStatus(taskId: string) {
