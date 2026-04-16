@@ -435,7 +435,7 @@ export default {
     splitModeNurseryRhyme: '儿歌模式',
     splitModeNurseryRhymeTip: '儿歌模式：专为儿童音乐视频设计（适合0-5岁）。输入带时间戳的歌词，使用 [VERSE N: 主题] 段落标记和 (M:SS – M:SS) 时间戳格式。AI将生成与歌词同步的、安全的、字面化的儿童友好型视觉插图。支持叙事型（如 Wheels on the Bus）和累积型（如 Old MacDonald）两种歌曲结构。使用 [INSTRUMENTAL] 标记纯乐器段落。',
     splitModeMVMaker: 'MV制作',
-    splitModeMVMakerTip: 'MV制作模式：根据带时间戳的歌词创建MV分镜。选择流派来获得风格特定的镜头规划。使用 [VERSE]、[CHORUS]、[PRE-CHORUS]、[BRIDGE]、[DROP] 标记和 (M:SS – M:SS) 时间戳。流派：游戏恐怖适用于 FNAF/Poppy Playtime/Sprunki 风格（CG5/TryHardNinja风格）。',
+    splitModeMVMakerTip: 'MV制作模式：根据带时间戳的歌词创建MV分镜。选择流派来获得风格特定的镜头规划。使用 [VERSE]、[CHORUS]、[PRE-CHORUS]、[BRIDGE]、[DROP] 标记和 (M:SS – M:SS) 时间戳。使用 [NOTE] 标签添加镜头和人物的创意提示。流派：游戏恐怖适用于 FNAF/Poppy Playtime/Sprunki 风格（CG5/TryHardNinja风格）。',
     mvGenreProfile: '流派',
     mvGenreGamingHorror: '🎮 游戏恐怖 (FNAF, Poppy Playtime, Sprunki, CG5风格)',
     batchTaskSubmitted: '批量生成任务已提交！',

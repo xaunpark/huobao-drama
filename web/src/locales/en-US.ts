@@ -455,7 +455,7 @@ export default {
     splitModeNurseryRhyme: 'Nursery Rhyme',
     splitModeNurseryRhymeTip: 'Nursery Rhyme Mode: Designed for children\'s music videos (ages 0-5). Input timestamped lyrics with [VERSE N: Subject] section headers and (M:SS – M:SS) timestamps. AI creates literal, child-friendly visual illustrations synchronized to lyrics timing. Supports both Narrative (Wheels on the Bus) and Cumulative (Old MacDonald) song structures. Use [INSTRUMENTAL] tag for non-vocal sections.',
     splitModeMVMaker: 'MV Maker',
-    splitModeMVMakerTip: 'MV Maker Mode: Create music video storyboards from timestamped lyrics. Select a genre profile for style-specific shot planning. Input lyrics with [VERSE], [CHORUS], [PRE-CHORUS], [BRIDGE], [DROP] markers and (M:SS – M:SS) timestamps. Genre: Gaming Horror for FNAF/Poppy Playtime/Sprunki fan-made songs (CG5/TryHardNinja style).',
+    splitModeMVMakerTip: 'MV Maker Mode: Create music video storyboards from timestamped lyrics. Select a genre profile for style-specific shot planning. Input lyrics with [VERSE], [CHORUS], [PRE-CHORUS], [BRIDGE], [DROP] markers and (M:SS – M:SS) timestamps. Use [NOTE] to add creative directions (e.g. [NOTE] camera shakes). Genre: Gaming Horror for FNAF/Poppy Playtime/Sprunki fan-made songs (CG5/TryHardNinja style).',
     mvGenreProfile: 'Genre',
     mvGenreGamingHorror: '🎮 Gaming Horror (FNAF, Poppy Playtime, Sprunki, CG5 style)',
     batchTaskSubmitted: 'Batch generation task submitted!',

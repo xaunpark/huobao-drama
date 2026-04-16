@@ -7,6 +7,9 @@ Each object contains:
 - description: Role in the drama and visual description (string, 80-150 words)
 - image_prompt: English prompt for AI image generation (string). Describe the isolated object in detail: materials, colors, condition, size, distinctive features. Always end with "isolated on white background, product photography style, high detail".
 
+[Script Reading Rules]
+- Pay SPECIAL ATTENTION to any text marked with [NOTE] tags in the script. These contain the user's explicit creative directions and custom descriptions for props and items.
+
 [Example]
 [
   {

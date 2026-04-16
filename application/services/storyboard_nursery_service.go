@@ -139,6 +139,12 @@ func parseLyricsInput(script string) ([]LyricsBlock, error) {
 			endTS := tsMatch[2]
 			content := strings.TrimSpace(tsMatch[3])
 
+			// Strip [NOTE] and anything after it if placed on the same line
+			noteIdx := strings.Index(strings.ToUpper(content), "[NOTE]")
+			if noteIdx != -1 {
+				content = strings.TrimSpace(content[:noteIdx])
+			}
+
 			startSec, err := parseTimestampToSeconds(startTS)
 			if err != nil {
 				continue // Skip malformed timestamps

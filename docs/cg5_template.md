@@ -459,6 +459,8 @@ Generate an array, each element is a shot containing:
 **CRITICAL: Return ONLY a valid JSON array. Start directly with [ and end with ]. ALL content MUST be in ENGLISH.**
 
 [Important Notes]
+- The user may include [NOTE] tags in the script for creative direction (e.g., [NOTE] Jester jump scares the camera).
+- DO NOT include the text from [NOTE] tags in the 'dialogue', 'lyrics_text' or NARRATOR fields. Use these notes EXCLUSIVELY to influence your 'scene_description', 'action', 'camera_movement', and 'shot_type'.
 - dialogue = SUNG LYRICS by character. Empty during instrumental intro/outro
 - 3D Kinetic Typography is a CORE ELEMENT — describe text behavior in EVERY shot that has lyrics
 - Volumetric fog, under-lighting, and colored rim lights must be mentioned in EVERY scene description

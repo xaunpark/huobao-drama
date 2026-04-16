@@ -13,6 +13,9 @@ Each character object has these fields:
 - description: Background story and character relationships (string, 100-200 words). For state variants, briefly describe what state this is and how it differs from the base state.
 - voice_style: Voice characteristics for TTS synthesis (string, 20-40 words). For non-living entities (vehicles, objects), use "none".
 
+[Script Reading Rules]
+- Pay SPECIAL ATTENTION to any text marked with [NOTE] tags in the script. These contain the user's explicit creative directions and custom descriptions for characters. Use these to accurately capture the specific character designs requested by the user.
+
 [State Variant Rules]
 When a character or entity undergoes a SIGNIFICANT VISUAL CHANGE across the story that adds or removes major visual elements attached to its body/surface, you MUST create a SEPARATE character entry for each visually distinct state.
 

@@ -14,6 +14,7 @@
 }
 
 [Rules]
+- Pay SPECIAL ATTENTION to any text marked with [NOTE] tags in the script. These contain the user's explicit directions for environment, camera, and scene mood.
 - prompt field: English only, pure background (NO people, NO characters, NO figures)
 - scene_numbers: list all shot numbers using this background
 - Every shot must be assigned to exactly one background
