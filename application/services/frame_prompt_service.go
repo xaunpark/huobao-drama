@@ -33,6 +33,18 @@ func NewFramePromptService(db *gorm.DB, cfg *config.Config, log *logger.Logger) 
 	}
 }
 
+// resolveStyleForShot returns the per-shot distilled image_style if available,
+// otherwise falls back to the drama-level style key (used by resolveEffectiveStyle).
+// This ensures that distilled, shot-specific styles take priority over the full
+// project-level style_prompt template, reducing style bleeding across shots.
+// See: plans/shot-style-distill.md (Phase 3, Task 10)
+func resolveStyleForShot(sb models.Storyboard, dramaStyle string) string {
+	if sb.ImageStyle != nil && *sb.ImageStyle != "" {
+		return *sb.ImageStyle
+	}
+	return dramaStyle
+}
+
 // FrameType 帧类型
 type FrameType string
 
@@ -249,8 +261,9 @@ func (s *FramePromptService) generateFirstFrame(dramaID uint, sb models.Storyboa
 	// 构建上下文信息
 	contextInfo := s.buildStoryboardContext(sb, scene)
 
-	// 使用国际化提示词
-	dynamicPrompt := s.promptI18n.WithDramaFirstFramePrompt(dramaID, dramaStyle)
+	// 使用国际化提示词 — 优先使用 shot-level distilled style
+	shotStyle := resolveStyleForShot(sb, dramaStyle)
+	dynamicPrompt := s.promptI18n.WithDramaFirstFramePrompt(dramaID, shotStyle)
 	systemPrompt := dynamicPrompt + "\n\n" + fixed.Get("image_generation")
 	userPrompt := s.promptI18n.FormatUserPrompt("frame_info", contextInfo)
 
@@ -288,8 +301,9 @@ func (s *FramePromptService) generateKeyFrame(dramaID uint, sb models.Storyboard
 	// 构建上下文信息
 	contextInfo := s.buildStoryboardContext(sb, scene)
 
-	// 使用国际化提示词
-	dynamicPrompt := s.promptI18n.WithDramaKeyFramePrompt(dramaID, dramaStyle)
+	// 使用国际化提示词 — 优先使用 shot-level distilled style
+	shotStyle := resolveStyleForShot(sb, dramaStyle)
+	dynamicPrompt := s.promptI18n.WithDramaKeyFramePrompt(dramaID, shotStyle)
 	systemPrompt := dynamicPrompt + "\n\n" + fixed.Get("image_generation")
 	userPrompt := s.promptI18n.FormatUserPrompt("key_frame_info", contextInfo)
 
@@ -327,8 +341,9 @@ func (s *FramePromptService) generateLastFrame(dramaID uint, sb models.Storyboar
 	// 构建上下文信息
 	contextInfo := s.buildStoryboardContext(sb, scene)
 
-	// 使用国际化提示词
-	dynamicPrompt := s.promptI18n.WithDramaLastFramePrompt(dramaID, dramaStyle)
+	// 使用国际化提示词 — 优先使用 shot-level distilled style
+	shotStyle := resolveStyleForShot(sb, dramaStyle)
+	dynamicPrompt := s.promptI18n.WithDramaLastFramePrompt(dramaID, shotStyle)
 	systemPrompt := dynamicPrompt + "\n\n" + fixed.Get("image_generation")
 	userPrompt := s.promptI18n.FormatUserPrompt("last_frame_info", contextInfo)
 
@@ -409,17 +424,18 @@ func (s *FramePromptService) generateActionSequence(dramaID uint, sb models.Stor
 	// 构建上下文信息
 	contextInfo := s.buildStoryboardContext(sb, scene)
 
-	// 使用国际化提示词 - 根据 pacing_mode 选择不同的提示词
+	// 使用国际化提示词 - 根据 pacing_mode 选择不同的提示词 — 优先使用 shot-level distilled style
+	shotStyle := resolveStyleForShot(sb, dramaStyle)
 	var dynamicPrompt string
 	if sb.PacingMode != nil && *sb.PacingMode == "rapid_cut" {
 		// Rapid cut mode: 3 panels = 3 distinct micro-shots
-		dynamicPrompt = s.promptI18n.WithDramaRapidCutActionSequenceFramePrompt(dramaID, dramaStyle)
+		dynamicPrompt = s.promptI18n.WithDramaRapidCutActionSequenceFramePrompt(dramaID, shotStyle)
 		s.log.Infow("Using rapid cut action sequence prompt",
 			"storyboard_id", sb.ID,
 			"pacing_mode", *sb.PacingMode)
 	} else {
 		// Standard mode: 3 panels = Start → Peak → End of one action
-		dynamicPrompt = s.promptI18n.WithDramaActionSequenceFramePrompt(dramaID, dramaStyle)
+		dynamicPrompt = s.promptI18n.WithDramaActionSequenceFramePrompt(dramaID, shotStyle)
 	}
 	systemPrompt := dynamicPrompt + "\n\n" + fixed.Get("image_generation")
 	userPrompt := s.promptI18n.FormatUserPrompt("frame_info", contextInfo)

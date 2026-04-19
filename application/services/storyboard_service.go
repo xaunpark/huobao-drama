@@ -19,22 +19,26 @@ import (
 )
 
 type StoryboardService struct {
-	db          *gorm.DB
-	aiService   *AIService
-	taskService *TaskService
-	log         *logger.Logger
-	config      *config.Config
-	promptI18n  *PromptI18n
+	db                  *gorm.DB
+	aiService           *AIService
+	taskService         *TaskService
+	log                 *logger.Logger
+	config              *config.Config
+	promptI18n          *PromptI18n
+	styleDistillService *StyleDistillService
 }
 
 func NewStoryboardService(db *gorm.DB, cfg *config.Config, log *logger.Logger) *StoryboardService {
+	promptI18n := NewPromptI18n(cfg)
+	aiService := NewAIService(db, log)
 	return &StoryboardService{
-		db:          db,
-		aiService:   NewAIService(db, log),
-		taskService: NewTaskService(db, log),
-		log:         log,
-		config:      cfg,
-		promptI18n:  NewPromptI18n(cfg),
+		db:                  db,
+		aiService:           aiService,
+		taskService:         NewTaskService(db, log),
+		log:                 log,
+		config:              cfg,
+		promptI18n:          promptI18n,
+		styleDistillService: NewStyleDistillService(db, aiService, promptI18n, log),
 	}
 }
 
@@ -410,6 +414,10 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID string
 		}
 		return
 	}
+
+	// Trigger per-shot style distillation asynchronously (non-blocking)
+	epID, _ := strconv.ParseUint(episodeID, 10, 32)
+	go s.styleDistillService.BatchDistillStyles(uint(epID), dramaID)
 
 	// 更新任务进度
 	if err := s.taskService.UpdateTaskStatus(taskID, "processing", 90, "正在更新剧集时长..."); err != nil {
@@ -1201,6 +1209,10 @@ func (s *StoryboardService) processVisualUnitGeneration(taskID, episodeID string
 		}
 		return
 	}
+
+	// Trigger per-shot style distillation asynchronously (non-blocking)
+	epID, _ := strconv.ParseUint(episodeID, 10, 32)
+	go s.styleDistillService.BatchDistillStyles(uint(epID), dramaID)
 
 	if err := s.taskService.UpdateTaskStatus(taskID, "processing", 90, "Updating episode duration..."); err != nil {
 		s.log.Errorw("Failed to update task status", "error", err, "task_id", taskID)

@@ -475,6 +475,10 @@ func (s *StoryboardService) processNurseryRhymeGeneration(
 		return
 	}
 
+	// Trigger per-shot style distillation asynchronously (non-blocking)
+	epIDUint, _ := strconv.ParseUint(episodeID, 10, 32)
+	go s.styleDistillService.BatchDistillStyles(uint(epIDUint), dramaID)
+
 	if err := s.taskService.UpdateTaskStatus(taskID, "processing", 90, "Updating episode duration..."); err != nil {
 		s.log.Errorw("Failed to update task status", "error", err, "task_id", taskID)
 	}

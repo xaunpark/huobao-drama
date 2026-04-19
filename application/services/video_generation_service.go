@@ -360,18 +360,22 @@ func (s *VideoGenerationService) ProcessVideoGeneration(videoGenID uint) {
 	// 构建完整的提示词：风格提示词 + 约束提示词 + 用户提示词
 	prompt := videoGen.Prompt
 
-	// TODO(Phase 3): referenceMode detection below will be repurposed for
-	// per-shot video_style prepending when StyleDistillService is implemented.
-	// For now, the detection is disabled since video_constraint injection was removed.
+	// Prepend per-shot distilled video_style if available.
+	// This replaces the removed video_constraint injection with a concise,
+	// shot-specific constraint produced by StyleDistillService.
 	// See: plans/shot-style-distill.md (Phase 3: Integration, Task 11)
-	// referenceMode := "single"
-	// if videoGen.ReferenceMode != nil { referenceMode = *videoGen.ReferenceMode }
-	// ... frame type detection for action/first/last/key ...
-
-	// NOTE: video_constraint 不再在此处注入。video_constraint 是为 LLM 设计的系统指令，
-	// 不应直接注入到视频生成 API（Kling/Doubao）。将在 Phase 3 中被 per-shot 的
-	// distilled video_style 替代。
-	// See: plans/shot-style-distill.md (Phase 1: Cleanup)
+	if videoGen.StoryboardID != nil {
+		var storyboard models.Storyboard
+		if err := s.db.First(&storyboard, *videoGen.StoryboardID).Error; err == nil {
+			if storyboard.VideoStyle != nil && *storyboard.VideoStyle != "" {
+				prompt = *storyboard.VideoStyle + "\n\n" + prompt
+				s.log.Infow("Prepended distilled video_style to prompt",
+					"id", videoGenID,
+					"storyboard_id", *videoGen.StoryboardID,
+					"video_style_length", len(*storyboard.VideoStyle))
+			}
+		}
+	}
 
 	// 打印完整的提示词信息
 	s.log.Infow("Video generation prompts",
