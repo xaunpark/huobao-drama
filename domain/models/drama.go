@@ -148,6 +148,9 @@ type Storyboard struct {
 	AnimationHint   *string       `gorm:"type:text" json:"animation_hint"`               // "lip_sync, bounce, speech_bubble_pop"
 	IsCallback      *bool         `json:"is_callback"`                                   // Is this a callback/repeat shot?
 	CallbackShotNum *int          `json:"callback_shot_num"`                             // Reference to original shot number
+	// Per-shot distilled style fields (populated by StyleDistillService after storyboard creation)
+	ImageStyle      *string       `gorm:"type:text" json:"image_style,omitempty"`        // Distilled visual style for this specific shot
+	VideoStyle      *string       `gorm:"type:text" json:"video_style,omitempty"`        // Distilled video constraint for this specific shot
 	CreatedAt        time.Time      `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt        time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
 	DeletedAt        gorm.DeletedAt `gorm:"index" json:"-"`
