@@ -598,3 +598,19 @@ func (p *PromptI18n) WithDramaStylePrompt(dramaID uint, style string, customStyl
 	// Fallback to original per-style logic
 	return p.GetStylePrompt(style, customStyle)
 }
+
+// FormatFramePromptWithStyle formats a frame prompt template directly with a pre-resolved style.
+// This bypasses resolveEffectiveStyle, which is necessary when using per-shot distilled styles
+// that would otherwise be overridden by the template's style_prompt.
+// See: plans/shot-style-distill.md (Phase 3, Task 10)
+func (p *PromptI18n) FormatFramePromptWithStyle(dramaID uint, promptKey string, style string) string {
+	imageRatio := "16:9"
+	template := p.resolvePrompt(dramaID, promptKey)
+	if strings.Contains(template, "%s") {
+		return fmt.Sprintf(template, style, imageRatio)
+	}
+	return formatPromptWithVars(template, map[string]string{
+		"{{STYLE}}": style,
+		"{{RATIO}}": imageRatio,
+	})
+}

@@ -33,16 +33,15 @@ func NewFramePromptService(db *gorm.DB, cfg *config.Config, log *logger.Logger) 
 	}
 }
 
-// resolveStyleForShot returns the per-shot distilled image_style if available,
-// otherwise falls back to the drama-level style key (used by resolveEffectiveStyle).
-// This ensures that distilled, shot-specific styles take priority over the full
-// project-level style_prompt template, reducing style bleeding across shots.
+// resolveStyleForShot checks whether a per-shot distilled image_style is available.
+// Returns (effectiveStyle, true) if distilled, or ("", false) to signal fallback to
+// the normal WithDrama*FramePrompt flow.
 // See: plans/shot-style-distill.md (Phase 3, Task 10)
-func resolveStyleForShot(sb models.Storyboard, dramaStyle string) string {
+func resolveStyleForShot(sb models.Storyboard) (string, bool) {
 	if sb.ImageStyle != nil && *sb.ImageStyle != "" {
-		return *sb.ImageStyle
+		return *sb.ImageStyle, true
 	}
-	return dramaStyle
+	return "", false
 }
 
 // FrameType 帧类型
@@ -262,8 +261,14 @@ func (s *FramePromptService) generateFirstFrame(dramaID uint, sb models.Storyboa
 	contextInfo := s.buildStoryboardContext(sb, scene)
 
 	// 使用国际化提示词 — 优先使用 shot-level distilled style
-	shotStyle := resolveStyleForShot(sb, dramaStyle)
-	dynamicPrompt := s.promptI18n.WithDramaFirstFramePrompt(dramaID, shotStyle)
+	var dynamicPrompt string
+	if shotStyle, isDistilled := resolveStyleForShot(sb); isDistilled {
+		// Distilled style: format template directly, bypassing resolveEffectiveStyle
+		// which would override with the full template style_prompt
+		dynamicPrompt = s.promptI18n.FormatFramePromptWithStyle(dramaID, "image_first_frame", shotStyle)
+	} else {
+		dynamicPrompt = s.promptI18n.WithDramaFirstFramePrompt(dramaID, dramaStyle)
+	}
 	systemPrompt := dynamicPrompt + "\n\n" + fixed.Get("image_generation")
 	userPrompt := s.promptI18n.FormatUserPrompt("frame_info", contextInfo)
 
@@ -302,8 +307,12 @@ func (s *FramePromptService) generateKeyFrame(dramaID uint, sb models.Storyboard
 	contextInfo := s.buildStoryboardContext(sb, scene)
 
 	// 使用国际化提示词 — 优先使用 shot-level distilled style
-	shotStyle := resolveStyleForShot(sb, dramaStyle)
-	dynamicPrompt := s.promptI18n.WithDramaKeyFramePrompt(dramaID, shotStyle)
+	var dynamicPrompt string
+	if shotStyle, isDistilled := resolveStyleForShot(sb); isDistilled {
+		dynamicPrompt = s.promptI18n.FormatFramePromptWithStyle(dramaID, "image_key_frame", shotStyle)
+	} else {
+		dynamicPrompt = s.promptI18n.WithDramaKeyFramePrompt(dramaID, dramaStyle)
+	}
 	systemPrompt := dynamicPrompt + "\n\n" + fixed.Get("image_generation")
 	userPrompt := s.promptI18n.FormatUserPrompt("key_frame_info", contextInfo)
 
@@ -342,8 +351,12 @@ func (s *FramePromptService) generateLastFrame(dramaID uint, sb models.Storyboar
 	contextInfo := s.buildStoryboardContext(sb, scene)
 
 	// 使用国际化提示词 — 优先使用 shot-level distilled style
-	shotStyle := resolveStyleForShot(sb, dramaStyle)
-	dynamicPrompt := s.promptI18n.WithDramaLastFramePrompt(dramaID, shotStyle)
+	var dynamicPrompt string
+	if shotStyle, isDistilled := resolveStyleForShot(sb); isDistilled {
+		dynamicPrompt = s.promptI18n.FormatFramePromptWithStyle(dramaID, "image_last_frame", shotStyle)
+	} else {
+		dynamicPrompt = s.promptI18n.WithDramaLastFramePrompt(dramaID, dramaStyle)
+	}
 	systemPrompt := dynamicPrompt + "\n\n" + fixed.Get("image_generation")
 	userPrompt := s.promptI18n.FormatUserPrompt("last_frame_info", contextInfo)
 
@@ -425,17 +438,26 @@ func (s *FramePromptService) generateActionSequence(dramaID uint, sb models.Stor
 	contextInfo := s.buildStoryboardContext(sb, scene)
 
 	// 使用国际化提示词 - 根据 pacing_mode 选择不同的提示词 — 优先使用 shot-level distilled style
-	shotStyle := resolveStyleForShot(sb, dramaStyle)
 	var dynamicPrompt string
-	if sb.PacingMode != nil && *sb.PacingMode == "rapid_cut" {
-		// Rapid cut mode: 3 panels = 3 distinct micro-shots
-		dynamicPrompt = s.promptI18n.WithDramaRapidCutActionSequenceFramePrompt(dramaID, shotStyle)
-		s.log.Infow("Using rapid cut action sequence prompt",
-			"storyboard_id", sb.ID,
-			"pacing_mode", *sb.PacingMode)
+	if shotStyle, isDistilled := resolveStyleForShot(sb); isDistilled {
+		// Distilled style: use appropriate template based on pacing mode
+		if sb.PacingMode != nil && *sb.PacingMode == "rapid_cut" {
+			dynamicPrompt = s.promptI18n.FormatFramePromptWithStyle(dramaID, "image_action_sequence_rapid_cut", shotStyle)
+			s.log.Infow("Using rapid cut action sequence prompt with distilled style",
+				"storyboard_id", sb.ID,
+				"pacing_mode", *sb.PacingMode)
+		} else {
+			dynamicPrompt = s.promptI18n.FormatFramePromptWithStyle(dramaID, "image_action_sequence", shotStyle)
+		}
 	} else {
-		// Standard mode: 3 panels = Start → Peak → End of one action
-		dynamicPrompt = s.promptI18n.WithDramaActionSequenceFramePrompt(dramaID, shotStyle)
+		if sb.PacingMode != nil && *sb.PacingMode == "rapid_cut" {
+			dynamicPrompt = s.promptI18n.WithDramaRapidCutActionSequenceFramePrompt(dramaID, dramaStyle)
+			s.log.Infow("Using rapid cut action sequence prompt",
+				"storyboard_id", sb.ID,
+				"pacing_mode", *sb.PacingMode)
+		} else {
+			dynamicPrompt = s.promptI18n.WithDramaActionSequenceFramePrompt(dramaID, dramaStyle)
+		}
 	}
 	systemPrompt := dynamicPrompt + "\n\n" + fixed.Get("image_generation")
 	userPrompt := s.promptI18n.FormatUserPrompt("frame_info", contextInfo)
