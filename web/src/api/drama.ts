@@ -180,6 +180,10 @@ export const dramaAPI = {
     return request.delete(`/storyboards/${storyboardId}`)
   },
 
+  distillStyles(episodeId: string) {
+    return request.post(`/episodes/${episodeId}/distill-styles`)
+  },
+
   clearBatchData(episodeId: string) {
     return request.post(`/episodes/${episodeId}/clear-generated-data`)
   }

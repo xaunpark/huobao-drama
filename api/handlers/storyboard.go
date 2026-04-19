@@ -129,3 +129,16 @@ func (h *StoryboardHandler) ClearGeneratedData(c *gin.Context) {
 
 	response.Success(c, gin.H{"message": "Generated data cleared successfully"})
 }
+
+// DistillStyles triggers a manual re-distillation of per-shot styles
+func (h *StoryboardHandler) DistillStyles(c *gin.Context) {
+	episodeID := c.Param("episode_id")
+
+	if err := h.storyboardService.TriggerStyleDistillation(episodeID); err != nil {
+		h.log.Errorw("Failed to trigger style distillation", "error", err, "episode_id", episodeID)
+		response.InternalError(c, err.Error())
+		return
+	}
+
+	response.Success(c, gin.H{"message": "Style distillation started in background"})
+}

@@ -136,8 +136,8 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 		// 分镜头路由
 		episodes := api.Group("/episodes")
 		{
-			// 分镜头
 			episodes.POST("/:episode_id/storyboards", storyboardHandler.GenerateStoryboard)
+			episodes.POST("/:episode_id/distill-styles", storyboardHandler.DistillStyles)
 			episodes.POST("/:episode_id/props/extract", propHandler.ExtractProps)
 			episodes.POST("/:episode_id/characters/extract", characterLibraryHandler.ExtractCharacters)
 			episodes.GET("/:episode_id/storyboards", sceneHandler.GetStoryboardsForEpisode)

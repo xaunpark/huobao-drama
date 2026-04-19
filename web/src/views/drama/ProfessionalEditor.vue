@@ -39,6 +39,9 @@
               <el-button text :icon="VideoCamera" @click="showBatchR2VDialog = true" :title="$t('professionalEditor.batchR2V.title')">
                 R2V
               </el-button>
+              <el-button text :icon="Refresh" @click="handleReDistillStyles" :loading="distillingReq" title="Re-distill per-shot styles for the entire episode">
+                Re-distill
+              </el-button>
               <el-button text :icon="Plus" @click="handleAddStoryboard" v-if="currentViewMode === 'editorial'">
                 {{ $t("storyboard.add") }}
               </el-button>
@@ -147,6 +150,24 @@
 
       <!-- 右侧编辑面板 -->
       <div class="edit-panel">
+        <!-- Distillation Banner -->
+        <div v-if="storyboards.length > 0 && isDistillingStyles" class="distillation-banner" style="padding: 12px; margin-bottom: 8px; background-color: var(--el-color-primary-light-9); border: 1px solid var(--el-color-primary-light-5); border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 8px; color: var(--el-color-primary);">
+            <el-icon class="is-loading"><Loading /></el-icon>
+            <div style="font-size: 13px; font-weight: 500; display: flex; flex-direction: column;">
+              <span>🎨 AI is summarizing per-shot styles in the background... Creating media now will use fallback styles.</span>
+              <span style="font-size: 12px; opacity: 0.8; margin-top: 4px;">
+                Status: Image Styles ({{ styleDistillStats.image }}/{{ styleDistillStats.total }}) | Video Constraints ({{ styleDistillStats.video }}/{{ styleDistillStats.total }})
+              </span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <el-button size="small" type="primary" plain @click="loadStoryboardsView(currentViewMode)" :loading="loadingData">
+              <el-icon><RefreshRight /></el-icon> Refresh
+            </el-button>
+          </div>
+        </div>
+
         <el-tabs v-model="activeTab" class="edit-tabs">
           <!-- 镜头属性标签 -->
           <el-tab-pane
@@ -588,6 +609,18 @@
                   >
                 </div>
 
+                <!-- Distilled Style Read-only Field -->
+                <div class="prompt-section" v-if="currentStoryboard?.image_style">
+                  <div class="section-label">🎨 Distilled Image Style</div>
+                  <el-input
+                    v-model="currentStoryboard.image_style"
+                    type="textarea"
+                    :rows="2"
+                    readonly
+                    style="opacity: 0.8;"
+                  />
+                </div>
+
                 <!-- 提示词区域 -->
                 <div class="prompt-section">
                   <div class="section-label">
@@ -745,6 +778,18 @@
           <el-tab-pane :label="$t('video.videoGeneration')" name="video">
             <div class="tab-content" v-if="currentStoryboard">
               <div class="video-generation-section">
+                <!-- Distilled Video Style Read-only Field -->
+                <div class="video-prompt-container" v-if="currentStoryboard?.video_style" style="margin-bottom: 20px;">
+                  <div class="section-label">🎨 Distilled Video Constraint</div>
+                  <el-input
+                    v-model="currentStoryboard.video_style"
+                    type="textarea"
+                    :rows="2"
+                    readonly
+                    style="opacity: 0.8;"
+                  />
+                </div>
+
                 <!-- 生成提示词展示 -->
                 <div class="video-prompt-container" style="margin-bottom: 20px;">
                   <el-input
@@ -2683,6 +2728,28 @@ const toggleCharacter = (charId: number) => {
   }
 };
 
+const styleDistillStats = computed(() => {
+  let image = 0;
+  let video = 0;
+  storyboards.value.forEach(sb => {
+    if (sb.image_style) image++;
+    if (sb.video_style) video++;
+  });
+  return { image, video, total: storyboards.value.length };
+});
+
+const isDistillingStyles = computed(() => {
+  if (storyboards.value.length === 0) return false;
+  
+  // If the drama has no style defined, there's no distillation process to run
+  if (!drama.value?.style && !drama.value?.custom_style) return false;
+
+  // We consider distillation running if shots lack both image_style and video_style
+  // but exist in the Database (meaning the process hasn't finished its async work).
+  // Distillation always populates either image_style or video_style if successful.
+  return storyboards.value.some(sb => !sb.image_style && !sb.video_style);
+});
+
 const currentStoryboard = computed(() => {
   if (!currentStoryboardId.value) return null;
   return (
@@ -3290,6 +3357,33 @@ const stopPolling = () => {
 };
 
 // 生成图片
+const distillingReq = ref(false);
+const handleReDistillStyles = async () => {
+  try {
+    const isConfirm = await ElMessageBox.confirm(
+      "This will clear and regenerate distilled styles (image_style and video_style) for ALL shots in this episode. You can keep working while it generates in the background. Do you want to proceed?",
+      "Re-distill Styles",
+      {
+        confirmButtonText: "Proceed",
+        cancelButtonText: "Cancel",
+        type: "warning",
+      }
+    )
+    if (!isConfirm) return;
+    distillingReq.value = true;
+    await dramaAPI.distillStyles(episodeId.value as string);
+    ElMessage.success("Background style distillation task started");
+    await loadStoryboardsView(currentViewMode.value); // This will show the distillation banner
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error(error);
+      ElMessage.error("Failed to start distillation task");
+    }
+  } finally {
+    distillingReq.value = false;
+  }
+}
+
 const generateFrameImage = async () => {
   if (!currentStoryboard.value || !currentFramePrompt.value) return;
 

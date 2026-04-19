@@ -2189,3 +2189,30 @@ func getString(s *string) string {
 	}
 	return *s
 }
+
+// TriggerStyleDistillation clears existing distilled styles and manually triggers a background re-distillation.
+// See: plans/shot-style-distill.md (Phase 4, UI/UX)
+func (s *StoryboardService) TriggerStyleDistillation(episodeIDStr string) error {
+	episodeID, err := strconv.ParseUint(episodeIDStr, 10, 32)
+	if err != nil {
+		return fmt.Errorf("invalid episode ID")
+	}
+
+	var episode models.Episode
+	if err := s.db.First(&episode, episodeID).Error; err != nil {
+		return fmt.Errorf("failed to fetch episode: %w", err)
+	}
+
+	// Clear existing styles to force re-distillation and trigger frontend reactive banner
+	if err := s.db.Model(&models.Storyboard{}).Where("episode_id = ?", episodeID).Updates(map[string]interface{}{
+		"image_style": gorm.Expr("NULL"),
+		"video_style": gorm.Expr("NULL"),
+	}).Error; err != nil {
+		return fmt.Errorf("failed to clear existing styles: %w", err)
+	}
+
+	// Trigger asynchronously
+	go s.styleDistillService.BatchDistillStyles(uint(episodeID), episode.DramaID)
+
+	return nil
+}

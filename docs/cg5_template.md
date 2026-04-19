@@ -393,11 +393,11 @@ Please return JSON array directly.
 - Insert/POV Shot: 5% — First-person perspective of victim (hands on glass, looking through cage bars), or detail shots of props (syringe, CRT screen)
 
 [Camera Angle Distribution]
-- Low angle (looking up): 50% — PRIMARY. Makes monsters look towering, powerful, threatening. Camera placed below character looking up
-- Eye-level: 25% — Dialogue/interaction scenes, confrontation moments, character-to-character exchanges
-- High angle (looking down): 10% — Victim's smallness, things trapped in cages, looking down into pits
-- Worm's eye (ground level): 10% — Characters crawling, lying down, or extreme power shots (camera at floor level looking up at towering monster)
-- POV (first person): 5% — Trapped/chased perspective, hands visible, desperate viewpoint
+- Low angle (looking up): 70% — PRIMARY & ESSENTIAL. Makes monsters look towering, powerful, and threatening. MUST be the dominant angle whenever a monster is on screen.
+- Eye-level: 15% — Short dialogue/interaction scenes or deep confrontations.
+- High angle (looking down): 5% — Victim's smallness, things trapped in cages, looking down into pits.
+- Worm's eye (ground level): 5% — Extreme power shots (camera at floor level looking up at towering monster).
+- POV (first person): 5% — Trapped/chased perspective, hands visible, desperate viewpoint.
 
 [Camera Movement — CINEMATIC 3D VIRTUAL CAMERA]
 - Slow push-in: 40% — PRIMARY. Gradually pushing toward character's face during buildup moments. Creates tension and claustrophobia. Speed: very slow during verses, accelerating toward chorus
@@ -405,6 +405,11 @@ Please return JSON array directly.
 - Static (locked): 15% — Used during intense close-ups and title cards. The stillness contrasts with the chaotic content
 - Handheld (fake shake): 15% — Simulated camera shake during high-energy chorus moments and violent action. Intensity synced to beat drops
 - 3D Typography tracking: 10% — Camera moves THROUGH or AROUND floating text, treating typography as physical 3D objects in space
+
+[Narrative & Spatial Continuity — MANDATORY]
+1. **CONTINUOUS NARRATIVE**: Do NOT just place characters singing in isolated voids. The sequence MUST tell a visible story (e.g., waking up -> stalking -> chasing through a factory -> cornering the victim). Each shot is a progression of the hunt. If the input contains a script/story arc (via [NOTE] tags), you MUST build the sequence to drive towards that overarching narrative, rather than just illustrating individual lyrics in isolation.
+2. **SPATIAL AWARENESS**: Connect your shots logically. If Shot A shows a character in a hallway, Shot B should maintain that environment. Create a sense of moving *through* a physical level.
+3. **LOGICAL ACTION**: Character poses and actions must carry over. If a monster raises a claw in Shot A, Shot B should show the strike. Avoid disjointed jump cuts where characters reset to an idle pose.
 
 [Composition Rules — MANDATORY]
 1. **CENTER SUBJECT**: 70% of shots place the monster CHARACTER dead center. Negative space on sides filled with 3D TYPOGRAPHY
