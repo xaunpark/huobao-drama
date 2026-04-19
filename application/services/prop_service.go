@@ -172,7 +172,9 @@ func (s *PropService) processPropImageGeneration(taskID string, prop models.Prop
 	s.taskService.UpdateTaskStatus(taskID, "processing", 0, "正在生成图片...")
 
 	// 准备生成参数
-	imageStyle := "Modern Japanese anime style"
+	// NOTE: 不再硬编码 style。prop.Prompt 已在提取阶段通过 LLM（prop_extraction.txt 的 %s）
+	// 融入了 style_prompt 的风格要求。硬编码 "anime" 会与非动漫模板冲突。
+	// See: plans/shot-style-distill.md (Phase 1: Cleanup)
 	imageSize := "1024x1024"
 
 	// 创建生成请求
@@ -182,7 +184,6 @@ func (s *PropService) processPropImageGeneration(taskID string, prop models.Prop
 		ImageType: string(models.ImageTypeProp),
 		Prompt:    *prop.Prompt,
 		Size:      imageSize,
-		Style:     &imageStyle,
 		Provider:  s.config.AI.DefaultImageProvider, // 使用默认配置
 	}
 

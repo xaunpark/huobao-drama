@@ -269,21 +269,12 @@ func (s *ImageGenerationService) ProcessImageGeneration(imageGenID uint) {
 		opts = append(opts, image.WithReferenceImages(referenceImages))
 	}
 
-	// 构建完整的提示词：风格提示词 + 用户提示词
+	// 构建完整的提示词
+	// NOTE: style_prompt 不再在此处注入。样式已在 LLM 层通过提取/帧提示模板中的 %s 占位符
+	// 融入到 prompt 中（character_extraction, scene_extraction, prop_extraction, image_first_frame 等）。
+	// 在 Image API 层重复注入会导致所有图片类型（character/scene/prop/shot）的样式污染。
+	// See: plans/shot-style-distill.md (Phase 1: Cleanup)
 	prompt := imageGen.Prompt
-
-	// 如果drama有风格设置，添加风格提示词
-	if drama.Style != "" && drama.Style != "realistic" {
-		stylePrompt := s.promptI18n.WithDramaStylePrompt(drama.ID, drama.Style, drama.CustomStyle)
-		if stylePrompt != "" {
-			// 将风格提示词作为系统级约束添加到提示词前面
-			prompt = stylePrompt + "\n\n" + prompt
-			s.log.Infow("Added style prompt to image generation",
-				"id", imageGenID,
-				"style", drama.Style,
-				"style_prompt_length", len(stylePrompt))
-		}
-	}
 
 	prompt += ", imageRatio:" + imageRatio
 

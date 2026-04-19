@@ -360,64 +360,23 @@ func (s *VideoGenerationService) ProcessVideoGeneration(videoGenID uint) {
 	// 构建完整的提示词：风格提示词 + 约束提示词 + 用户提示词
 	prompt := videoGen.Prompt
 
-	// 2. 添加视频约束提示词
-	// 根据参考图模式选择对应的约束提示词
-	referenceMode := "single" // 默认单图模式
-	if videoGen.ReferenceMode != nil {
-		referenceMode = *videoGen.ReferenceMode
-	}
+	// TODO(Phase 3): referenceMode detection below will be repurposed for
+	// per-shot video_style prepending when StyleDistillService is implemented.
+	// For now, the detection is disabled since video_constraint injection was removed.
+	// See: plans/shot-style-distill.md (Phase 3: Integration, Task 11)
+	// referenceMode := "single"
+	// if videoGen.ReferenceMode != nil { referenceMode = *videoGen.ReferenceMode }
+	// ... frame type detection for action/first/last/key ...
 
-	// 如果是单图模式，需要检查图片是否为动作序列图
-	if referenceMode == "single" && videoGen.ImageGenID != nil {
-		var imageGen models.ImageGeneration
-		if err := s.db.First(&imageGen, *videoGen.ImageGenID).Error; err == nil && imageGen.FrameType != nil {
-			if *imageGen.FrameType == "action" {
-				referenceMode = "action_sequence"
-				s.log.Infow("Detected action sequence image in single mode",
-					"id", videoGenID,
-					"image_gen_id", *videoGen.ImageGenID,
-					"frame_type", *imageGen.FrameType)
-			} else if *imageGen.FrameType == "first" {
-				referenceMode = "first_frame_strict"
-				s.log.Infow("Detected first frame image in single mode", "id", videoGenID)
-			} else if *imageGen.FrameType == "last" {
-				referenceMode = "last_frame_strict"
-				s.log.Infow("Detected last frame image in single mode", "id", videoGenID)
-			} else if *imageGen.FrameType == "key" {
-				referenceMode = "key_frame_style"
-				s.log.Infow("Detected key frame image in single mode", "id", videoGenID)
-			}
-		}
-	}
-
-	// Check if this storyboard uses rapid cut mode → use rapid cut video constraint
-	if videoGen.StoryboardID != nil {
-		var storyboard models.Storyboard
-		if err := s.db.First(&storyboard, *videoGen.StoryboardID).Error; err == nil {
-			if storyboard.PacingMode != nil && *storyboard.PacingMode == "rapid_cut" {
-				referenceMode = "rapid_cut"
-				s.log.Infow("Detected rapid cut production shot",
-					"id", videoGenID,
-					"storyboard_id", *videoGen.StoryboardID,
-					"pacing_mode", *storyboard.PacingMode)
-			}
-		}
-	}
-
-	constraintPrompt := s.promptI18n.WithDramaVideoConstraintPrompt(videoGen.DramaID, referenceMode)
-	if constraintPrompt != "" {
-		prompt = constraintPrompt + "\n\n" + prompt
-		s.log.Infow("Added constraint prompt to video generation",
-			"id", videoGenID,
-			"reference_mode", referenceMode,
-			"constraint_prompt_length", len(constraintPrompt))
-	}
+	// NOTE: video_constraint 不再在此处注入。video_constraint 是为 LLM 设计的系统指令，
+	// 不应直接注入到视频生成 API（Kling/Doubao）。将在 Phase 3 中被 per-shot 的
+	// distilled video_style 替代。
+	// See: plans/shot-style-distill.md (Phase 1: Cleanup)
 
 	// 打印完整的提示词信息
 	s.log.Infow("Video generation prompts",
 		"id", videoGenID,
 		"user_prompt", videoGen.Prompt,
-		"constraint_prompt", constraintPrompt,
 		"final_prompt", prompt)
 
 	result, err := client.GenerateVideo(imageURL, prompt, opts...)
