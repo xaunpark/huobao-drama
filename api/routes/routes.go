@@ -59,6 +59,8 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 	propHandler := handlers2.NewPropHandler(db, cfg, log, aiService, imageGenService)
 	promptTemplateHandler := handlers2.NewPromptTemplateHandler(db, log)
 	rapidCutHandler := handlers2.NewRapidCutHandler(db, cfg, log)
+	taskService := services2.NewTaskService(db, log)
+	videoReviewHandler := handlers2.NewVideoReviewHandler(db, log, aiService, taskService, localStoragePtr)
 
 	api := r.Group("/api/v1")
 	{
@@ -192,6 +194,8 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 			videos.POST("/episode/:episode_id/batch", videoGenHandler.BatchGenerateForEpisode)
 			videos.POST("/:id/upscale", videoGenHandler.UpscaleVideo)
 			videos.POST("/:id/reset-status", videoGenHandler.ResetVideoStatus)
+			videos.POST("/:id/review", videoReviewHandler.ReviewVideo)
+			videos.GET("/:id/review", videoReviewHandler.GetVideoReview)
 		}
 
 		videoMerges := api.Group("/video-merges")

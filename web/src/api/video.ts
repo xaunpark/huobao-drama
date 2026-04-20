@@ -48,5 +48,13 @@ export const videoAPI = {
   
   resetVideoStatus(videoGenId: number) {
     return request.post<{ status: string; message: string }>(`/videos/${videoGenId}/reset-status`)
+  },
+
+  reviewVideo(videoGenId: number) {
+    return request.post<{ task_id: string; status: string; message: string }>(`/videos/${videoGenId}/review`)
+  },
+
+  getVideoReview(videoGenId: number) {
+    return request.get<any>(`/videos/${videoGenId}/review`)
   }
 }

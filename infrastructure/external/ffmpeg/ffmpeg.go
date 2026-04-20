@@ -886,3 +886,76 @@ func (f *FFmpeg) generateSilence(outputPath string, duration float64) (string, e
 	f.log.Infow("Silence audio generated successfully", "output", outputPath)
 	return outputPath, nil
 }
+
+// CreateContactSheet generates a contact sheet (grid of thumbnails with timestamps)
+// from a video file. Used by video review to create a single image for AI vision analysis.
+// Returns: (contactSheetPath, totalFrameCount, error)
+func (f *FFmpeg) CreateContactSheet(videoPath string, fps float64, outDir string, cols int) (string, int, error) {
+	f.log.Infow("Creating contact sheet", "video", videoPath, "fps", fps, "cols", cols)
+
+	// 1. Get video duration using existing method
+	duration, err := f.GetVideoDuration(videoPath)
+	if err != nil {
+		return "", 0, fmt.Errorf("failed to get video duration: %w", err)
+	}
+
+	totalFrames := int(duration * fps)
+	if totalFrames == 0 {
+		return "", 0, fmt.Errorf("video too short or fps too low: duration=%.2f fps=%.1f", duration, fps)
+	}
+
+	// Cap at 80 frames max to prevent overly large contact sheets
+	maxFrames := 80
+	actualFPS := fps
+	if totalFrames > maxFrames {
+		actualFPS = float64(maxFrames) / duration
+		totalFrames = maxFrames
+		f.log.Infow("Capped frames to max", "maxFrames", maxFrames, "adjustedFPS", actualFPS)
+	}
+
+	rows := (totalFrames + cols - 1) / cols // ceil division
+
+	outputPath := filepath.Join(outDir, fmt.Sprintf("contact_sheet_%d.jpg", time.Now().UnixNano()))
+
+	// 2. Try with timestamp overlay first (drawtext filter)
+	vf := fmt.Sprintf(
+		"fps=%.2f,scale=320:-1,drawtext=text='%%{pts\\:hms}':x=5:y=5:fontsize=14:fontcolor=white:borderw=1:bordercolor=black,tile=%dx%d",
+		actualFPS, cols, rows,
+	)
+
+	cmd := exec.Command("ffmpeg",
+		"-y", "-i", videoPath,
+		"-vf", vf,
+		"-q:v", "2",
+		outputPath,
+	)
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		// Fallback: try without drawtext (font issues on some systems)
+		f.log.Warnw("Contact sheet with timestamps failed, trying without drawtext",
+			"error", err, "output", string(output))
+
+		vfFallback := fmt.Sprintf(
+			"fps=%.2f,scale=320:-1,tile=%dx%d",
+			actualFPS, cols, rows,
+		)
+
+		cmdFallback := exec.Command("ffmpeg",
+			"-y", "-i", videoPath,
+			"-vf", vfFallback,
+			"-q:v", "2",
+			outputPath,
+		)
+
+		outputFallback, errFallback := cmdFallback.CombinedOutput()
+		if errFallback != nil {
+			f.log.Errorw("Contact sheet generation failed completely",
+				"error", errFallback, "output", string(outputFallback))
+			return "", 0, fmt.Errorf("contact sheet generation failed: %w, output: %s", errFallback, string(outputFallback))
+		}
+	}
+
+	f.log.Infow("Contact sheet created", "output", outputPath, "frames", totalFrames, "grid", fmt.Sprintf("%dx%d", cols, rows))
+	return outputPath, totalFrames, nil
+}

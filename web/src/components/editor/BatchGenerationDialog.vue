@@ -55,6 +55,9 @@
           <el-button type="success" plain :disabled="isBatching" @click="startUpscaleAll">
             <el-icon><MagicStick /></el-icon> Upscale All Videos
           </el-button>
+          <el-button type="warning" plain :disabled="isBatching" :loading="isReviewing" @click="startReviewAll">
+            <el-icon><View /></el-icon> Review Videos
+          </el-button>
           <el-button type="info" plain :loading="isDownloadingZip" @click="downloadAllVideos">
              <el-icon><Download /></el-icon> {{ $t('professionalEditor.batch.downloadAll') }}
           </el-button>
@@ -101,6 +104,22 @@
               </el-tag>
             </template>
           </el-table-column>
+          <el-table-column label="Score" width="120">
+            <template #default="scope">
+              <template v-if="reviewScores[scope.row.id]">
+                <el-tag :type="getVerdictTagType(reviewScores[scope.row.id].verdict)" size="small" effect="dark">
+                  {{ reviewScores[scope.row.id].overall_score.toFixed(1) }}
+                </el-tag>
+                <span style="font-size: 11px; margin-left: 4px; color: #999; text-transform: capitalize">
+                  {{ reviewScores[scope.row.id].verdict }}
+                </span>
+              </template>
+              <template v-else-if="reviewingShots[scope.row.id]">
+                <el-tag type="info" size="small"><el-icon class="is-loading"><Loading /></el-icon> Reviewing</el-tag>
+              </template>
+              <span v-else style="color: #ccc">—</span>
+            </template>
+          </el-table-column>
           <el-table-column :label="$t('professionalEditor.batch.progress')" width="150">
             <template #default="scope">
               <el-progress 
@@ -124,7 +143,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from 'vue'
-import { MagicStick, Download, Delete } from '@element-plus/icons-vue'
+import { MagicStick, Download, Delete, View, Loading } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import JSZip from 'jszip'
 import axios from 'axios'
@@ -163,8 +182,13 @@ const visible = computed({
 const selectedVideoModel = ref(props.defaultVideoModel || '')
 const isBatching = ref(false)
 const isDownloadingZip = ref(false)
+const isReviewing = ref(false)
 const shouldStop = ref(false)
 const generationMode = ref<'key'|'action'>('action')
+
+// Video review state
+const reviewScores = reactive<Record<string, any>>({})
+const reviewingShots = reactive<Record<string, boolean>>({})
 const { maxConcurrentThreads } = useAISettings()
 
 // 任务状态追踪 map: shotId -> { step: 'prompt'|'image'|'video', status: 'pending'|'loading'|'done'|'error', progress: number }
@@ -297,6 +321,16 @@ const initTaskStates = async () => {
       video: videoState,
       videoId: activeVideoId,
       progress: progress
+    }
+
+    // Fetch existing review for current video
+    if (activeVideoId) {
+      try {
+        const review = await videoAPI.getVideoReview(activeVideoId)
+        if (review) {
+          reviewScores[sb.id] = review
+        }
+      } catch { /* no review yet */ }
     }
   }
 }
@@ -732,6 +766,74 @@ const startUpscaleAll = async () => {
   } finally {
     isBatching.value = false
     emit('completed')
+  }
+}
+
+const startReviewAll = async () => {
+  if (isBatching.value || isReviewing.value) return
+  isReviewing.value = true
+  shouldStop.value = false
+
+  try {
+    ElMessage.info('Starting video quality review...')
+    await initTaskStates()
+
+    await runConcurrently(localStoryboards.value, 4, async (sb) => {
+      // Only review shots that have a completed video
+      if (!['done', 'hd'].includes(taskStates[sb.id]?.video)) return
+
+      const videoId = taskStates[sb.id]?.videoId
+      if (!videoId) return
+
+      // Skip if already has review for this exact video
+      if (reviewScores[sb.id]?.video_gen_id === videoId) return
+
+      reviewingShots[sb.id] = true
+
+      try {
+        // Trigger review
+        const res = await videoAPI.reviewVideo(videoId)
+        const taskId = res.task_id
+
+        // Poll task status
+        while (!shouldStop.value) {
+          const task = await taskAPI.getStatus(taskId)
+          if (task.status === 'completed') {
+            let result = task.result
+            if (typeof result === 'string') result = JSON.parse(result)
+            reviewScores[sb.id] = result
+            break
+          }
+          if (task.status === 'failed') {
+            console.error(`Review failed for shot ${sb.storyboard_number}:`, task.error || task.message)
+            ElMessage.error(`Shot ${sb.storyboard_number} review failed: ${task.error || task.message || 'Unknown error'}`)
+            break
+          }
+          await workerDelay(3000)
+        }
+      } catch (e: any) {
+        console.error(`Review shot ${sb.storyboard_number} failed:`, e)
+      } finally {
+        reviewingShots[sb.id] = false
+      }
+    })
+
+    if (!shouldStop.value) {
+      ElMessage.success('Video review complete!')
+    }
+  } finally {
+    isReviewing.value = false
+  }
+}
+
+const getVerdictTagType = (verdict: string) => {
+  switch (verdict) {
+    case 'excellent': return 'success'
+    case 'good': return ''
+    case 'acceptable': return 'warning'
+    case 'poor': return 'danger'
+    case 'unusable': return 'danger'
+    default: return 'info'
   }
 }
 

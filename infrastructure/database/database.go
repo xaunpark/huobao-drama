@@ -94,5 +94,8 @@ func AutoMigrate(db *gorm.DB) error {
 
 		// 提示词模板
 		&models.PromptTemplate{},
+
+		// 视频审核
+		&models.VideoReview{},
 	)
 }
