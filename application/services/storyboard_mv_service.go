@@ -17,7 +17,8 @@ import (
 
 // MVGenrePromptMap maps genre profile keys to default prompt files
 var MVGenrePromptMap = map[string]string{
-	"gaming_horror": "storyboard_mv_gaming_horror.txt",
+	"gaming_horror":   "storyboard_mv_gaming_horror.txt",
+	"cinematic_movie": "storyboard_mv_cinematic_movie.txt",
 	// Future genres:
 	// "gaming_parody": "storyboard_mv_gaming_parody.txt",
 	// "general":       "storyboard_mv_general.txt",

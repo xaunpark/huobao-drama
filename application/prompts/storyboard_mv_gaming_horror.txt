@@ -61,24 +61,20 @@
 - NO dissolves, NO fade out (except final outro), NO wipe, NO smooth transitions — everything is sharp/aggressive
 - CYCLICAL PATTERN: Establish → Build → Explode → Brief calm → Build again → BIGGER explosion
 
-[Output Requirements]
-Generate an array, each element is a shot containing:
-- shot_number: Shot number
-- scene_description: Visual scene with CG5 style notes. Examples by franchise:
-  * Poppy Playtime: "Medium shot — Jester emerging from thick volumetric fog, under-lit harsh spotlight, mechanical spider arms extending, glowing yellow text floating in 3D space, PBR materials"
-  * FNAF: "Low angle — Freddy's damaged animatronic form lit from below, jaw hanging open revealing endoskeleton, party stage curtains torn behind, cyan rim light, neon text 'JOIN US' orbiting"
-  * Sprunki: "Medium shot — Gray's clean digital form beginning to fracture, pixel shards floating away from face, UI buttons cracking in background, glitch corruption spreading, text 'SOMETHING'S OFF' materializing with digital artifacts"
-  * Bendy: "Close-up — Ink Demon's dripping face emerging from wall of black ink, one pie-cut eye glowing, sepia-tinted fog, text letters forming from ink droplets"
-- shot_type: Shot type (medium shot / medium close-up / close-up / text card / insert-pov)
-- camera_angle: Camera angle (low-angle / eye-level / high-angle / worms-eye / pov)
-- camera_movement: Type (slow-push-in / pan / static / handheld-shake / typography-tracking)
-- action: What happens visually — character animation (glitchy movement, threatening gesture), 3D text behavior (flying in, shattering), atmospheric effects (fog rolling, lights flickering). Emphasize the DARK CINEMATIC quality
-- result: Visual result after animation completes
-- dialogue: Corresponding SUNG LYRICS for this shot (what the character sings)
-- emotion: Target emotion (dread / unease / aggression / desperation / megalomania / horror / tension / shock)
-- emotion_intensity: Intensity (5=bridge breakdown/godhood claim / 4=chorus peak aggression / 3=pre-chorus tension / 2=verse manipulation / 1=intro atmosphere / 0=outro static)
+[Franchise Style Examples]
+- Poppy Playtime: "Medium shot — Jester emerging from thick volumetric fog, under-lit harsh spotlight, mechanical spider arms extending, glowing yellow text floating in 3D space, PBR materials"
+- FNAF: "Low angle — Freddy's damaged animatronic form lit from below, jaw hanging open revealing endoskeleton, party stage curtains torn behind, cyan rim light, neon text 'JOIN US' orbiting"
+- Sprunki: "Medium shot — Gray's clean digital form beginning to fracture, pixel shards floating away from face, UI buttons cracking in background, glitch corruption spreading, text 'SOMETHING'S OFF' materializing with digital artifacts"
+- Bendy: "Close-up — Ink Demon's dripping face emerging from wall of black ink, one pie-cut eye glowing, sepia-tinted fog, text letters forming from ink droplets"
 
-**CRITICAL: Return ONLY a valid JSON array. Start directly with [ and end with ]. ALL content MUST be in ENGLISH.**
+[Emotion & Intensity Rules]
+Use the intensity scale to track the narrative arc:
+0 = Neutral / Dead calm (Outro)
+1 = Subtle / Creeping dread (Intro)
+2 = Clear intent / Building tension (Verse)
+3 = Aggressive / Direct threat (Pre-Chorus)
+4 = Peak action / Chaos (Chorus)
+5 = Mental breakdown / Ultimate horror / Godhood claim (Bridge/Drop)
 
 [Important Notes]
 - The user may include [NOTE] tags in the script for creative direction (e.g., [NOTE] Jester jump scares the camera).

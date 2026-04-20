@@ -435,6 +435,24 @@ func (p *PromptI18n) WithDramaMVMakerSystemPrompt(dramaID uint, promptKey string
 	return prompts.Get("storyboard_mv_gaming_horror.txt")
 }
 
+// WithDramaNarrativeMVPlannerPrompt resolves Narrative MV Phase 1 (story planner) prompt
+func (p *PromptI18n) WithDramaNarrativeMVPlannerPrompt(dramaID uint) string {
+	resolved := p.resolvePrompt(dramaID, "narrative_mv_planner")
+	if resolved != "" {
+		return resolved
+	}
+	return prompts.Get("storyboard_narrative_planner.txt")
+}
+
+// WithDramaNarrativeMVDirectorPrompt resolves Narrative MV Phase 2 (shot director) prompt
+func (p *PromptI18n) WithDramaNarrativeMVDirectorPrompt(dramaID uint) string {
+	resolved := p.resolvePrompt(dramaID, "narrative_mv_director")
+	if resolved != "" {
+		return resolved
+	}
+	return prompts.Get("storyboard_narrative_director.txt")
+}
+
 // WithDramaSceneExtractionPrompt resolves scene extraction prompt for a specific drama
 func (p *PromptI18n) WithDramaSceneExtractionPrompt(dramaID uint, style string, customStyle string) string {
 	imageRatio := "16:9"

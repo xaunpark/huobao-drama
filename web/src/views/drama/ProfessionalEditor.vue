@@ -65,55 +65,85 @@
         </div>
 
         <div class="storyboard-list">
-          <div
+          <template
             v-for="(shot, index) in storyboards"
             :key="shot.id"
-            class="storyboard-item"
-            :class="{ active: currentStoryboardId === shot.id }"
-            @click="selectStoryboard(shot.id)"
           >
-            <div class="shot-content">
-              <div class="shot-header">
-                <div class="shot-title-row">
-                  <span class="shot-number">{{
-                    $t("storyboard.shotNumber", {
-                      number: shot.storyboard_number,
-                    })
-                  }}</span>
-                  <span class="shot-title">{{
-                    shot.title || $t("storyboard.untitled")
-                  }}</span>
+            <!-- Narrative MV: Part group header (shown only when narrative_part changes) -->
+            <div
+              v-if="shot.narrative_part && (index === 0 || shot.narrative_part !== storyboards[index - 1]?.narrative_part)"
+              class="narrative-part-header"
+              :class="'narrative-part-' + shot.narrative_part"
+            >
+              <span class="narrative-part-icon">{{ shot.narrative_part === 'prologue' ? '🎬' : shot.narrative_part === 'music_film' ? '🎵' : '🌅' }}</span>
+              <span class="narrative-part-label">{{ shot.narrative_part === 'prologue' ? 'PROLOGUE' : shot.narrative_part === 'music_film' ? 'MUSIC FILM' : 'EPILOGUE' }}</span>
+              <span class="narrative-part-count">
+                {{ storyboards.filter(s => s.narrative_part === shot.narrative_part).length }} shots
+                · {{ storyboards.filter(s => s.narrative_part === shot.narrative_part).reduce((sum, s) => sum + (s.duration || 0), 0) }}s
+              </span>
+            </div>
+            <div
+              class="storyboard-item"
+              :class="{
+                active: currentStoryboardId === shot.id,
+                'narrative-border-prologue': shot.narrative_part === 'prologue',
+                'narrative-border-music-film': shot.narrative_part === 'music_film',
+                'narrative-border-epilogue': shot.narrative_part === 'epilogue'
+              }"
+              @click="selectStoryboard(shot.id)"
+            >
+              <div class="shot-content">
+                <div class="shot-header">
+                  <div class="shot-title-row">
+                    <span class="shot-number">{{
+                      $t("storyboard.shotNumber", {
+                        number: shot.storyboard_number,
+                      })
+                    }}</span>
+                    <span class="shot-title">{{
+                      shot.title || $t("storyboard.untitled")
+                    }}</span>
+                  </div>
+                  <div class="shot-actions">
+                    <span class="shot-duration">{{ shot.duration }}s</span>
+                    <el-button
+                      link
+                      type="danger"
+                      :icon="Delete"
+                      @click.stop="handleDeleteStoryboard(shot)"
+                      class="delete-btn"
+                    />
+                  </div>
                 </div>
-                <div class="shot-actions">
-                  <span class="shot-duration">{{ shot.duration }}s</span>
-                  <el-button
-                    link
-                    type="danger"
-                    :icon="Delete"
-                    @click.stop="handleDeleteStoryboard(shot)"
-                    class="delete-btn"
-                  />
+                <div class="shot-action" v-if="shot.action">
+                  {{ shot.action }}
                 </div>
-              </div>
-              <div class="shot-action" v-if="shot.action">
-                {{ shot.action }}
-              </div>
-              <!-- Voice-over: Script segment preview -->
-              <div class="shot-script-segment" v-if="shot.script_segment">
-                <el-icon :size="12" style="margin-right: 4px; color: var(--el-color-warning);"><Headset /></el-icon>
-                <span>{{ shot.script_segment.length > 60 ? shot.script_segment.substring(0, 60) + '...' : shot.script_segment }}</span>
-              </div>
-              <!-- Voice-over: Audio mode + Shot role badges -->
-              <div class="shot-vo-badges" v-if="shot.audio_mode || shot.shot_role">
-                <el-tag v-if="shot.audio_mode" size="small" :type="shot.audio_mode === 'narrator_only' ? 'info' : 'danger'" style="margin-right: 4px;">
-                  {{ shot.audio_mode === 'narrator_only' ? '🎙️ Narrator' : '🗣️ Dialogue' }}
-                </el-tag>
-                <el-tag v-if="shot.shot_role" size="small" type="success">
-                  {{ shot.shot_role }}
-                </el-tag>
+                <!-- Voice-over: Script segment preview -->
+                <div class="shot-script-segment" v-if="shot.script_segment">
+                  <el-icon :size="12" style="margin-right: 4px; color: var(--el-color-warning);"><Headset /></el-icon>
+                  <span>{{ shot.script_segment.length > 60 ? shot.script_segment.substring(0, 60) + '...' : shot.script_segment }}</span>
+                </div>
+                <!-- Voice-over: Audio mode + Shot role badges -->
+                <div class="shot-vo-badges" v-if="shot.audio_mode || shot.shot_role">
+                  <el-tag v-if="shot.audio_mode" size="small" :type="shot.audio_mode === 'narrator_only' ? 'info' : 'danger'" style="margin-right: 4px;">
+                    {{ shot.audio_mode === 'narrator_only' ? '🎙️ Narrator' : '🗣️ Dialogue' }}
+                  </el-tag>
+                  <el-tag v-if="shot.shot_role" size="small" type="success">
+                    {{ shot.shot_role }}
+                  </el-tag>
+                </div>
+                <!-- Narrative MV: Music sync badge (compact) -->
+                <div class="shot-narrative-badges" v-if="shot.narrative_part && shot.music_sync_type">
+                  <el-tag size="small" type="warning" style="margin-right: 4px;">
+                    🎵 {{ shot.music_segment || 'Music' }}
+                  </el-tag>
+                  <el-tag size="small" :type="shot.music_sync_type === 'convergent' ? 'danger' : shot.music_sync_type === 'irony' ? 'warning' : 'info'">
+                    🎯 {{ shot.music_sync_type }}
+                  </el-tag>
+                </div>
               </div>
             </div>
-          </div>
+          </template>
         </div>
       </div>
 
@@ -381,6 +411,49 @@
                   <label>📏 Triggered Rules</label>
                   <div style="display: flex; gap: 4px; flex-wrap: wrap;">
                     <el-tag v-for="rule in currentStoryboard.split_rules" :key="rule" size="small" type="warning">{{ rule }}</el-tag>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Narrative MV metadata (conditionally shown for narrative_mv mode) -->
+              <div class="narrative-mv-section" v-if="currentStoryboard.narrative_part">
+                <div class="section-label" style="display: flex; align-items: center; gap: 6px;">
+                  <span>{{ currentStoryboard.narrative_part === 'prologue' ? '🎬' : currentStoryboard.narrative_part === 'music_film' ? '🎵' : '🌅' }}</span>
+                  Narrative MV
+                </div>
+
+                <!-- Part badge -->
+                <div class="vo-field">
+                  <label>🎞️ Part</label>
+                  <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+                    <el-tag
+                      :type="currentStoryboard.narrative_part === 'prologue' ? 'warning' : currentStoryboard.narrative_part === 'epilogue' ? 'info' : 'danger'"
+                      size="default"
+                    >
+                      {{ currentStoryboard.narrative_part === 'prologue' ? '🎬 PROLOGUE' : currentStoryboard.narrative_part === 'music_film' ? '🎵 MUSIC FILM' : '🌅 EPILOGUE' }}
+                    </el-tag>
+                    <el-tag v-if="currentStoryboard.music_segment" size="small" type="info">
+                      {{ currentStoryboard.music_segment }}
+                    </el-tag>
+                    <el-tag v-if="currentStoryboard.music_sync_type" size="small" :type="currentStoryboard.music_sync_type === 'convergent' ? 'danger' : currentStoryboard.music_sync_type === 'irony' ? 'warning' : 'info'">
+                      🎯 {{ currentStoryboard.music_sync_type }}
+                    </el-tag>
+                  </div>
+                </div>
+
+                <!-- Acting Note -->
+                <div class="vo-field" v-if="currentStoryboard.acting_note">
+                  <label>🎭 Acting Note</label>
+                  <div class="vo-script-segment" style="font-style: italic;">
+                    {{ currentStoryboard.acting_note }}
+                  </div>
+                </div>
+
+                <!-- Lyrics Anchor -->
+                <div class="vo-field" v-if="currentStoryboard.lyrics_anchor">
+                  <label>🎤 Lyrics Anchor (post-prod)</label>
+                  <div style="font-size: 12px; color: var(--el-text-color-placeholder); font-style: italic;">
+                    {{ currentStoryboard.lyrics_anchor }}
                   </div>
                 </div>
               </div>
@@ -7100,4 +7173,83 @@ onBeforeUnmount(() => {
   padding: 6px 10px;
   border-radius: 6px;
 }
+
+/* === Narrative MV — 3-Part Visual Grouping === */
+
+/* Group header separators between prologue / music_film / epilogue */
+.narrative-part-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin: 4px 0 2px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.narrative-part-prologue {
+  background: rgba(230, 126, 34, 0.12);
+  border-left: 3px solid #E67E22;
+  color: #E67E22;
+}
+
+.narrative-part-music_film {
+  background: rgba(142, 68, 173, 0.12);
+  border-left: 3px solid #8E44AD;
+  color: #8E44AD;
+}
+
+.narrative-part-epilogue {
+  background: rgba(41, 128, 185, 0.12);
+  border-left: 3px solid #2980B9;
+  color: #2980B9;
+}
+
+.narrative-part-icon {
+  font-size: 14px;
+}
+
+.narrative-part-label {
+  flex: 1;
+}
+
+.narrative-part-count {
+  font-size: 10px;
+  opacity: 0.7;
+  font-weight: 400;
+}
+
+/* Left border color-coding per part on shot items */
+.narrative-border-prologue {
+  border-left: 3px solid #E67E22 !important;
+}
+
+.narrative-border-music-film {
+  border-left: 3px solid #8E44AD !important;
+}
+
+.narrative-border-epilogue {
+  border-left: 3px solid #2980B9 !important;
+}
+
+/* Narrative MV compact badge row in shot list */
+.shot-narrative-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+/* Narrative MV metadata section in detail panel */
+.narrative-mv-section {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(142, 68, 173, 0.06);
+  border: 1px solid rgba(142, 68, 173, 0.15);
+  border-radius: 8px;
+}
 </style>
+

@@ -151,6 +151,13 @@ type Storyboard struct {
 	// Per-shot distilled style fields (populated by StyleDistillService after storyboard creation)
 	ImageStyle      *string       `gorm:"type:text" json:"image_style,omitempty"`        // Distilled visual style for this specific shot
 	VideoStyle      *string       `gorm:"type:text" json:"video_style,omitempty"`        // Distilled video constraint for this specific shot
+	// Narrative MV fields (narrative_mv mode)
+	NarrativePart   *string       `gorm:"size:20" json:"narrative_part"`                 // "prologue" | "music_film" | "epilogue"
+	HasMusic        *bool         `json:"has_music"`                                     // false for parts 1 & 3
+	MusicSegment    *string       `gorm:"size:50" json:"music_segment"`                  // "VERSE 1", "CHORUS", null for no-music parts
+	MusicSyncType   *string       `gorm:"size:20" json:"music_sync_type"`                // "parallel" | "convergent" | "irony"
+	ActingNote      *string       `gorm:"type:text" json:"acting_note"`                  // Director's micro-expression / body language instruction
+	LyricsAnchor    *string       `gorm:"type:text" json:"lyrics_anchor"`                // Lyric line this shot is time-anchored to (post-prod ref)
 	CreatedAt        time.Time      `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt        time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
 	DeletedAt        gorm.DeletedAt `gorm:"index" json:"-"`

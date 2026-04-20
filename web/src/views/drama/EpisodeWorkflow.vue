@@ -826,6 +826,10 @@
                       <el-icon style="margin-right: 4px;"><VideoCamera /></el-icon>
                       {{ $t('workflow.splitModeMVMaker') }}
                     </el-radio-button>
+                    <el-radio-button value="narrative_mv">
+                      <el-icon style="margin-right: 4px;"><Film /></el-icon>
+                      {{ $t('workflow.splitModeNarrativeMV') }}
+                    </el-radio-button>
                   </el-radio-group>
                   <div v-if="shotSplitMode === 'mv_maker'" style="margin-top: 8px;">
                     <span style="font-size: 13px; color: var(--el-text-color-secondary); margin-right: 8px;">
@@ -833,18 +837,19 @@
                     </span>
                     <el-select v-model="mvGenreProfile" size="small" style="width: 280px;">
                       <el-option value="gaming_horror" :label="$t('workflow.mvGenreGamingHorror')" />
+                      <el-option value="cinematic_movie" :label="$t('workflow.mvGenreCinematicMovie')" />
                     </el-select>
                   </div>
                 </div>
                 <div v-if="shotSplitMode !== 'auto'" style="margin-bottom: 12px;">
                   <el-alert
-                    :type="shotSplitMode === 'preserve' ? 'success' : shotSplitMode === 'visual_unit' ? 'warning' : shotSplitMode === 'nursery_rhyme' ? 'warning' : shotSplitMode === 'mv_maker' ? 'danger' : 'info'"
+                    :type="shotSplitMode === 'preserve' ? 'success' : shotSplitMode === 'visual_unit' ? 'warning' : shotSplitMode === 'nursery_rhyme' ? 'warning' : shotSplitMode === 'mv_maker' ? 'danger' : shotSplitMode === 'narrative_mv' ? 'warning' : 'info'"
                     :closable="false"
                     style="display: inline-block; max-width: 500px;"
                   >
                     <template #title>
                       <span style="font-size: 12px;">
-                        {{ shotSplitMode === 'preserve' ? $t('workflow.splitModePreserveTip') : shotSplitMode === 'visual_unit' ? $t('workflow.splitModeVisualUnitTip') : shotSplitMode === 'nursery_rhyme' ? $t('workflow.splitModeNurseryRhymeTip') : shotSplitMode === 'mv_maker' ? $t('workflow.splitModeMVMakerTip') : $t('workflow.splitModeBreakdownTip') }}
+                        {{ shotSplitMode === 'preserve' ? $t('workflow.splitModePreserveTip') : shotSplitMode === 'visual_unit' ? $t('workflow.splitModeVisualUnitTip') : shotSplitMode === 'nursery_rhyme' ? $t('workflow.splitModeNurseryRhymeTip') : shotSplitMode === 'mv_maker' ? $t('workflow.splitModeMVMakerTip') : shotSplitMode === 'narrative_mv' ? $t('workflow.splitModeNarrativeMVTip') : $t('workflow.splitModeBreakdownTip') }}
                       </span>
                     </template>
                   </el-alert>
@@ -986,6 +991,9 @@
                 </el-dropdown-item>
                 <el-dropdown-item command="mv_maker">
                   <el-icon><VideoCamera /></el-icon> {{ $t('workflow.splitModeMVMaker') }}
+                </el-dropdown-item>
+                <el-dropdown-item command="narrative_mv">
+                  <el-icon><Film /></el-icon> {{ $t('workflow.splitModeNarrativeMV') }}
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>

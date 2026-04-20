@@ -276,6 +276,14 @@ func (s *StoryboardService) processStoryboardGeneration(taskID, episodeID string
 		return
 	}
 
+	// Route to narrative_mv mode if selected
+	if splitMode == "narrative_mv" {
+		s.log.Infow("Using NARRATIVE_MV mode — cinematic short film + music (3-part structure)",
+			"task_id", taskID)
+		s.processNarrativeMVGeneration(taskID, episodeID, dramaID, model, scriptContent, characterList, sceneList, propList)
+		return
+	}
+
 	// Route to nursery_rhyme mode if selected
 	if splitMode == "nursery_rhyme" {
 		s.log.Infow("Using NURSERY_RHYME mode — lyrics-synced shot planning for children's music videos", "task_id", taskID)

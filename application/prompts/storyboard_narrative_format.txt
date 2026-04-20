@@ -1,0 +1,116 @@
+=== OUTPUT FORMAT ===
+
+You MUST return a valid JSON array of shot objects. No markdown, no explanation, just the JSON array.
+
+Each shot object must have these fields:
+
+```json
+[
+  {
+    "shot_id": 1,
+    "narrative_part": "prologue",
+    "has_music": false,
+    "duration_sec": 6,
+    "music_segment": "",
+    "music_sync_type": "",
+    "lyrics_anchor": "",
+    "visual_description": "Wide establishing shot of the rehearsal room at night. A single working light above the barre casts long shadows across the wooden floor. The door is ajar. Rain visible through the window.",
+    "acting_note": "No character visible yet — the room itself tells the story of absence and routine. Focus on the worn floor, the chair with a folded towel.",
+    "title": "Empty Rehearsal Room",
+    "shot_type": "WS",
+    "camera_angle": "eye-level",
+    "camera_movement": "slow dolly forward",
+    "narrative_function": "setup_character",
+    "subtext": "The room is waiting for someone. The audience doesn't know who yet.",
+    "location": "Ballet rehearsal room",
+    "atmosphere": "Night, single overhead light, rain outside, quiet",
+    "characters": [],
+    "scene_id": 1
+  },
+  {
+    "shot_id": 8,
+    "narrative_part": "music_film",
+    "has_music": true,
+    "duration_sec": 4,
+    "music_segment": "CHORUS",
+    "music_sync_type": "convergent",
+    "lyrics_anchor": "I'm still here though there's no one left",
+    "visual_description": "Medium shot from behind An as she begins her first real dance movement. Her arms raise slowly into first position. The single spotlight catches the line of her shoulders.",
+    "acting_note": "This is the first genuine, unguarded movement she makes. Not performing for anyone — dancing because her body remembers how. Her spine straightens as muscle memory takes over.",
+    "title": "First Real Dance",
+    "shot_type": "MS",
+    "camera_angle": "eye-level",
+    "camera_movement": "slow tracking left",
+    "narrative_function": "emotional_peak",
+    "subtext": "She is saying goodbye through dance. The audience should feel she is doing something for the last time.",
+    "location": "Ballet rehearsal room — center stage",
+    "atmosphere": "Spotlight narrowing, surrounding darkness deepening",
+    "characters": [1],
+    "scene_id": 1
+  },
+  {
+    "shot_id": 25,
+    "narrative_part": "epilogue",
+    "has_music": false,
+    "duration_sec": 8,
+    "music_segment": "",
+    "music_sync_type": "",
+    "lyrics_anchor": "",
+    "visual_description": "Close-up of Minh's hand picking up An's ballet shoe from the empty floor. He holds it briefly, then his grip tightens. Behind him, the window shows morning rain.",
+    "acting_note": "His hand trembles almost imperceptibly. He does not cry. His jaw sets. This is a man who just understood everything too late.",
+    "title": "The Shoe Remains",
+    "shot_type": "CU",
+    "camera_angle": "high-angle",
+    "camera_movement": "static",
+    "narrative_function": "resolution",
+    "subtext": "He knew. He was there last night in the shadows. But he never spoke. This shoe is his regret made physical.",
+    "location": "Ballet rehearsal room — floor",
+    "atmosphere": "Morning, cold natural light from window, empty room",
+    "characters": [2],
+    "scene_id": 1
+  }
+]
+```
+
+=== FIELD DEFINITIONS ===
+
+shot_id: Sequential number starting from 1 (backend will re-number, but keep sequential for context)
+narrative_part: REQUIRED. "prologue" | "music_film" | "epilogue" — which of the 3 film parts this shot belongs to
+has_music: REQUIRED. false for "prologue" and "epilogue" shots, true for "music_film" shots
+duration_sec: REQUIRED. Integer seconds. Prologue: 4-8s. Music Film: 3-6s. Epilogue: 4-10s.
+music_segment: The music segment name this shot falls within ("INTRO", "VERSE 1", "CHORUS", etc.). Empty for prologue/epilogue.
+music_sync_type: "parallel" | "convergent" | "irony" | "" — how this shot's emotional content relates to the music. Empty for prologue/epilogue.
+lyrics_anchor: The lyric line that plays during this shot (for post-production time alignment ONLY — do NOT illustrate this lyric). Empty for instrumental or no-music parts.
+visual_description: REQUIRED. Detailed scene description for AI image generation (minimum 30 words). Must be TEMPLATE-AGNOSTIC — describe composition, staging, action only. Do NOT describe rendering style, color grade, or material textures.
+acting_note: REQUIRED. Director's instruction for character acting — micro-expressions, body language, what the character is feeling internally vs showing externally.
+title: Short descriptive title for the shot (2-5 words)
+shot_type: "ELS" | "WS" | "MS" | "MCU" | "CU" | "ECU" (Extreme Long / Wide / Medium / Medium Close-Up / Close-Up / Extreme Close-Up)
+camera_angle: "eye-level" | "low-angle" | "high-angle" | "dutch" | "overhead" | "worms-eye"
+camera_movement: "static" | "dolly forward" | "dolly back" | "tracking left" | "tracking right" | "pan left" | "pan right" | "tilt up" | "tilt down" | "slow push-in" | "crane up" | "crane down" | "handheld"
+narrative_function: "setup_character" | "plot_reveal" | "emotional_peak" | "resolution" — what this shot does for the story
+subtext: What is happening beneath the surface that the camera reveals but dialogue does not say. What the character is hiding. "Visual irony" lives here.
+location: Scene location name
+atmosphere: Mood, lighting conditions, ambient state (environment, not visual style)
+characters: Array of character IDs from the provided character list
+scene_id: Background scene ID from the provided scene list (null if no match)
+
+=== DURATION RULES (CRITICAL) ===
+
+1. PROLOGUE: Sum of all prologue shot durations MUST approximately equal the declared Prologue target duration.
+2. MUSIC FILM: Sum of all music_film shot durations MUST approximately equal the total music duration (±10%). This is ESSENTIAL — the shots must cover the entire song.
+3. EPILOGUE: Sum of all epilogue shot durations MUST approximately equal the declared Epilogue target duration.
+4. DO NOT output timestamp_start or timestamp_end — the backend computes these from cumulative duration_sec.
+5. If a music segment is 45 seconds long, you need approximately 8-15 shots to cover it (at 3-6s each). Do NOT create a single 45-second shot.
+
+=== CRITICAL RULES ===
+
+1. Return ONLY the JSON array. No markdown code fences, no explanation text. Start with [ and end with ].
+2. Every music segment MUST be covered by shots. No gaps in coverage.
+3. Duration values MUST be integers (whole seconds).
+4. visual_description MUST be detailed enough for AI image generation (minimum 30 words).
+5. Characters array MUST only use IDs from the provided character list.
+6. acting_note must describe INTERNAL state manifesting as EXTERNAL behavior — not just "character looks sad."
+7. Shots must be ordered chronologically: all prologue shots first, then all music_film, then all epilogue.
+8. Do NOT describe visual style, textures, or rendering techniques in visual_description — those come from the Template system.
+
+***CRITICAL LANGUAGE CONSTRAINT***: Write your entire response IN ENGLISH, regardless of the input language.

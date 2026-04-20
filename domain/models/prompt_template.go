@@ -43,6 +43,9 @@ type PromptTemplatePrompts struct {
 	VisualUnitBreakdown    string `json:"visual_unit_breakdown,omitempty"`    // Voice-over AI Director shot planning
 	NurseryRhymeBreakdown  string `json:"nursery_rhyme_breakdown,omitempty"`  // Nursery rhyme lyrics-synced shot planning
 	MVMakerGamingHorror    string `json:"mv_maker_gaming_horror,omitempty"`   // MV Maker: Gaming horror genre prompt
+	MVMakerCinematicMovie  string `json:"mv_maker_cinematic_movie,omitempty"` // MV Maker: Cinematic movie genre prompt
+	NarrativeMVPlanner     string `json:"narrative_mv_planner,omitempty"`    // Narrative MV: story planning prompt (Phase 1)
+	NarrativeMVDirector    string `json:"narrative_mv_director,omitempty"`   // Narrative MV: shot director prompt (Phase 2)
 }
 
 // PromptTypeToDefaultFile 将 prompt type key 映射到默认的 embed 文件名
@@ -63,4 +66,7 @@ var PromptTypeToDefaultFile = map[string]string{
 	"visual_unit_breakdown":    "storyboard_visual_unit.txt",
 	"nursery_rhyme_breakdown":  "storyboard_nursery_rhyme.txt",
 	"mv_maker_gaming_horror":   "storyboard_mv_gaming_horror.txt",
+	"mv_maker_cinematic_movie": "storyboard_mv_cinematic_movie.txt",
+	"narrative_mv_planner":     "storyboard_narrative_planner.txt",
+	"narrative_mv_director":    "storyboard_narrative_director.txt",
 }
