@@ -281,8 +281,10 @@ func (s *PromptTemplateService) getPromptFromStruct(p models.PromptTemplatePromp
 		return p.VideoExtraction
 	case "visual_unit_breakdown":
 		return p.VisualUnitBreakdown
-	case "narrative_music_dna":
-		return p.NarrativeMusicDNA
+	case "narrative_mv_planner":
+		return p.NarrativeMVPlanner
+	case "narrative_mv_director":
+		return p.NarrativeMVDirector
 	default:
 		return ""
 	}

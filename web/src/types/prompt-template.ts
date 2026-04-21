@@ -20,8 +20,9 @@ export interface PromptTemplatePrompts {
   image_action_sequence?: string
   video_constraint?: string
   style_prompt?: string
-  visual_unit_breakdown?: string  // Voice-over AI Director shot planning
-  narrative_music_dna?: string    // Music-specific style DNA for narrative_mv mode
+  visual_unit_breakdown?: string    // Voice-over AI Director shot planning
+  narrative_mv_planner?: string     // Narrative MV Phase 1: Story Planner (optional override)
+  narrative_mv_director?: string    // Narrative MV Phase 2: Shot Director (main visual language)
 }
 
 export interface CreatePromptTemplateRequest {
@@ -61,6 +62,8 @@ export const PROMPT_TYPE_GROUPS = [
     types: [
       { key: 'storyboard_breakdown', label: 'Phân rã Storyboard' },
       { key: 'visual_unit_breakdown', label: 'AI Director (Voice-over)' },
+      { key: 'narrative_mv_director', label: '🎬 Shot Director (Narrative MV)' },
+      { key: 'narrative_mv_planner', label: '📖 Story Planner (Narrative MV — Phase 1)' },
     ]
   },
   {
@@ -85,7 +88,6 @@ export const PROMPT_TYPE_GROUPS = [
     key: 'style',
     types: [
       { key: 'style_prompt', label: 'Prompt phong cách chung' },
-      { key: 'narrative_music_dna', label: '🎵 Music DNA (Narrative MV)' },
     ]
   }
 ] as const
