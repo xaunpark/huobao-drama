@@ -1,7 +1,7 @@
 # Part-Aware Template for Narrative MV Mode
 
 > Created: 2026-04-21
-> Status: Draft
+> Status: Reviewed — Ready for Implementation
 
 ## Summary
 
@@ -117,10 +117,7 @@ Add new field to `PromptTemplatePrompts`:
 NarrativeMusicDNA string `json:"narrative_music_dna,omitempty"` // Music-specific style DNA for narrative_mv mode
 ```
 
-Add to `PromptTypeToDefaultFile` map:
-```go
-"narrative_music_dna": "",  // No default — template-specific
-```
+**Note:** Do NOT add an empty string entry to `PromptTypeToDefaultFile` — this field has no default embed file. It only exists in template overrides. The `getPromptFromStruct` case (Task 2) handles retrieval.
 
 ### Task 2: Add `getPromptFromStruct` case
 
@@ -156,13 +153,27 @@ if sb.NarrativePart != nil {
 
 **File:** `application/services/style_distill_service.go`
 
+**4a. Add `ResolveNarrativeMusicDNA` helper to `PromptI18n`:**
+
+`PromptI18n` has `templateService` as private field (no getter). Add a public delegating method:
+
+**File:** `application/services/prompt_i18n.go`
+```go
+// ResolveNarrativeMusicDNA returns the template's narrative_music_dna field if set.
+func (p *PromptI18n) ResolveNarrativeMusicDNA(dramaID uint) string {
+    if p.templateService != nil && dramaID > 0 {
+        return p.templateService.ResolvePromptIfCustom(dramaID, "narrative_music_dna")
+    }
+    return ""
+}
+```
+
+**4b. Modify `BatchDistillStyles` in `style_distill_service.go`:**
+
 After resolving `stylePrompt` (line 93), add:
 ```go
 // Resolve narrative music DNA if available
-narrativeMusicDNA := ""
-if s.promptI18n != nil && s.promptI18n.GetTemplateService() != nil {
-    narrativeMusicDNA = s.promptI18n.GetTemplateService().ResolvePromptIfCustom(dramaID, "narrative_music_dna")
-}
+narrativeMusicDNA := s.promptI18n.ResolveNarrativeMusicDNA(dramaID)
 
 // Check if any shots have narrative_part (indicating narrative_mv mode)
 hasNarrativeShots := false
@@ -174,12 +185,14 @@ for _, sb := range storyboards {
 }
 ```
 
-Then modify the distillation call:
+Then modify BOTH image and video distillation calls:
 - If `hasNarrativeShots && narrativeMusicDNA != ""`:
-  - Split shots into 2 groups: music vs non-music
-  - Call `distillImageStyles(stylePrompt, nonMusicShots)` for prologue/epilogue
-  - Call `distillImageStyles(stylePrompt + "\n\n" + narrativeMusicDNA, musicShots)` for music_film
-  - Merge results
+  - Split shotContexts into 2 groups: `musicShots` (narrative_part == "music_film") vs `nonMusicShots`
+  - For image distillation:
+    - Call `distillImageStyles(stylePrompt, nonMusicShots)` for prologue/epilogue
+    - Call `distillImageStyles(stylePrompt + "\n\n[MUSIC-SPECIFIC STYLE]\n" + narrativeMusicDNA, musicShots)` for music_film
+  - For video distillation: apply the same split pattern with `videoConstraint`
+  - Merge results arrays
 - Else: existing single-call behavior (backward compatible)
 
 ### Task 5: Create CG5 Narrative MV template content
