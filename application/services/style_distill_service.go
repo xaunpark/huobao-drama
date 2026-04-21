@@ -34,16 +34,15 @@ func NewStyleDistillService(db *gorm.DB, aiService *AIService, promptI18n *Promp
 
 // shotContext is the subset of storyboard fields sent to the LLM for distillation.
 type shotContext struct {
-	ShotNumber    int    `json:"shot_number"`
-	Action        string `json:"action,omitempty"`
-	Result        string `json:"result,omitempty"`
-	Location      string `json:"location,omitempty"`
-	Atmosphere    string `json:"atmosphere,omitempty"`
-	ShotType      string `json:"shot_type,omitempty"`
-	Angle         string `json:"angle,omitempty"`
-	Movement      string `json:"movement,omitempty"`
-	Characters    string `json:"characters,omitempty"`
-	NarrativePart string `json:"narrative_part,omitempty"` // "prologue" | "music_film" | "epilogue"
+	ShotNumber int    `json:"shot_number"`
+	Action     string `json:"action,omitempty"`
+	Result     string `json:"result,omitempty"`
+	Location   string `json:"location,omitempty"`
+	Atmosphere string `json:"atmosphere,omitempty"`
+	ShotType   string `json:"shot_type,omitempty"`
+	Angle      string `json:"angle,omitempty"`
+	Movement   string `json:"movement,omitempty"`
+	Characters string `json:"characters,omitempty"`
 }
 
 // distilledImageStyle is the expected JSON output from the image distill LLM call.
@@ -106,21 +105,6 @@ func (s *StyleDistillService) BatchDistillStyles(episodeID uint, dramaID uint) {
 	// 4. Build shot context
 	shotContexts := s.buildShotContexts(storyboards)
 
-	// 4.5. Narrative MV: resolve music-specific DNA and detect part-aware shots
-	narrativeMusicDNA := s.promptI18n.ResolveNarrativeMusicDNA(dramaID)
-	hasNarrativeShots := false
-	for _, sb := range storyboards {
-		if sb.NarrativePart != nil && *sb.NarrativePart != "" {
-			hasNarrativeShots = true
-			break
-		}
-	}
-	usePartAwareDistill := hasNarrativeShots && narrativeMusicDNA != ""
-	if usePartAwareDistill {
-		s.log.Infow("Part-aware distillation enabled for narrative_mv mode",
-			"episode_id", episodeID, "music_dna_length", len(narrativeMusicDNA))
-	}
-
 	// 5. Run distillation in parallel
 	var wg sync.WaitGroup
 	var imageStyles []distilledImageStyle
@@ -131,11 +115,7 @@ func (s *StyleDistillService) BatchDistillStyles(episodeID uint, dramaID uint) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			if usePartAwareDistill {
-				imageStyles, imageErr = s.distillPartAware(stylePrompt, narrativeMusicDNA, shotContexts, "image")
-			} else {
-				imageStyles, imageErr = s.distillImageStyles(stylePrompt, shotContexts)
-			}
+			imageStyles, imageErr = s.distillImageStyles(stylePrompt, shotContexts)
 		}()
 	}
 
@@ -143,11 +123,7 @@ func (s *StyleDistillService) BatchDistillStyles(episodeID uint, dramaID uint) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			if usePartAwareDistill {
-				videoStyles, videoErr = s.distillPartAwareVideo(videoConstraint, narrativeMusicDNA, shotContexts)
-			} else {
-				videoStyles, videoErr = s.distillVideoStyles(videoConstraint, shotContexts)
-			}
+			videoStyles, videoErr = s.distillVideoStyles(videoConstraint, shotContexts)
 		}()
 	}
 
@@ -211,11 +187,6 @@ func (s *StyleDistillService) buildShotContexts(storyboards []models.Storyboard)
 				names[i] = c.Name
 			}
 			ctx.Characters = strings.Join(names, ", ")
-		}
-
-		// Narrative MV: include narrative_part for part-aware distillation
-		if sb.NarrativePart != nil {
-			ctx.NarrativePart = *sb.NarrativePart
 		}
 
 		contexts = append(contexts, ctx)
@@ -360,78 +331,3 @@ func extractJSONArray(response string) string {
 	}
 	return response[start : end+1]
 }
-
-// ============================================================================
-// Part-Aware Distillation (Narrative MV Mode)
-// ============================================================================
-
-// splitShotsByMusic separates shotContexts into music_film shots and non-music (prologue/epilogue) shots.
-func splitShotsByMusic(shots []shotContext) (musicShots, nonMusicShots []shotContext) {
-	for _, s := range shots {
-		if s.NarrativePart == "music_film" {
-			musicShots = append(musicShots, s)
-		} else {
-			nonMusicShots = append(nonMusicShots, s)
-		}
-	}
-	return
-}
-
-// distillPartAware runs image style distillation with different style inputs for music vs non-music shots.
-// Non-music shots (prologue/epilogue) receive coreStyle only.
-// Music shots receive coreStyle + musicDNA (full CG5 aesthetic with 3D text, beat sync, etc.)
-func (s *StyleDistillService) distillPartAware(coreStyle, musicDNA string, shots []shotContext, _ string) ([]distilledImageStyle, error) {
-	musicShots, nonMusicShots := splitShotsByMusic(shots)
-
-	var allResults []distilledImageStyle
-
-	// Distill non-music shots with core style only
-	if len(nonMusicShots) > 0 {
-		results, err := s.distillImageStyles(coreStyle, nonMusicShots)
-		if err != nil {
-			return nil, fmt.Errorf("distill non-music image styles failed: %w", err)
-		}
-		allResults = append(allResults, results...)
-	}
-
-	// Distill music shots with core + music DNA
-	if len(musicShots) > 0 {
-		fullStyle := coreStyle + "\n\n[MUSIC-SPECIFIC VISUAL STYLE — Apply only to shots WITH music]\n" + musicDNA
-		results, err := s.distillImageStyles(fullStyle, musicShots)
-		if err != nil {
-			return nil, fmt.Errorf("distill music image styles failed: %w", err)
-		}
-		allResults = append(allResults, results...)
-	}
-
-	return allResults, nil
-}
-
-// distillPartAwareVideo runs video constraint distillation with split style for narrative_mv mode.
-func (s *StyleDistillService) distillPartAwareVideo(coreConstraint, musicDNA string, shots []shotContext) ([]distilledVideoStyle, error) {
-	musicShots, nonMusicShots := splitShotsByMusic(shots)
-
-	var allResults []distilledVideoStyle
-
-	// Distill non-music shots with core constraint only
-	if len(nonMusicShots) > 0 {
-		results, err := s.distillVideoStyles(coreConstraint, nonMusicShots)
-		if err != nil {
-			return nil, fmt.Errorf("distill non-music video styles failed: %w", err)
-		}
-		allResults = append(allResults, results...)
-	}
-
-	// Distill music shots with core + music DNA
-	if len(musicShots) > 0 {
-		fullConstraint := coreConstraint + "\n\n[MUSIC-SPECIFIC CONSTRAINT — Apply only to shots WITH music]\n" + musicDNA
-		results, err := s.distillVideoStyles(fullConstraint, musicShots)
-		if err != nil {
-			return nil, fmt.Errorf("distill music video styles failed: %w", err)
-		}
-		allResults = append(allResults, results...)
-	}
-
-	return allResults, nil
-}
-

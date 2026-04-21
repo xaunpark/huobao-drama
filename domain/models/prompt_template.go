@@ -46,7 +46,7 @@ type PromptTemplatePrompts struct {
 	MVMakerCinematicMovie  string `json:"mv_maker_cinematic_movie,omitempty"` // MV Maker: Cinematic movie genre prompt
 	NarrativeMVPlanner     string `json:"narrative_mv_planner,omitempty"`    // Narrative MV: story planning prompt (Phase 1)
 	NarrativeMVDirector    string `json:"narrative_mv_director,omitempty"`   // Narrative MV: shot director prompt (Phase 2)
-	NarrativeMusicDNA      string `json:"narrative_music_dna,omitempty"`     // Music-specific style DNA for narrative_mv (3D text, beat sync, etc.)
+	NarrativeMVCG5         string `json:"narrative_mv_cg5,omitempty"`        // Narrative MV: CG5 3-act visual style template
 }
 
 // PromptTypeToDefaultFile 将 prompt type key 映射到默认的 embed 文件名
@@ -70,4 +70,5 @@ var PromptTypeToDefaultFile = map[string]string{
 	"mv_maker_cinematic_movie": "storyboard_mv_cinematic_movie.txt",
 	"narrative_mv_planner":     "storyboard_narrative_planner.txt",
 	"narrative_mv_director":    "storyboard_narrative_director.txt",
+	"narrative_mv_cg5":         "storyboard_narrative_cg5.txt",
 }
