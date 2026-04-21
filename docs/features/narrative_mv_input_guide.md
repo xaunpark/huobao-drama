@@ -68,19 +68,19 @@ An arrives at the dark studio. Rain streaks the windows. She slowly takes off he
     [SYNC_POINT] An executes a perfect, full-body grand jeté, transcending her age for a brief second — convergent
 (2:00 - 2:30) OUTRO — emotion: fading, peaceful resolution
 
-[LYRICS]
-Dust in the light
-Where I used to fly
-The music has faded
-But I still remember
-I try to hold on
-But the floor is too cold
-And the mirror shows someone I don't know
-But when I was here
-I was queen of the air
-I touched the sky
-And I didn't care
-Now it's time to say goodbye
+[LYRICS] (đã lược bỏ một phần để ngắn gọn cho mục đích làm ví dụ)
+(0:30 - 0:35) Dust in the light
+(0:36 - 0:40) Where I used to fly
+(0:41 - 0:45) The music has faded
+(0:46 - 0:50) But I still remember
+(0:51 - 0:55) I try to hold on
+(0:56 - 1:00) But the floor is too cold
+(1:01 - 1:10) And the mirror shows someone I don't know
+(1:15 - 1:20) But when I was here
+(1:22 - 1:28) I was queen of the air
+(1:30 - 1:35) I touched the sky
+(1:38 - 1:45) And I didn't care
+(1:48 - 1:55) Now it's time to say goodbye
 
 [EPILOGUE] duration: 30s
 The music ends. An is out of breath, smiling softly. She picks up her overcoat, drapes it over her shoulders, and walks out the door. The final shot lingers on the empty studio bathed in the morning light, perfectly still.
