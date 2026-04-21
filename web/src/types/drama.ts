@@ -96,6 +96,14 @@ export interface Storyboard {
   composed_image?: string
   scene_id?: string
   scene?: Scene
+  // Narrative MV Fields
+  narrative_part?: 'prologue' | 'music_film' | 'epilogue'
+  has_music?: boolean
+  music_segment?: string
+  music_sync_type?: 'parallel' | 'convergent' | 'irony'
+  acting_note?: string
+  lyrics_anchor?: string
+  
   created_at: string
   updated_at: string
   [key: string]: any

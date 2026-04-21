@@ -132,14 +132,16 @@
                     {{ shot.shot_role }}
                   </el-tag>
                 </div>
-                <!-- Narrative MV: Music sync badge (compact) -->
-                <div class="shot-narrative-badges" v-if="shot.narrative_part && shot.music_sync_type">
-                  <el-tag size="small" type="warning" style="margin-right: 4px;">
-                    🎵 {{ shot.music_segment || 'Music' }}
+                <div class="shot-narrative-badges" v-if="shot.narrative_part">
+                  <el-tag v-if="shot.music_segment" size="small" type="warning" style="margin-right: 4px;">
+                    🎵 {{ shot.music_segment }}
                   </el-tag>
-                  <el-tag size="small" :type="shot.music_sync_type === 'convergent' ? 'danger' : shot.music_sync_type === 'irony' ? 'warning' : 'info'">
+                  <el-tag v-if="shot.music_sync_type" size="small" :type="shot.music_sync_type === 'convergent' ? 'danger' : shot.music_sync_type === 'irony' ? 'warning' : 'info'" style="margin-right: 4px;">
                     🎯 {{ shot.music_sync_type }}
                   </el-tag>
+                  <div v-if="shot.lyrics_anchor" class="shot-lyrics-anchor">
+                    🎤 "{{ shot.lyrics_anchor.length > 50 ? shot.lyrics_anchor.substring(0, 50) + '...' : shot.lyrics_anchor }}"
+                  </div>
                 </div>
               </div>
             </div>
@@ -7250,6 +7252,17 @@ onBeforeUnmount(() => {
   background: rgba(142, 68, 173, 0.06);
   border: 1px solid rgba(142, 68, 173, 0.15);
   border-radius: 8px;
+}
+
+.shot-lyrics-anchor {
+  font-size: 11px;
+  color: var(--el-text-color-secondary);
+  font-style: italic;
+  margin-top: 4px;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
 
