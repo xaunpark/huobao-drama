@@ -21,6 +21,7 @@ export interface PromptTemplatePrompts {
   video_constraint?: string
   style_prompt?: string
   visual_unit_breakdown?: string  // Voice-over AI Director shot planning
+  narrative_music_dna?: string    // Music-specific style DNA for narrative_mv mode
 }
 
 export interface CreatePromptTemplateRequest {
@@ -84,6 +85,7 @@ export const PROMPT_TYPE_GROUPS = [
     key: 'style',
     types: [
       { key: 'style_prompt', label: 'Prompt phong cách chung' },
+      { key: 'narrative_music_dna', label: '🎵 Music DNA (Narrative MV)' },
     ]
   }
 ] as const

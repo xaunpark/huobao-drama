@@ -352,9 +352,8 @@ func (s *StoryboardService) processNarrativeMVGeneration(
 
 	// 3. Phase 2: Shot Generation AI call
 	directorPrompt := s.promptI18n.WithDramaNarrativeMVDirectorPrompt(dramaID)
-	visualStylePrompt := s.promptI18n.WithDramaNarrativeMVVisualStylePrompt(dramaID)
 	formatInstructions := prompts.Get("storyboard_narrative_format.txt")
-	phase2Prompt := buildNarrativePhase2Prompt(directorPrompt, visualStylePrompt, scriptContent, bible, narrativePlan, characterList, sceneList, propList, formatInstructions)
+	phase2Prompt := buildNarrativePhase2Prompt(directorPrompt, scriptContent, bible, narrativePlan, characterList, sceneList, propList, formatInstructions)
 
 	phase2Text, err := callAI(phase2Prompt)
 	if err != nil {
@@ -496,10 +495,8 @@ func buildNarrativePhase1Prompt(plannerSystemPrompt, rawScript string, bible *St
 }
 
 // buildNarrativePhase2Prompt constructs the shot director prompt for Phase 2
-// visualStylePrompt is optional — when set (e.g. CG5 3-act template), it injects
-// specific visual language rules BEFORE the generic director instructions.
 func buildNarrativePhase2Prompt(
-	directorSystemPrompt, visualStylePrompt, rawScript string,
+	directorSystemPrompt, rawScript string,
 	bible *StoryBible,
 	plan NarrativePlan,
 	characterList, sceneList, propList string,
@@ -507,11 +504,6 @@ func buildNarrativePhase2Prompt(
 ) string {
 	var sb strings.Builder
 
-	// Inject visual style template first (e.g. CG5 3-act cinematography rules)
-	if visualStylePrompt != "" {
-		sb.WriteString(visualStylePrompt)
-		sb.WriteString("\n\n=== DIRECTOR INSTRUCTIONS (applied on top of visual style above) ===\n")
-	}
 	sb.WriteString(directorSystemPrompt)
 	sb.WriteString("\n\n=== STORY BIBLE ===\n")
 	sb.WriteString(rawScript)

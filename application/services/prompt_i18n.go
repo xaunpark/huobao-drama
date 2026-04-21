@@ -84,6 +84,16 @@ func (p *PromptI18n) ResolveEffectiveStylePublic(dramaID uint, style string, cus
 	return p.resolveEffectiveStyle(dramaID, style, customStyle)
 }
 
+// ResolveNarrativeMusicDNA returns the template's narrative_music_dna field if set.
+// This contains music-specific style elements (3D text, beat sync, etc.) that should
+// only be applied to music_film shots in narrative_mv mode.
+func (p *PromptI18n) ResolveNarrativeMusicDNA(dramaID uint) string {
+	if p.templateService != nil && dramaID > 0 {
+		return p.templateService.ResolvePromptIfCustom(dramaID, "narrative_music_dna")
+	}
+	return ""
+}
+
 // GetLanguage 获取当前语言设置
 func (p *PromptI18n) GetLanguage() string {
 	lang := p.config.App.Language
@@ -451,12 +461,6 @@ func (p *PromptI18n) WithDramaNarrativeMVDirectorPrompt(dramaID uint) string {
 		return resolved
 	}
 	return prompts.Get("storyboard_narrative_director.txt")
-}
-
-// WithDramaNarrativeMVVisualStylePrompt resolves Narrative MV visual style template (e.g. CG5 3-act)
-// Returns empty string if no visual style template is configured for this drama (style is optional)
-func (p *PromptI18n) WithDramaNarrativeMVVisualStylePrompt(dramaID uint) string {
-	return p.resolvePrompt(dramaID, "narrative_mv_cg5")
 }
 
 // WithDramaSceneExtractionPrompt resolves scene extraction prompt for a specific drama
