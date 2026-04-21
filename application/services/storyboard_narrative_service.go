@@ -752,6 +752,8 @@ func (s *StoryboardService) saveNarrativeShots(episodeID string, dramaID uint, s
 				// Use LyricsText field to store lyric anchor for post-prod reference
 				LyricsText:      strPtr(shot.LyricsAnchor),
 				SectionType:     strPtr(shot.MusicSegment),
+				// Reuse existing Voice-over field so lyrics appear in the main text block
+				ScriptSegment:   strPtr(shot.LyricsAnchor),
 				AudioMode:       &audioMode,
 				ShotRole:        strPtr(shot.NarrativeFunction),
 				VisualType:      strPtr("literal"),
