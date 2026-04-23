@@ -329,31 +329,30 @@ func (s *CharacterLibraryService) BuildCharacterFullPrompt(characterID string) (
 }
 
 // buildCharacterPrompt builds the full prompt from character + drama info.
-// If the appearance already contains the character sheet marker (from a previous Edit Prompt save),
-// it is used as-is to avoid double-appending style and suffix.
+// Prioritizes CharacterPrompt (if available) > Appearance > Description.
 func (s *CharacterLibraryService) buildCharacterPrompt(character *models.Character, drama *models.Drama) string {
 	prompt := ""
 
-	// 优先使用appearance字段，它包含了最详细的外貌描述
-	if character.Appearance != nil && *character.Appearance != "" {
+	// Priority 1: Use the explicit CharacterPrompt if available (from new AI template)
+	if character.CharacterPrompt != nil && *character.CharacterPrompt != "" {
+		prompt = *character.CharacterPrompt
+	} else if character.Appearance != nil && *character.Appearance != "" {
+		// Priority 2: Use Appearance field
 		prompt = *character.Appearance
 	} else if character.Description != nil && *character.Description != "" {
+		// Priority 3: Use Description field
 		prompt = *character.Description
 	} else {
+		// Fallback
 		prompt = character.Name
 	}
 
-	// If the appearance already contains the character sheet marker,
-	// it means the user has previously edited and saved the full prompt.
-	// Use it as-is to avoid double-appending style and suffix.
+	// If the prompt already contains the character sheet marker,
+	// use it as-is to avoid double-appending style and suffix.
 	if strings.Contains(prompt, "character sheet") {
 		return prompt
 	}
 
-	// The Appearance field (if AI-extracted) already incorporates the necessary character design semantics.
-	// We no longer manually concatenate the massive style prefix to prevent confusing 
-	// downstream diffusion models with excessive LLM-oriented instructional text.
-	
 	// Add special character sheet requirements
 	prompt += ", t-pose, character sheet, turn around character, white background, no text overlay"
 
@@ -380,8 +379,15 @@ func (s *CharacterLibraryService) GenerateCharacterImage(characterID string, ima
 		return nil, err
 	}
 
-	// 构建生成提示词 - 使用统一的方法构建完整提示词
-	prompt := s.buildCharacterPrompt(&character, &drama)
+	// Choose prompt based on mode (T2I vs I2I variant)
+	var prompt string
+	if referenceImageURL != nil && *referenceImageURL != "" && character.VariantPrompt != nil && *character.VariantPrompt != "" {
+		// I2I Mode: generating a variant using an existing reference image
+		prompt = *character.VariantPrompt
+	} else {
+		// T2I Mode: generating character from scratch
+		prompt = s.buildCharacterPrompt(&character, &drama)
+	}
 
 	// 调用图片生成服务
 	dramaIDStr := fmt.Sprintf("%d", character.DramaID)
@@ -605,12 +611,15 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 	// AI returns object format: {narrator_voice_profile: "...", characters: [...]}
 	// Also support legacy array format for backward compatibility
 	type extractedChar struct {
-		Name        string `json:"name"`
-		Role        string `json:"role"`
-		Appearance  string `json:"appearance"`
-		Personality string `json:"personality"`
-		Description string `json:"description"`
-		VoiceStyle  string `json:"voice_style"`
+		Name              string `json:"name"`
+		Role              string `json:"role"`
+		Appearance        string `json:"appearance"`
+		Personality       string `json:"personality"`
+		Description       string `json:"description"`
+		VoiceStyle        string `json:"voice_style"`
+		CharacterPrompt   string `json:"character_prompt"`
+		VariantPrompt     string `json:"variant_prompt"`
+		EpisodeDescriptor string `json:"episode_descriptor"`
 	}
 
 	var charList []extractedChar
@@ -650,7 +659,23 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 		err := s.db.Where("drama_id = ? AND name = ?", episode.DramaID, charData.Name).First(&existingCharacter).Error
 
 		if err == nil {
-			// 如果存在，只关联，不更新
+			// 如果存在，更新 episode-specific variant fields (costume/state changes)
+			variantUpdates := map[string]interface{}{}
+			if charData.CharacterPrompt != "" {
+				variantUpdates["character_prompt"] = charData.CharacterPrompt
+			}
+			if charData.VariantPrompt != "" {
+				variantUpdates["variant_prompt"] = charData.VariantPrompt
+			}
+			if charData.EpisodeDescriptor != "" {
+				variantUpdates["episode_descriptor"] = charData.EpisodeDescriptor
+			}
+			if len(variantUpdates) > 0 {
+				if err := s.db.Model(&existingCharacter).Updates(variantUpdates).Error; err != nil {
+					s.log.Warnw("Failed to update variant fields for existing character", "error", err, "name", charData.Name)
+				}
+			}
+			// 关联到当前 episode
 			if err := s.db.Model(&episode).Association("Characters").Append(&existingCharacter); err != nil {
 				s.log.Warnw("Failed to associate existing character", "error", err)
 			}
@@ -658,13 +683,16 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 		} else {
 			// 创建新角色
 			newCharacter := models.Character{
-				DramaID:     episode.DramaID,
-				Name:        charData.Name,
-				Role:        &charData.Role,
-				Appearance:  &charData.Appearance,
-				Personality: &charData.Personality,
-				Description: &charData.Description,
-				VoiceStyle:  &charData.VoiceStyle,
+				DramaID:           episode.DramaID,
+				Name:              charData.Name,
+				Role:              &charData.Role,
+				Appearance:        &charData.Appearance,
+				Personality:       &charData.Personality,
+				Description:       &charData.Description,
+				VoiceStyle:        &charData.VoiceStyle,
+				CharacterPrompt:   ptrIfNotEmpty(charData.CharacterPrompt),
+				VariantPrompt:     ptrIfNotEmpty(charData.VariantPrompt),
+				EpisodeDescriptor: ptrIfNotEmpty(charData.EpisodeDescriptor),
 			}
 			if err := s.db.Create(&newCharacter).Error; err != nil {
 				s.log.Errorw("Failed to create extracted character", "error", err)
@@ -684,4 +712,12 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 		"count":                  len(savedCharacters),
 		"narrator_voice_profile": narratorProfile,
 	})
+}
+
+// ptrIfNotEmpty returns nil for empty strings, pointer to value otherwise
+func ptrIfNotEmpty(s string) *string {
+	if s == "" {
+		return nil
+	}
+	return &s
 }

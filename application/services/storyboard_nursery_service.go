@@ -569,7 +569,10 @@ func (s *StoryboardService) saveNurseryRhymeShots(episodeID string, dramaID uint
 			if err := tx.Where("id IN ?", ids).Find(&chars).Error; err == nil {
 				for _, c := range chars {
 					desc := c.Name
-					if c.Appearance != nil && *c.Appearance != "" {
+					// Priority: EpisodeDescriptor > Appearance > Description
+					if c.EpisodeDescriptor != nil && *c.EpisodeDescriptor != "" {
+						desc += " (" + *c.EpisodeDescriptor + ")"
+					} else if c.Appearance != nil && *c.Appearance != "" {
 						desc += " (" + *c.Appearance + ")"
 					} else if c.Description != nil && *c.Description != "" {
 						desc += " (" + *c.Description + ")"

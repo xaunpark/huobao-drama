@@ -12,6 +12,9 @@ Each character object has these fields:
 - personality: Core personality traits and behavioral patterns (string, 100-200 words). For state variants, keep the same personality as the base character.
 - description: Background story and character relationships (string, 100-200 words). For state variants, briefly describe what state this is and how it differs from the base state.
 - voice_style: Voice characteristics for TTS synthesis (string, 20-40 words). For non-living entities (vehicles, objects), use "none".
+- character_prompt: ALWAYS generate this field. A complete, standalone text-to-image prompt for generating this character WITHOUT any reference image (string, 200-400 words). Must include: complete physical description, clothing, pose ("standing in relaxed t-pose"), style tag ("3D CGI render, character turnaround sheet, front/side/back views, white background, no text"). This prompt must be self-contained — someone reading ONLY this field should be able to generate an accurate character image.
+- variant_prompt: Delta prompt describing ONLY the costume/state changes from the character's base appearance (string, 50-150 words). Set to empty string "" if the character appears in their default/base outfit with no changes. Example: "Same character now wearing: white chef toque hat, white double-breasted chef jacket. Keep IDENTICAL face, body proportions, and skin tone from reference image."
+- episode_descriptor: A SHORT visual descriptor for this character as they appear in THIS episode (string, 10-30 words). Used in shot prompts instead of character names. Must be purely visual — NO character names. Example: "a bald toddler in chef hat and white jacket" or "a large red flatbed truck loaded with logs".
 
 [Script Reading Rules]
 - Pay SPECIAL ATTENTION to any text marked with [NOTE] tags in the script. These contain the user's explicit creative directions and custom descriptions for characters. Use these to accurately capture the specific character designs requested by the user.
@@ -65,7 +68,10 @@ Given a script about a logging truck adventure, the output should be:
       "appearance": "A large industrial flatbed truck with a bright red cab and chrome bumper. The cab has two round headlights and a tall exhaust pipe on the right side. The flatbed is empty and made of dark steel with wooden side rails. The truck has six large black rubber tires with muddy treads. A small company logo is painted in white on the driver door. The truck looks sturdy and well-maintained.",
       "personality": "Not applicable — this is a vehicle.",
       "description": "The main truck in its default empty state, before loading cargo. This is the base configuration seen at the start and after unloading.",
-      "voice_style": "none"
+      "voice_style": "none",
+      "character_prompt": "A large industrial flatbed truck with a bright red cab and chrome bumper, two round headlights, tall exhaust pipe on right side, empty dark steel flatbed with wooden side rails, six large black rubber tires with muddy treads, small white company logo on driver door, sturdy well-maintained appearance. Vehicle character sheet, front/side/back views, white background, no text, 3D CGI render.",
+      "variant_prompt": "",
+      "episode_descriptor": "a large red flatbed truck with an empty dark steel flatbed"
     },
     {
       "name": "Truck (Loaded with Logs)",
@@ -73,7 +79,10 @@ Given a script about a logging truck adventure, the output should be:
       "appearance": "A large industrial flatbed truck with a bright red cab and chrome bumper. The cab has two round headlights and a tall exhaust pipe on the right side. The flatbed is now stacked high with large brown timber logs, approximately 20 logs arranged in three layers and secured with thick orange ratchet straps. The logs extend slightly beyond the rear of the flatbed. Sawdust and bark fragments are scattered on the truck bed. The truck sits lower on its suspension due to the heavy load. Six large black rubber tires with muddy treads.",
       "personality": "Not applicable — this is a vehicle.",
       "description": "The truck after being loaded with timber logs at the logging site. The heavy cargo is the key visual difference from the empty state.",
-      "voice_style": "none"
+      "voice_style": "none",
+      "character_prompt": "A large industrial flatbed truck with bright red cab and chrome bumper, two round headlights, tall exhaust pipe, flatbed stacked high with 20 large brown timber logs in three layers secured with thick orange ratchet straps, logs extending beyond rear, sawdust scattered on bed, truck sitting lower on suspension, six large muddy tires. Vehicle character sheet, front/side/back views, white background, no text, 3D CGI render.",
+      "variant_prompt": "Same truck now with flatbed stacked high with large brown timber logs, approximately 20 logs arranged in three layers secured with thick orange ratchet straps. Sawdust and bark fragments scattered on truck bed. Truck sits lower on suspension. Keep IDENTICAL red cab, chrome bumper, headlights, and tire design from reference image.",
+      "episode_descriptor": "a large red flatbed truck stacked high with timber logs secured by orange straps"
     },
     {
       "name": "Truck (Towed by Rescue Vehicle)",
@@ -97,7 +106,10 @@ Given a script about a logging truck adventure, the output should be:
       "appearance": "A 45-year-old Chinese man with a stocky build and weathered tan skin. He has short-cropped grey-black hair and deep-set brown eyes with crow's feet wrinkles. A broad face with a flat nose and thick eyebrows. He wears a faded blue denim work jacket over a white undershirt, dark green cargo pants with multiple pockets, and heavy brown work boots. A yellow hard hat sits on his head. He has rough, calloused hands.",
       "personality": "Hardworking and reliable, Wang has been driving trucks for over 20 years. He is calm under pressure and has a dry sense of humor.",
       "description": "The logging truck driver who experiences the accident. He is a veteran driver who knows the mountain roads well.",
-      "voice_style": "deep and gravelly male voice, mid-40s, slow and steady pacing with a rural accent"
+      "voice_style": "deep and gravelly male voice, mid-40s, slow and steady pacing with a rural accent",
+      "character_prompt": "A 45-year-old Chinese man with stocky build and weathered tan skin, short-cropped grey-black hair, deep-set brown eyes with crow's feet wrinkles, broad face, flat nose, thick eyebrows. Wearing faded blue denim work jacket over white undershirt, dark green cargo pants with multiple pockets, heavy brown work boots, yellow hard hat. Rough calloused hands. Standing in relaxed t-pose. Character turnaround sheet, front/side/back views, white background, no text, realistic 3D render.",
+      "variant_prompt": "",
+      "episode_descriptor": "a stocky middle-aged man in blue denim jacket and yellow hard hat"
     }
   ]
 }
