@@ -734,11 +734,6 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 			if charData.EpisodeDescriptor != "" {
 				variantUpdates["episode_descriptor"] = charData.EpisodeDescriptor
 			}
-<<<<<<< Updated upstream
-			if len(variantUpdates) > 0 {
-				if err := s.db.Model(&existingCharacter).Updates(variantUpdates).Error; err != nil {
-					s.log.Warnw("Failed to update variant fields for existing character", "error", err, "name", charData.Name)
-=======
 			// DEBUG_TEMP
 			s.log.Infow("DEBUG character_extraction: about to update", "name", existingCharacter.Name, "updates_count", len(variantUpdates), "updates", variantUpdates)
 			if len(variantUpdates) > 0 {
@@ -747,7 +742,6 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 				s.log.Infow("DEBUG character_extraction: update result", "name", existingCharacter.Name, "error", updateErr)
 				if updateErr != nil {
 					s.log.Warnw("Failed to update variant fields for existing character", "error", updateErr, "name", charData.Name)
->>>>>>> Stashed changes
 				}
 			}
 			// 关联到当前 episode
