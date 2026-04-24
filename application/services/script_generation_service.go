@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/drama-generator/backend/application/prompts/fixed"
 	"github.com/drama-generator/backend/domain/models"
@@ -119,12 +120,15 @@ func (s *ScriptGenerationService) processCharacterGeneration(taskID string, req 
 	// AI returns object format: {narrator_voice_profile: "...", characters: [...]}
 	// Also support legacy array format for backward compatibility
 	type extractedChar struct {
-		Name        string `json:"name"`
-		Role        string `json:"role"`
-		Description string `json:"description"`
-		Personality string `json:"personality"`
-		Appearance  string `json:"appearance"`
-		VoiceStyle  string `json:"voice_style"`
+		Name              string `json:"name"`
+		Role              string `json:"role"`
+		Description       string `json:"description"`
+		Personality       string `json:"personality"`
+		Appearance        string `json:"appearance"`
+		VoiceStyle        string `json:"voice_style"`
+		CharacterPrompt   string `json:"character_prompt"`
+		VariantPrompt     string `json:"variant_prompt"`
+		EpisodeDescriptor string `json:"episode_descriptor"`
 	}
 
 	var charList []extractedChar
@@ -160,12 +164,46 @@ func (s *ScriptGenerationService) processCharacterGeneration(taskID string, req 
 
 	var characters []models.Character
 	for _, char := range charList {
-		// 检查角色是否已存在
+		// 检查角色是否已存在 — exact name first, then base-name fallback
+		// e.g. AI returns "Bubi (Pirate Captain)" → tries "Bubi" if exact fails
 		var existingChar models.Character
 		err := s.db.Where("drama_id = ? AND name = ?", req.DramaID, char.Name).First(&existingChar).Error
+
+		if err != nil {
+			// Exact match failed — try base name (strip " (State)" suffix)
+			baseName := char.Name
+			if idx := strings.Index(char.Name, " ("); idx > 0 {
+				baseName = char.Name[:idx]
+			}
+			if baseName != char.Name {
+				err = s.db.Where("drama_id = ? AND name = ?", req.DramaID, baseName).First(&existingChar).Error
+				if err == nil {
+					s.log.Infow("Matched character by base name", "ai_name", char.Name, "db_name", baseName, "task_id", taskID)
+				}
+			}
+		}
+
 		if err == nil {
-			// 角色已存在，直接使用已存在的角色，不覆盖
-			s.log.Infow("Character already exists, skipping", "drama_id", req.DramaID, "name", char.Name, "task_id", taskID)
+			// Character exists — update variant fields from this episode's AI extraction
+			variantUpdates := map[string]interface{}{}
+			if char.Appearance != "" {
+				variantUpdates["appearance"] = char.Appearance
+			}
+			if char.CharacterPrompt != "" {
+				variantUpdates["character_prompt"] = char.CharacterPrompt
+			}
+			if char.VariantPrompt != "" {
+				variantUpdates["variant_prompt"] = char.VariantPrompt
+			}
+			if char.EpisodeDescriptor != "" {
+				variantUpdates["episode_descriptor"] = char.EpisodeDescriptor
+			}
+			if len(variantUpdates) > 0 {
+				if updateErr := s.db.Model(&existingChar).Updates(variantUpdates).Error; updateErr != nil {
+					s.log.Warnw("Failed to update variant fields", "error", updateErr, "name", char.Name)
+				}
+			}
+			s.log.Infow("Character already exists, updated variant fields", "drama_id", req.DramaID, "name", char.Name, "task_id", taskID)
 			characters = append(characters, existingChar)
 			continue
 		}
@@ -173,13 +211,16 @@ func (s *ScriptGenerationService) processCharacterGeneration(taskID string, req 
 		// 角色不存在，创建新角色
 		dramaID, _ := strconv.ParseUint(req.DramaID, 10, 32)
 		character := models.Character{
-			DramaID:     uint(dramaID),
-			Name:        char.Name,
-			Role:        &char.Role,
-			Description: &char.Description,
-			Personality: &char.Personality,
-			Appearance:  &char.Appearance,
-			VoiceStyle:  &char.VoiceStyle,
+			DramaID:           uint(dramaID),
+			Name:              char.Name,
+			Role:              &char.Role,
+			Description:       &char.Description,
+			Personality:       &char.Personality,
+			Appearance:        &char.Appearance,
+			VoiceStyle:        &char.VoiceStyle,
+			CharacterPrompt:   scriptSvcPtrIfNotEmpty(char.CharacterPrompt),
+			VariantPrompt:     scriptSvcPtrIfNotEmpty(char.VariantPrompt),
+			EpisodeDescriptor: scriptSvcPtrIfNotEmpty(char.EpisodeDescriptor),
 		}
 
 		if err := s.db.Create(&character).Error; err != nil {
@@ -225,4 +266,12 @@ func minInt(a, b int) int {
 		return a
 	}
 	return b
+}
+
+// ptrIfNotEmpty returns nil for empty strings, pointer to value otherwise
+func scriptSvcPtrIfNotEmpty(s string) *string {
+	if s == "" {
+		return nil
+	}
+	return &s
 }

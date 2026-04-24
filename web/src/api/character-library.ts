@@ -101,6 +101,9 @@ export const characterLibraryAPI = {
     description?: string
     image_url?: string
     local_path?: string
+    character_prompt?: string
+    variant_prompt?: string
+    episode_descriptor?: string
   }) {
     return request.put(`/characters/${characterId}`, data)
   },
@@ -113,6 +116,11 @@ export const characterLibraryAPI = {
   // 获取角色完整提示词（包含风格和character sheet后缀）
   getCharacterFullPrompt(characterId: number | string) {
     return request.get<{ prompt: string }>(`/characters/${characterId}/full-prompt`)
+  },
+
+  // 获取单个角色完整信息（含 variant 字段）
+  getCharacter(characterId: number | string) {
+    return request.get<any>(`/characters/${characterId}`)
   },
 
   // 从剧本提取角色

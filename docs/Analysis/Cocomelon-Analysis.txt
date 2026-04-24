@@ -1,0 +1,675 @@
+Dưới đây là phân tích Visual DNA chi tiết của kênh Cocomelon để tái tạo phong cách bằng AI:
+
+1. KỸ THUẬT TẠO HÌNH ẢNH
+
+Phương pháp: 3D Render/CGI Animation.
+
+Phong cách: 3D Cartoon/Kids Animation cực kỳ tối giản và bo tròn.
+
+Mức độ Photorealistic: 1/10 (Hoàn toàn stylized).
+
+Đặc điểm AI: Không có artifact. Hình ảnh có chuyển động mượt mà, tốc độ khung hình cao (thường là 30-60fps).
+
+Face-cam: N/A. Toàn bộ là nhân vật hoạt hình 3D.
+
+2. MÀU SẮC CHÍNH XÁC
+2a. Shadow/Dark zones:
+
+Màu shadow (hex): #A0A0A0 (Xám nhạt) hoặc màu của vật thể nhưng đậm hơn chút. Không dùng màu đen thuần.
+
+Blacks: Được lift rất cao. Vùng tối nhất thường là màu xanh đậm hoặc nâu đậm, giá trị IRE ~15-20.
+
+2b. Highlight/Bright zones:
+
+Màu highlight (hex): #FFFFFF (Trắng sạch).
+
+Bloom: Rất nhẹ trên các bề mặt nhựa bóng. Bán kính nhỏ.
+
+Roll-off: Cực kỳ mềm mại, tạo cảm giác bề mặt mịn.
+
+2c. Midtone:
+
+Skin tones (JJ): #FCE2D1 (Warm peach).
+
+Cỏ/Thiên nhiên: #76C733 (Lime Green). Bầu trời: #6CCAF2 (Sky Blue).
+
+2d. Accent / Brand Colors:
+
+Xanh lá dưa hấu: #47A831. Hồng: #F589A3.
+
+2e. Tỷ lệ màu:
+
+Shadow 10%, Midtone 60%, Highlight 30%.
+
+Tổng thể: High-key (Sáng sủa). Color grading: Vibrant/Warm.
+
+3. ÁNH SÁNG CHÍNH XÁC
+3a. Setup ánh sáng:
+
+Ánh sáng nhân tạo giả lập studio.
+
+Key light: Hướng 45 độ từ phía trên, cường độ mạnh, cực kỳ soft.
+
+Fill light: Tỷ lệ Key:Fill gần như 1:1, xóa bỏ hầu hết bóng đổ gắt.
+
+Rim light: Thường có một lớp sáng bao quanh nhân vật để tách khỏi nền.
+
+3b. Biến thể context:
+
+Trong nhà (Phòng tắm): Ánh sáng phản chiếu từ gạch men trắng, tạo môi trường sáng đều.
+
+Ngoài trời (Bãi biển): Giả lập nắng nhưng không có bóng đen, màu sắc rực rỡ hơn.
+
+3c. Hiệu ứng:
+
+Atmospheric perspective: Rất ít, hậu cảnh thường chỉ mờ nhẹ (bokeh).
+
+Bóng đổ: Soft edge (cực mềm), hướng bóng không quá quan trọng.
+
+4. TEXTURE & CHẤT LIỆU
+4a. Chất lượng:
+
+Resolution: 4K clean. Sharpness: Clean/Soft (không gai góc).
+
+4b. Vật liệu chính:
+
+Nhựa (Plastic): Chiếm 90%, bề mặt mịn, độ bóng trung bình.
+
+Nước: Trong suốt, stylized với bọt trắng tròn trịa.
+
+Vải: Texture đơn giản, không có nếp nhăn chi tiết.
+
+4c. Con người:
+
+Da: Phẳng, không lỗ chân lông, có hiệu ứng Subsurface scattering nhẹ.
+
+Tóc: Một khối duy nhất hoặc vài sợi to, bo tròn.
+
+5. FILM GRAIN & POST-PROCESSING
+
+Film grain: 0 (Không có).
+
+Depth of field: Trung bình (Hậu cảnh hơi mờ để tập trung vào nhân vật).
+
+Aspect ratio: 16:9. Không có letterboxing.
+
+Chromatic aberration/Vignette: Không sử dụng.
+
+6. SO SÁNH VỚI CÁC STYLE QUEN THUỘC
+
+Tương đồng: Little Angel, LooLoo Kids, Blippi Wonders.
+
+Game style: Roblox nhưng render cao cấp hơn.
+
+7. SAMPLE PROMPT RECONSTRUCTION
+
+Frame 1: JJ driving a speedboat (00:09)
+{
+"frame_description": "JJ lái canô trên biển với các chú vịt trượt nước phía sau.",
+"full_prompt": "3D CGI animation, Cocomelon style, a cute toddler boy with a single blonde curl on head, wearing a yellow life vest, driving a bright colorful toy speedboat on a vibrant blue ocean. Behind the boat, five colorful rubber ducks on water skis. Tropical island background with palm trees, bright high-key lighting, soft shadows, volumetric lighting, saturated primary colors, plastic texture, rounded edges, high detail 8k render, masterpiece.",
+"negative_prompt": "realistic, photography, dark shadows, gritty, messy, grain, blurry, sharp edges, distorted faces.",
+"recommended_model": "Flux.1 or Midjourney v6 (Niji mode)",
+"recommended_settings": {"cfg_scale": 7, "steps": 30, "sampler": "Euler a"}
+}
+
+Frame 2: JJ in the bathtub (00:26)
+{
+"frame_description": "JJ trong bồn tắm đầy bọt với mẹ và đồ chơi.",
+"full_prompt": "3D render style, Cocomelon aesthetic, a cute toddler boy sitting in a blue bathtub filled with round white soap bubbles. Colorful plastic toy ducks floating. A kind mother figure with brown hair standing next to the tub in a bright bathroom with nautical decorations. Soft studio lighting, pastel color palette, smooth surfaces, subsurface scattering on skin, clean aesthetic, 4k resolution.",
+"negative_prompt": "dark, scary, realistic, dirty, high contrast, film grain, vintage.",
+"recommended_model": "DALL-E 3",
+"recommended_settings": {"cfg_scale": 6, "steps": 25, "sampler": "DPM++ 2M"}
+}
+
+Frame 3: Animals at the beach (01:36)
+{
+"frame_description": "Các con vật (Llama, Gấu, Voi) trên bãi biển phong cách Cocomelon.",
+"full_prompt": "Cocomelon style 3D animation, a group of stylized cute animals including a white llama in pajamas and a red teddy bear, standing on a sunny beach with yellow sand. Bright blue sky, colorful beach huts in the background. Everything has rounded shapes and smooth plastic-like textures. Vibrant colors, soft lighting, child-friendly atmosphere, Pixar-like quality but more simplified.",
+"negative_prompt": "rough textures, realistic fur, aggressive, dark, cinematic lighting, photorealism.",
+"recommended_model": "Midjourney v6 --style raw --s 250",
+"recommended_settings": {"cfg_scale": 7, "steps": 35, "sampler": "Euler"}
+}
+
+===========
+
+Dưới đây là phân tích chi tiết về ngôn ngữ hình ảnh và kỹ thuật quay phim (cinematography) của kênh **Cocomelon** từ góc độ một Đạo diễn hình ảnh (DP).
+
+---
+
+## 1. THỐNG KÊ CỠ CẢNH (Shot Size Distribution)
+
+Cocomelon sử dụng cỡ cảnh rất đa dạng để giữ sự chú ý của trẻ em, tập trung vào sự biểu cảm và hành động rõ ràng.
+
+| Cỡ cảnh | Số lần | % tổng | Dùng khi nào (context) |
+|----------|--------|--------|------------------------|
+| **Wide Shot (WS)** | Cao | 25% | Thiết lập bối cảnh (Bãi biển, phòng tắm, sân vườn). Cho thấy toàn bộ nhân vật và không gian. |
+| **Medium Wide (MWS)** | Vừa | 20% | Khi có 2-3 nhân vật cùng tương tác (JJ và các bạn trượt nước, JJ và mẹ bên bồn tắm). |
+| **Medium Shot (MS)** | Cao | 30% | Cỡ cảnh chủ đạo cho hành động. Tập trung vào cử chỉ tay và thân hình nhân vật khi nhảy múa/ăn uống. |
+| **Medium Close-Up (MCU)** | Vừa | 15% | Khi nhân vật hát hoặc nói trực tiếp với khán giả, tập trung vào phần ngực trở lên. |
+| **Close-Up (CU)** | Vừa | 8% | Nhấn mạnh biểu cảm khuôn mặt (khi JJ ngạc nhiên, cười hoặc khi nói "Yum yum"). |
+| **Insert/Detail Shot** | Thấp | 2% | Cận cảnh đồ vật: hạt đậu trên thìa, chú vịt cao su, chiếc mũ bay. |
+
+---
+
+## 2. THỐNG KÊ GÓC MÁY (Camera Angle)
+
+Góc máy của Cocomelon được thiết kế để tạo sự thân thiện và an toàn.
+
+| Góc máy | Số lần | % | Dùng khi nào |
+|---------|--------|---|-------------|
+| **Eye-level** | Rất cao | 85% | Góc nhìn ngang tầm mắt trẻ em. Tạo sự kết nối trực tiếp, bình đẳng và gần gũi giữa khán giả và nhân vật. |
+| **Low angle** | Thấp | 5% | Nhìn lên các nhân vật lớn hơn (Whale, Shark) hoặc khi muốn nhân vật trông có vẻ hào hứng, năng động hơn. |
+| **High angle** | Thấp | 10% | Thường dùng khi nhìn vào bồn tắm hoặc nhìn xuống đồ vật trên mặt đất/bàn picnic. |
+
+---
+
+## 3. CHUYỂN ĐỘNG CAMERA (Camera Movement)
+
+**Phương pháp chính:** Animation Camera (CGI). Các chuyển động cực kỳ mượt mà, không bao giờ có rung lắc (handheld shake).
+
+| Loại chuyển động | Tần suất | Tốc độ | Mô tả chi tiết |
+|-------------------|----------|--------|-----------------|
+| **Static** | Cao | - | Dùng trong các đoạn hội thoại hoặc hành động lặp lại tại chỗ. |
+| **Tracking/Dolly** | Vừa | Chậm/Đều | Camera đi ngang theo canô của JJ hoặc đi theo chiếc mũ bị gió thổi bay dọc bãi biển. |
+| **Slow Zoom In** | Vừa | Rất chậm | Nhấn mạnh vào cảm xúc của nhân vật khi cao trào của câu hát. |
+| **Pan Left/Right** | Thấp | Nhẹ nhàng | Mở rộng không gian bối cảnh từ trái sang phải để giới thiệu các nhân vật mới xuất hiện. |
+
+- **Thời gian trung bình mỗi shot:** 2.5 - 4 giây (Phù hợp với nhịp sinh học và sự tập trung của trẻ nhỏ).
+- **Transitions đặc trưng:** Chủ yếu là **Hard Cut** (Cắt thẳng). Đôi khi dùng **Dissolve** (Chồng mờ) khi chuyển cảnh lớn hoặc chuyển bài hát.
+
+---
+
+## 4. QUY LUẬT BỐ CỤC (Composition Rules)
+
+1.  **Center Placement (Chủ thể ở trung tâm):** JJ luôn là tâm điểm. Quy luật này giúp trẻ em dễ dàng xác định ai là người quan trọng nhất trong cảnh.
+2.  **Rule of Thirds (Quy tắc 1/3):** Được dùng khi có sự tương tác giữa 2 nhân vật (Mẹ bên trái, JJ bên phải) để tạo sự cân bằng thị giác.
+3.  **Depth Layers (Phân lớp độ sâu):** Cocomelon rất giỏi tạo chiều sâu 3D. Luôn có Tiền cảnh (bong bóng xà phòng, ngọn cỏ), Trung cảnh (nhân vật chính) và Hậu cảnh (đảo xa, ngôi nhà).
+4.  **Symmetry (Đối xứng):** Thường thấy trong các cảnh tập thể, tạo cảm giác trật tự, ngăn nắp và dễ nhìn.
+5.  **Leading Lines:** Đường bờ biển, cạnh bồn tắm hoặc hàng rào dẫn mắt người xem tập trung vào hành động của nhân vật chính.
+
+---
+
+## 5. NHỊP ĐỘ HÌNH ẢNH (Visual Pacing)
+
+- **Nhịp độ:** Phụ thuộc hoàn toàn vào nhịp điệu bài hát (BPM). Mỗi cú cắt cảnh thường rơi đúng vào phách mạnh (downbeat) hoặc kết thúc một câu hát.
+- **Tính chất:** Đều đặn, dễ dự đoán. Không có các cú cắt nhanh kiểu action movie gây choáng ngợp.
+- **Phần "Reflection" (Trầm tư):** Khi nhân vật buồn (như lúc vịt không quay về), shot hình được giữ lâu hơn (5-6 giây) với góc máy tĩnh để trẻ em cảm nhận được cảm xúc buồn.
+
+---
+
+## 6. MẪU CẮT CẢNH (Editing Patterns)
+
+- **Establishing → Action → Reaction:** Luôn bắt đầu bằng cảnh rộng (Bãi biển) -> Cảnh trung (JJ hát) -> Cận cảnh (Cua cười/Vịt quack). Đây là cấu trúc kể chuyện cơ bản nhất cho trẻ em.
+- **Reaction Shot:** Cực kỳ quan trọng. Sau mỗi hành động của vật nuôi hay đồ chơi, luôn có một shot quay mặt JJ hoặc bạn bè đang cười/ngạc nhiên để hướng dẫn khán giả nhí cách phản ứng cảm xúc.
+- **Rhythmic Editing:** Cắt cảnh theo nhịp "Do, do, do, do..." tạo sự vui nhộn và kích thích trẻ nhún nhảy theo.
+- **Match Cut:** Chuyển đổi giữa thế giới tưởng tượng (biển cả) và thực tế (bồn tắm) thông qua các hành động tương đồng của JJ.
+
+**Tổng kết:** Ngôn ngữ hình ảnh của Cocomelon là sự kết hợp giữa **tâm lý học trẻ em** và **kỹ thuật CGI chuẩn mực**: Sáng, rõ, trung tâm và mượt mà.
+
+==============
+
+Dưới đây là phân tích ngôn ngữ học chi tiết về phong cách trình bày của kênh **Cocomelon** để tái tạo bằng AI writing.
+
+---
+
+## 1. CẤU TRÚC VĨ MÔ (Macro Structure)
+- **Thể loại:** Story-driven musical narrative (Nhạc kịch kể chuyện cho trẻ em).
+- **Mở đầu:** 
+    - Luôn là "Cold Open" bằng Logo dưa hấu đặc trưng kèm âm thanh "Cocomelon!" và tiếng cười trẻ con.
+    - Sau đó là một câu hỏi trực tiếp hoặc thiết lập tình huống (VD: "Do you want to dance with us?" hoặc tiếng nhạc nổi lên ngay lập tức).
+- **Cấu trúc "Phần":** Video được chia theo cấu trúc bài hát (Verse - Chorus). Mỗi "khổ thơ" thường là một chu kỳ lặp lại của một hành động với một biến thể nhỏ (VD: 5 chú vịt -> 4 chú vịt; Ăn đậu -> Ăn cà rốt).
+- **Tầng Narrative:** 
+    - Tầng 1: Hành động thực tế của nhân vật (JJ ăn cơm).
+    - Tầng 2: Bài hát lồng tiếng cho suy nghĩ/cảm xúc của nhân vật.
+- **Kết thúc:** Thường bằng một hành động tình cảm (ôm, cười lớn, vỗ tay) và lời chào thân thiện.
+- **Thời lượng:** Narration (hát/nói) chiếm 95%, nhạc đệm chiếm 100% thời gian.
+
+**Sơ đồ cấu trúc tiêu biểu (Video 5 Little Ducks):**
+- 00:00-00:07 → Cocomelon Logo & Intro.
+- 00:08-00:20 → Thiết lập bối cảnh (JJ lái canô, giới thiệu 5 chú vịt).
+- 00:21-02:14 → Các vòng lặp bài hát (Mỗi chú vịt biến mất một lần).
+- 02:15-02:35 → Cao trào/Giải quyết (Tất cả vịt quay về).
+- 02:36-03:00 → Kết thúc vui vẻ & Outro logo.
+
+---
+
+## 2. PHONG CÁCH NGÔN NGỮ
+### 2a. Ngôi kể / Phong cách nói:
+- **Ngôi kể:** Linh hoạt giữa ngôi thứ nhất ("Yes, yes, I want to eat my peas") để trẻ em nhập vai, và ngôi thứ ba của người kể chuyện/mẹ để dẫn dắt.
+- **Voice:** Giọng nữ (người mẹ) ấm áp, dỗ dành; giọng trẻ em (JJ) trong trẻo, háo hức.
+- **Personality:** Cực kỳ tích cực (High-energy positivity), kiên nhẫn và luôn khích lệ (Encouraging).
+
+### 2b. Vocabulary & Sentence Pattern:
+- **Độ dài câu:** Rất ngắn (3-6 từ/câu).
+- **Cấu trúc:** Subject + Verb + Object đơn giản. Lặp từ rất nhiều.
+- **Từ vựng:** Level mầm non (Toddler-friendly). Tập trung vào danh từ cụ thể (peas, carrots, duck, boat) và động từ hành động (eat, swim, wash).
+- **Từ tượng thanh (Onomatopoeia):** Tần suất cực cao (Quack, yum, swish, splash, do do do).
+- **Humor:** Kiểu hài hước hình thể đơn giản (Slapstick) hoặc các tình huống bất ngờ nhẹ nhàng (chiếc mũ bay mất).
+
+### 2c. Thủ pháp tu từ:
+- **Repetition (Lặp lại):** Đây là thủ pháp quan trọng nhất. Lặp lại cả từ đơn ("Yes, yes, yes") và cấu trúc câu ("...it's time to eat your...").
+- **Direct Address:** Nói thẳng với khán giả ("Will you dance with us?").
+- **Anaphora:** Lặp lại cụm từ đầu câu để tạo nhịp điệu cho trẻ dễ học theo.
+
+### 2d. Transition Phrases (Cụm từ chuyển ý):
+Vì là nhạc kịch, các cụm từ chuyển ý thường nằm trong lời bài hát:
+1. **Chuyển phần:** "And then...", "But only...", "Look, look!"
+2. **Giải thích:** "See, see...", "It's time to..."
+3. **Cảm xúc:** "Yay, yay!", "Oh no!", "Aha!"
+4. **Kết luận:** "Yum, yum, yum!", "Ha, ha, ha!", "All gone now!"
+
+---
+
+## 3. NHỊP ĐỘ KỂ (Narration Pacing)
+- **Tốc độ:** Chậm, rõ ràng (Enunciation cực tốt để trẻ em nghe rõ từng âm tiết).
+- **Energy:** Luôn giữ mức năng lượng cao nhưng không gây cảm giác vội vã.
+- **Khoảng nghỉ:** Luôn có khoảng nghỉ ngắn sau mỗi câu hát để giai điệu "ngấm" hoặc để trẻ em kịp bắt chước hành động.
+
+---
+
+## 4. CẢM XÚC & TONE (Emotional Arc)
+- **Tone chủ đạo:** Playful (Vui nhộn), Safe (An toàn), Educational (Giáo dục).
+- **Emotional Arc:**
+    - 00:00 → Joy/Excitement (Cấp độ 4) → Bắt đầu trò chơi/bài hát.
+    - 01:30 → Slight Concern/Curiosity (Cấp độ 2) → Một vấn đề nhỏ xuất hiện (vịt đi mất, không muốn ăn rau).
+    - 02:45 → Pure Joy/Satisfaction (Cấp độ 5) → Giải quyết vấn đề (ăn hết rau, vịt quay về).
+
+---
+
+## 5. SO SÁNH VỚI CÁC KÊNH TƯƠNG ĐỒNG
+
+| Khía cạnh | Cocomelon | Little Angel |
+|-----------|---------------------|---------------------|
+| Tone | Nhẹ nhàng, ấm áp hơn | Năng động, náo nhiệt hơn |
+| Pacing | Chậm, rõ chữ | Nhanh hơn một chút |
+| Lặp lại | Cực cao (Hypnotic) | Cao |
+
+---
+
+## 6. SAMPLE SCRIPT RECREATION
+*(Chủ đề: Rửa tay - Washing Hands)*
+
+**[Intro Music - Bright and bouncy]**
+
+**Narrator (Mom voice):** "Look, look! JJ, your hands are messy! It's time to wash them!"
+
+**JJ (Child voice):** "Oh! Bubbles! Yes, yes!"
+
+**(Verse 1)**
+"Wash, wash, wash, it’s time to wash your hands!"
+"Yes, yes, yes, I want to wash my hands!"
+"Good, good! The soap is good for you!"
+"Yay, yay, yay! I love the bubbles, ooh!"
+
+**(Chorus - Rhythmic and repetitive)**
+"Scrub-a-dub-dub, rub-a-dub-dub!"
+"Left and right, left and right!"
+"Splash, splash, splash! Wash the germs away!"
+"Now we’re clean and ready to play!"
+
+**Narrator:** "See, see? Teddy likes to wash too!"
+**JJ:** "Ha! Ha! Ha! Bubbles everywhere! All clean now! Yay!"
+
+**[Outro - Laughter and soft musical fade]**
+
+============
+
+Dưới đây là phân tích thiết kế sản xuất và chỉ đạo nghệ thuật của kênh **Cocomelon** để phục vụ tái tạo bằng AI.
+
+## 1. NHÂN VẬT (Characters)
+
+### 1a. Phong cách thể hiện:
+- **Loại hình:** 3D CGI Animation (Hoạt hình máy tính 3D).
+- **Tạo hình:** Stylized (Cách điệu hóa cực cao). Đầu to, mắt tròn lớn, tỉ lệ cơ thể "chibi" dành cho trẻ mầm non.
+- **Mức độ thực tế:** 1/10 (Hoàn toàn giống đồ chơi nhựa).
+
+### 1b. Trang phục & Ngoại hình:
+- **Nhóm 1: JJ (Nhân vật chính)**
+    - Trang phục: Bộ áo liền quần (onesie) màu xanh nhạt in hình gấu hoặc áo cứu hộ màu vàng.
+    - Đặc điểm: Một sợi tóc xoăn duy nhất trên đỉnh đầu, da mịn không tì vết.
+- **Nhóm 2: Người lớn (Bố, Mẹ, Cô giáo)**
+    - Trang phục: Đơn giản, màu sắc tươi sáng, họa tiết lớn (VD: Đồ bơi họa tiết dưa hấu).
+    - Style: Thân thiện, bo tròn các góc cạnh.
+
+### 1c. Biểu cảm & Ngôn ngữ cơ thể:
+- **Biểu cảm:** Luôn vui tươi, ngạc nhiên với khuôn miệng mở rộng hình chữ O.
+- **Cử chỉ:** Chậm, rõ ràng, mang tính biểu đạt cao (vẫy tay, vỗ tay, nhảy nhót nhịp nhàng).
+
+## 2. BỐI CẢNH & MÔI TRƯỜNG (Environments)
+
+### 2a. Bối cảnh chính:
+- **Loại không gian:** Thế giới giả lập tươi sáng, sạch sẽ tuyệt đối.
+- **Kiến trúc:** Nhà ở, bồn tắm, bãi biển được thiết kế như những bộ đồ chơi lắp ráp khổng lồ.
+- **Ánh sáng:** High-key, không có vùng tối gắt. Nguồn sáng tán xạ đều từ phía trên.
+- **Bảng màu:** Màu cơ bản (Primary colors) cực kỳ rực rỡ: Xanh dương, Xanh lá, Vàng, Đỏ.
+
+### 2b. Tính nhất quán:
+- Mọi môi trường đều có chung một "vật liệu" cảm giác như nhựa mềm hoặc cao su mịn, tạo sự an toàn và nhất quán xuyên suốt.
+
+## 3. ĐỒ VẬT & ĐẠO CỤ (Props)
+- **Đặc điểm:** Các đồ vật (canô, chú vịt, rau củ) có mức độ chi tiết trung bình (5/10), tập trung vào hình khối bo tròn, không có góc nhọn.
+- **Chất liệu:** Nhựa bóng nhẹ (Semi-glossy plastic).
+- **Vai trò:** Vừa mang tính giáo dục (nhận biết tên gọi) vừa mang tính trang trí sinh động.
+
+## 4. ĐỒ HỌA ON-SCREEN
+
+### 4a. Typography:
+- **Text:** Lời bài hát (Subtitles) xuất hiện ở cạnh dưới.
+- **Font:** Sans-serif bo tròn, nét dày, màu trắng có viền đen hoặc bóng đổ để nổi bật trên nền rực rỡ.
+- **Animation:** Text thường nảy (bounce) hoặc đổi màu theo nhịp nhạc.
+
+### 4b. Graphic & Brand:
+- **Logo:** Hình dưa hấu kết hợp TV với chú bọ rùa ở góc trên.
+- **Consistent Identity:** Sử dụng các icon chuyển cảnh đơn giản, màu sắc đồng bộ với bảng màu thương hiệu.
+
+## 5. OUTPUT: IMAGE GENERATION REFERENCE SHEET
+
+```json
+{
+  "content_type": "3D Kids Animation / CGI Toy Aesthetic",
+  "style_keywords": ["Cocomelon style", "3D render", "high saturation", "rounded edges", "plastic texture", "toddler-friendly", "vibrant colors", "soft studio lighting"],
+  "negative_keywords": ["realistic skin", "sharp edges", "gritty", "dark shadows", "vintage", "sketchy", "complex textures", "film grain"],
+  "color_palette": {
+    "shadow_primary": "#A0A0A0",
+    "shadow_secondary": "#B0C4DE",
+    "highlight_warm": "#FFFFFF",
+    "highlight_cool": "#E0FFFF",
+    "accent_primary": "#47A831",
+    "accent_secondary": "#F589A3",
+    "brand_colors": ["#6CCAF2", "#76C733"],
+    "dominant_midtones": ["#FCE2D1", "#FFD700"]
+  },
+  "lighting_setup": {
+    "primary_method": "High-key Studio Lighting",
+    "key_fill_ratio": "1:1",
+    "light_sources": ["Top-down softbox", "Global illumination"],
+    "mood": "Cheerful and Safe"
+  },
+  "texture_detail_level": "3/10",
+  "film_grain_intensity": "0/10",
+  "realism_level": "1/10",
+  "production_value": "9/10"
+}
+```
+
+==========
+
+Dưới đây là phân tích kỹ thuật hậu kỳ và chuyển động (Motion Graphics & Post-production) của kênh **Cocomelon** từ góc độ một chuyên gia dựng phim.
+
+---
+
+## 1. PHƯƠNG PHÁP SẢN XUẤT VIDEO
+- **Phương pháp chính:** Full 3D Animation (CGI). Toàn bộ nhân vật, môi trường và vật thể được dựng hình, gán xương (rigging) và diễn hoạt trong môi trường 3D.
+- **Tỷ lệ:** 100% Animation. Không có người thật hay ảnh tĩnh.
+- **Phần mềm/Tools ước đoán:** 
+    - Diễn hoạt & Dựng hình: Autodesk Maya hoặc 3ds Max.
+    - Rendering: Arnold hoặc V-Ray (tạo cảm giác bề mặt nhựa/cao su mịn).
+    - Hậu kỳ & Compositing: Adobe After Effects (để thêm các hiệu ứng hạt, ánh sáng lấp lánh).
+
+---
+
+## 2. CÁC KIỂU CHUYỂN ĐỘNG (Motion Types)
+
+### 2a. Camera Movement:
+- **Tốc độ:** Chậm đến trung bình, cực kỳ ổn định.
+- **Kiểu chuyển động:** Chủ yếu là **Dolly** (tiến/lùi) và **Tracking** (đi ngang theo nhân vật).
+- **Easing:** Sử dụng **Ease-in/out** (phanh/khởi động mềm) 100%, không bao giờ dừng đột ngột, tạo cảm giác trôi chảy, dễ chịu cho mắt trẻ em.
+- **Thời gian trung bình mỗi cú máy:** 3 - 5 giây.
+
+### 2b. Subject Movement:
+- **Nhân vật:** Full motion. Sử dụng nguyên lý "Squash and Stretch" (Co giãn) của hoạt hình để nhân vật trông mềm mại và sống động.
+- **Vật thể:** Có vật lý giả lập (nước bắn, bóng nảy, tóc đung đưa) nhưng ở mức độ đơn giản hóa.
+
+### 2c. Particle & Atmospheric Effects:
+- **Nước & Bọt biển:** Các hạt bong bóng tròn trịa, chuyển động nổi lên trên.
+- **Sparkles/Glow:** Các ngôi sao nhỏ lấp lánh xung quanh đồ vật mới hoặc cảnh chuyển đổi phép thuật.
+- **Depth-of-field:** Hậu cảnh thường được làm mờ (Gaussian Blur) để tập trung thị giác vào nhân vật chính.
+
+### 2d. Speed Effects:
+- **Tốc độ:** Nhất quán theo nhịp nhạc (60-90 BPM). Không dùng Slow motion hay Time-lapse.
+
+---
+
+## 3. TRANSITIONS (Chuyển cảnh)
+
+| Loại | Tần suất | Duration | Dùng khi nào |
+|------|----------|---------------|-------------|
+| **Hard cut** | Rất cao (90%) | - | Cắt theo nhịp phách của bài hát (Downbeat). |
+| **Cross dissolve** | Thấp | 500ms | Chuyển giữa các phân đoạn kể chuyện khác nhau (VD: Từ phòng tắm ra bãi biển). |
+| **Wipe (Custom)** | Thấp | 800ms | Sử dụng hình ảnh chú bọ rùa hoặc Logo Cocomelon để quét qua màn hình khi kết thúc bài hát. |
+
+---
+
+## 4. NHẠC & ÂM THANH (Audio Design)
+
+### 4a. Nhạc nền:
+- **Thể loại:** Nursery Rhymes / Children's Pop.
+- **Instruments:** Piano, Xylophone (tiếng mộc cầm trong trẻo), Brass (kèn đồng vui nhộn), Drum kit nhẹ nhàng.
+- **Mood:** Luôn nhất quán ở trạng thái vui vẻ, tích cực.
+
+### 4b. Sound Effects (SFX):
+- **Loại:** Foley hoạt hình (tiếng vịt kêu "quack", tiếng nước "splash", tiếng cười "giggle").
+- **Sync:** SFX được đồng bộ cực kỳ chính xác với hành động (Frame-accurate sync). Mỗi lần JJ chạm tay hay vịt nhảy đều có tiếng động tương ứng.
+
+### 4c. Voice:
+- **Chất lượng:** Professional Studio Recording. Giọng hát được xử lý rất sạch, có độ vang (reverb) nhẹ để tạo cảm giác không gian.
+
+---
+
+## 5. TIMELINE BREAKDOWN (Ví dụ 30 giây đầu)
+
+| Thời gian | Duration | Nội dung | Cỡ cảnh | Camera move | Transition vào | FX |
+|-----------|----------|----------|---------|-------------|----------------|------------|
+| 00:00 | 7s | Intro Logo Cocomelon | MS | Static | Fade from black | Sparkle |
+| 00:07 | 5s | JJ lái canô trên biển | WS | Tracking right | Hard cut | Water splash |
+| 00:12 | 4s | 5 chú vịt trượt nước | MWS | Dolly out | Hard cut | Sun flare |
+| 00:16 | 4s | Cận cảnh JJ cười | CU | Static | Hard cut | Depth of field |
+| 00:20 | 5s | Chú vịt xanh biến mất | MS | Slow Zoom In | Hard cut | Poof cloud |
+| 00:25 | 5s | Mẹ JJ trong bồn tắm | WS | Pan left | Cross dissolve | Bubbles |
+
+---
+
+## 6. VIDEO GENERATION / RECREATION PARAMETERS
+
+### AI Video Prompt (Dành cho Kling, Runway Gen-3 hoặc Sora):
+
+```json
+{
+  "shot_description": "JJ driving a boat with ducks",
+  "video_prompt": "3D CGI animation in Cocomelon style, a cute toddler boy with a single hair curl driving a small colorful speedboat on a bright blue cartoon ocean. Five colorful rubber ducks on water skis are being towed behind. Soft sunlight, high-key lighting, vibrant saturated colors, smooth plastic textures, gentle camera tracking movement, high quality render, 60fps, fluid motion.",
+  "duration": "5s",
+  "camera_motion": "Tracking right with ease-in-out",
+  "style_keywords": ["CGI", "Nursery rhyme aesthetic", "Soft lighting", "Vibrant"]
+}
+```
+
+```json
+{
+  "shot_description": "Bubbles in a bathtub",
+  "video_prompt": "3D render of a bright bathroom, a blue bathtub filled with hundreds of perfect round white soap bubbles. A small purple toy boat floats on the bubbles. Soft studio lighting reflecting off the ceramic tiles, pastel colors, magical sparkles floating in the air, shallow depth of field, high resolution animation.",
+  "duration": "4s",
+  "camera_motion": "Slow Dolly-in",
+  "style_keywords": ["Plastic texture", "High-key", "Clean"]
+}
+```
+
+===========
+
+Dưới đây là phân tích chi tiết về cấu trúc Audio-Visual của kênh **Cocomelon**, tập trung vào sự phối hợp giữa lớp hát dẫn (Narrator/Singer) và các phản ứng/lời thoại của nhân vật (Character Dialogue).
+
+---
+
+## 1. PHÂN LOẠI AUDIO MODE TỪNG SHOT (Ví dụ: Five Little Ducks)
+
+| # | Timestamp | Duration | Audio Mode | Narrator? | Dialogue? | Dialogue Content | Nhận xét |
+|---|-----------|----------|------------|-----------|-----------|------------------|----------|
+| 1 | 00:00-00:07 | 7s | narrator_only | Có | Không | (Âm thanh Logo) | Thiết lập thương hiệu |
+| 2 | 00:08-00:20 | 12s | narrator_only | Có | Không | (Hát dẫn Verse 1) | Giới thiệu bối cảnh |
+| 3 | 00:21-00:24 | 3s | dialogue_dominant | Không | Có | "Hehe! Quack!" | JJ cười và vịt kêu |
+| 4 | 00:25-00:30 | 5s | narrator_only | Có | Không | (Hát dẫn lời Mẹ) | Dẫn dắt hành động |
+| 5 | 00:31-00:34 | 3s | dialogue_dominant | Không | Có | "Oh no!" | JJ biểu cảm lo lắng |
+| 6 | 00:35-00:40 | 5s | dialogue_dominant | Có | Có | "Quack, quack!" | Vịt kêu đè lên nhạc |
+
+---
+
+## 2. THỐNG KÊ PHÂN BỐ AUDIO MODE
+
+| Audio Mode | Số shots | % tổng | Tổng thời lượng | % thời lượng |
+|------------|----------|--------|-----------------|-------------|
+| **narrator_only** | ~15 | 65% | ~120s | 75% |
+| **dialogue_dominant**| ~8 | 35% | ~40s | 25% |
+
+*Nhận xét: Lớp nhạc hát dẫn (Narrator) chiếm ưu thế tuyệt đối để giữ nhịp bài hát, lớp Dialogue đóng vai trò là các "điểm nhấn" cảm xúc.*
+
+---
+
+## 3. PHÂN LOẠI ĐỐI THOẠI (Dialogue Taxonomy)
+
+| # | Speaker | Dialogue Type | Nội dung | Trigger |
+|---|---------|---------------|----------|---------|
+| 1 | [JJ] | **reaction** | "Hehe!", "Yay!" | EMOTIONAL_PEAK (Vui vẻ) |
+| 2 | [Mẹ] | **soft_line** | "Yum yum!", "Good job!" | EXPLANATION_BREAK (Khích lệ) |
+| 3 | [Con vật] | **reaction** | "Quack!", "Moo!" | CHARACTER_INTRO (Giới thiệu) |
+| 4 | [Đám đông]| **crowd** | (Tiếng cười tập thể) | RESOLUTION (Kết thúc) |
+
+---
+
+## 4. PHÂN TÍCH NHỊP ĐỘ NARRATOR ↔ DIALOGUE
+
+### 4a. Mô hình xen kẽ:
+- **Pattern:** Thường sau 2 câu hát (narrator_only) sẽ có 1 phản ứng ngắn (dialogue_dominant). 
+- **Chuỗi liên tục:** Narrator có thể hát liên tục 15-20s, nhưng Dialogue hiếm khi kéo dài quá 3s mà không có nhạc hát dẫn quay lại.
+
+### 4b. Mật độ theo giai đoạn:
+- **Opening:** 90% Narrator (Giới thiệu bài hát).
+- **Middle:** 70% Narrator / 30% Dialogue (Các tình huống lặp lại).
+- **Climax:** 50% Narrator / 50% Dialogue (Nhiều tiếng reo hò, phản ứng dồn dập).
+- **Resolution:** 80% Dialogue (Tiếng cười, chào tạm biệt).
+
+### 4c. Transition rules:
+- **Cue phrases:** Narrator thường kết thúc bằng các từ gợi mở như: "...and then?", "...but who is there?", "...look!".
+- **Ducking:** Khi nhân vật nói hoặc cười, âm lượng nhạc nền (BGM) và giọng hát dẫn giảm khoảng 30-40% để làm nổi bật âm thanh nhân vật.
+
+---
+
+## 5. VISUAL-AUDIO SYNC (Đồng bộ Hình ảnh ↔ Âm thanh)
+
+### 5a. Quy tắc cỡ cảnh:
+- **narrator_only:** Thường dùng Wide Shot (WS) hoặc Medium Shot (MS) để cho thấy toàn bộ bối cảnh và hành động.
+- **dialogue_dominant:** Luôn chuyển sang Close-Up (CU) hoặc Medium Close-Up (MCU) để khán giả thấy rõ khẩu hình và biểu cảm của nhân vật khi phát ngôn.
+
+### 5b. Character visibility:
+- Nhân vật luôn lip-sync (khớp miệng) nếu họ là người đang hát phần Narrator.
+- Nếu là lớp Dialogue phản ứng (giggle, gasp), nhân vật sẽ có cử động cơ thể mạnh (nhảy lên, vung tay).
+
+---
+
+## 6. SFX & MUSIC LAYER
+
+### 6a. Sound Effects:
+- **cartoon_SFX:** Tiếng "Boing" khi nhảy, "Ding" khi có ý tưởng.
+- **foley:** Tiếng nước vỗ, tiếng bước chân trên cát.
+- **Sync:** 100% SFX đồng bộ với hành động trên màn hình.
+
+### 6b. Background Music:
+- Chạy liên tục 100% thời lượng. Nhạc không bao giờ dừng lại, kể cả khi nhân vật nói chuyện.
+
+---
+
+## 7. SAMPLE RECONSTRUCTION (Tái tạo cấu trúc)
+
+*(Chủ đề: Bé học đi giày - Putting on Shoes)*
+
+**[Music: Bright, upbeat nursery rhyme tempo]**
+
+**Narrator:** "One foot in, and two feet in, let's put on our shoes today!" (narrator_only)
+
+**[JJ]** "Left foot! Hehe!" (dialogue_dominant)
+
+**Narrator:** "Pull the strap and make it tight, now we're ready out to play!" (narrator_only)
+
+**[JJ]** "Ready! Go, go, go!" (dialogue_dominant)
+
+**Narrator:** "Look at Teddy, he wants shoes too! Can you help him, JJ?" (dialogue_dominant, dẫn dắt hành động tiếp theo)
+
+**[Teddy]** "Squeak! Squeak!"
+**[JJ]** "Oh! Teddy's shoes are blue!"
+
+**[SFX]** Magic sparkle sound as shoes appear on Teddy's feet.
+**[CROWD]** Giggle and applause.
+
+**Narrator:** "Yay! We all have shoes on now!" (Resolution)
+
+==============
+
+This is the **Master Reference Sheet** for the **Cocomelon** visual and narrative DNA, synthesized for precise AI replication across image, video, and text generation.
+
+---
+
+## A. STYLE DNA SUMMARY
+Cocomelon is a world-leading 3D CGI preschool entertainment brand defined by its "Toddler-Centric Toy Aesthetic." The visual identity is characterized by vibrant, high-saturation primary colors, soft high-key studio lighting, and rounded, safe geometry that mimics high-quality plastic and rubber toys. Characters feature exaggerated "chibi" proportions with large, expressive eyes and simplified facial features to maximize emotional resonance with toddlers. The content is a rhythmic, nursery-rhyme-driven musical narrative that emphasizes safety, curiosity, and positive reinforcement. Every frame feels like a clean, inviting digital playground where the lighting is always bright, the surfaces are always smooth, and the mood is perpetually cheerful and encouraging. It is a world without sharp edges, grit, or visual complexity, optimized for clarity and rhythmic engagement.
+
+## B. IMAGE GENERATION MASTER PROMPT
+**Style Foundation:** Professional 3D CGI animation render, high-end preschool entertainment aesthetic, Cocomelon style. 
+**Geometry & Shapes:** Every object and character must feature extremely rounded edges and soft, plump geometry. No sharp corners or jagged lines. Characters have large heads, big expressive round eyes with distinct white highlights, and simplified button noses.
+**Lighting & Atmosphere:** High-key studio lighting with global illumination. Soft, diffused shadows with a very high key-to-fill ratio (nearly 1:1), ensuring no dark or gritty areas. The environment should feel bathed in a warm, even glow. Subtle bloom on highlights to suggest clean, reflective surfaces. 
+**Materials & Textures:** Surfaces mimic high-quality semi-glossy plastic, smooth rubber, and soft silicone. Apply subtle subsurface scattering to character skin to give it a warm, "glowy" peach-like appearance without any realistic pores or imperfections. Fabrics are simplified with flat or simple patterns (polka dots, stripes). Hair is rendered as solid, smooth clumps or single thick strands rather than individual fibers.
+**Color Palette:** Extremely vibrant and saturated primary and secondary colors (Lime Green, Sky Blue, Canary Yellow, Watermelon Pink). The background should be as colorful as the foreground but slightly softer in focus.
+**Composition:** Subject-centric, often centered or following the rule of thirds. Clean backgrounds with distinct depth layers (Foreground, Midground, Background). All elements must look like premium toys in a perfectly organized digital playroom or stylized outdoor setting.
+**Technical Quality:** 8k resolution, masterpiece, clean render, Octane render style, raytracing, vibrant saturation, 3D character design, ultra-smooth surfaces, inviting and safe atmosphere.
+
+## C. NEGATIVE PROMPT
+Photorealistic skin, realistic hair fibers, skin pores, imperfections, grit, dirt, weathering, sharp edges, jagged lines, high-contrast lighting, dark shadows, cinematic noir, grainy, film grain, vintage, desaturated, muted colors, messy environments, complex textures, horror, scary, sharp objects, realistic animals, anatomical correctness, thin lines, sketch style, 2D illustration.
+
+## D. EXACT COLOR PALETTE
+```json
+{
+  "shadows": ["#A0A0A0", "#B0C4DE"],
+  "midtones": ["#6CCAF2", "#76C733"],
+  "highlights": ["#FFFFFF", "#F0FFFF"],
+  "accents": ["#47A831", "#F589A3"],
+  "brand_colors": ["#47A831", "#FFD700"],
+  "skin_warm": "#FCE2D1",
+  "skin_cool": "#FADADD"
+}
+```
+
+## E. NARRATION / PRESENTATION STYLE GUIDE
+- **Content Type:** Musical Nursery Rhyme / Educational Storytelling.
+- **Point of View:** Primarily Second Person ("Can you help?") and First Person ("Yes, yes, I want to!").
+- **Tone & Personality:** High-energy positivity, encouraging, patient, and warm.
+- **Sentence Patterns:** Short, rhythmic, and highly repetitive. Subject-Verb-Object (SVO).
+- **Vocabulary Level:** Preschool / Toddler (Ages 1-4). Focus on concrete nouns and action verbs.
+- **Humor Style:** Simple slapstick, visual surprises (mismatched hats), and joyful reactions.
+- **Top 15 Transition Phrases:** "Look!", "One, two, three...", "But only...", "See, see?", "It's time to...", "Yay, yay!", "Oh no!", "Aha!", "Yum, yum!", "Ha, ha, ha!", "Where did it go?", "Look at that!", "Are you ready?", "Good job!", "All gone!"
+- **Emotional Arc Pattern:** Joyful Setup → Gentle Conflict/Question → Rhythmic Repetition → Positive Resolution/Celebration.
+- **Pacing Notes:** Slow, clear enunciation. Every phrase is timed to a musical beat.
+
+## F. SHOT LANGUAGE RULES
+- **Shot Size Distribution:** 30% Medium Shot (Action), 25% Wide Shot (Context), 20% Medium Wide (Interaction), 15% Medium Close-Up (Expressions), 10% Close-Up (Emotional emphasis).
+- **Camera Angle Preferences:** 85% Eye-level (Toddler's height), 10% High-angle (Looking at toys), 5% Low-angle (Large animals/characters).
+- **Average Shot Duration:** 2.5 – 4 seconds.
+- **Transition Types:** 90% Hard Cuts (on the beat), 10% Cross Dissolves (scene changes).
+- **Signature Shots:** Centered JJ giggling, Character "Lip-Sync" Close-Up, The "Follow-the-Object" Tracking Shot, Wide Picnic/Playground Establishing Shot, The "Encouraging Mom" MCU.
+
+## G. MOTION / VIDEO RULES
+- **Production Method:** Full 3D CGI Animation.
+- **Animation Techniques:** Squash and Stretch for bounciness, fluid easing (Ease-in/out) on all movements.
+- **Speed & Easing:** Moderate, steady speeds. No abrupt stops. Everything flows with the music.
+- **Particle Effects:** Large, round soap bubbles, magical sparkles (stars), simple water splashes.
+- **Transition Timing:** Precisely synced to the musical downbeat (Frame-accurate).
+- **Camera Movement:** Smooth Dollies, Pans, and Orbits. Zero handheld camera shake.
+
+## H. VISUAL DESIGN REFERENCE
+- **Character Design:** Toddlers have one blonde curl, large heads, and "Doughy" limbs. Adults are friendly and soft-featured.
+- **Costume Rules:** Simple patterns, bright solid colors. Materials look like soft cotton or spandex.
+- **Environment Rules:** Perfectly clean, "Toy-box" logic. Furniture and architecture are rounded.
+- **Prop Styling:** Props are oversized, brightly colored, and look like molded plastic.
+- **Typography:** Rounded Sans-Serif fonts (like VAG Round or similar). White with thick outlines or soft shadows.
+- **Brand Identity:** Watermelon-TV Logo and Ladybug icon constant presence in intros/outros.
+
+## I. AUDIO DESIGN REFERENCE
+- **Music Genre & Mood:** Children's Pop / Orchestral Nursery Rhymes. Upbeat, simple, and melodic.
+- **SFX Usage Patterns:** Cartoony foley (boings, whistles), synced laughter, and environmental sounds (splashes, quacks).
+- **Voice Characteristics:** Warm, high-pitched, clearly articulated singing and giggling.
+- **Audio Mixing Ratios:** Music 50% / Vocals 40% / SFX 10%. Music never stops. Music ducks by 30% for dialogue.

@@ -458,14 +458,29 @@ func (s *CharacterLibraryService) waitAndUpdateCharacterImage(characterID uint, 
 	s.log.Warnw("Character image generation timeout", "character_id", characterID, "image_gen_id", imageGenID)
 }
 
+// GetCharacterByID returns the full character record by ID (includes all variant fields)
+func (s *CharacterLibraryService) GetCharacterByID(characterID string) (*models.Character, error) {
+	var character models.Character
+	if err := s.db.Where("id = ?", characterID).First(&character).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("character not found")
+		}
+		return nil, err
+	}
+	return &character, nil
+}
+
 type UpdateCharacterRequest struct {
-	Name        *string `json:"name"`
-	Role        *string `json:"role"`
-	Appearance  *string `json:"appearance"`
-	Personality *string `json:"personality"`
-	Description *string `json:"description"`
-	ImageURL    *string `json:"image_url"`
-	LocalPath   *string `json:"local_path"`
+	Name              *string `json:"name"`
+	Role              *string `json:"role"`
+	Appearance        *string `json:"appearance"`
+	Personality       *string `json:"personality"`
+	Description       *string `json:"description"`
+	ImageURL          *string `json:"image_url"`
+	LocalPath         *string `json:"local_path"`
+	CharacterPrompt   *string `json:"character_prompt"`
+	VariantPrompt     *string `json:"variant_prompt"`
+	EpisodeDescriptor *string `json:"episode_descriptor"`
 }
 
 // UpdateCharacter 更新角色信息
@@ -511,6 +526,15 @@ func (s *CharacterLibraryService) UpdateCharacter(characterID string, req *Updat
 	}
 	if req.LocalPath != nil {
 		updates["local_path"] = *req.LocalPath
+	}
+	if req.CharacterPrompt != nil {
+		updates["character_prompt"] = *req.CharacterPrompt
+	}
+	if req.VariantPrompt != nil {
+		updates["variant_prompt"] = *req.VariantPrompt
+	}
+	if req.EpisodeDescriptor != nil {
+		updates["episode_descriptor"] = *req.EpisodeDescriptor
 	}
 
 	if len(updates) == 0 {
@@ -600,11 +624,18 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 	systemPrompt := dynamicPrompt + "\n\n" + fixedPrompt
 	userPrompt := fmt.Sprintf("《剧本内容》\n%s", script)
 
-	response, err := s.aiService.GenerateText(userPrompt, systemPrompt, ai.WithMaxTokens(3000))
+	response, err := s.aiService.GenerateText(userPrompt, systemPrompt, ai.WithMaxTokens(6000))
 	if err != nil {
 		s.taskService.UpdateTaskError(taskID, err)
 		return
 	}
+
+	// DEBUG_TEMP: dump first 3000 chars of raw AI response to diagnose field parsing
+	dumpLen := len(response)
+	if dumpLen > 3000 {
+		dumpLen = 3000
+	}
+	s.log.Infow("DEBUG character_extraction: raw AI response (first 3000 chars)", "response_preview", response[:dumpLen])
 
 	s.taskService.UpdateTaskStatus(taskID, "processing", 50, "正在整理角色数据...")
 
@@ -633,8 +664,12 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 	if err := utils.SafeParseAIJSON(response, &objectResult); err == nil && len(objectResult.Characters) > 0 {
 		charList = objectResult.Characters
 		narratorProfile = objectResult.NarratorVoiceProfile
+		// DEBUG_TEMP
+		s.log.Infow("DEBUG character_extraction: parsed as OBJECT format", "char_count", len(charList))
 	} else {
 		// Fallback: try array format
+		// DEBUG_TEMP
+		s.log.Infow("DEBUG character_extraction: object parse failed, trying array format", "object_err", err)
 		if err := utils.SafeParseAIJSON(response, &charList); err != nil {
 			s.log.Errorw("Failed to parse AI response for characters", "error", err, "response", response)
 			s.taskService.UpdateTaskError(taskID, fmt.Errorf("解析AI响应失败"))
@@ -654,9 +689,38 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 
 	var savedCharacters []models.Character
 	for _, charData := range charList {
-		// 检查是否已存在同名角色
+		// DEBUG_TEMP: log what AI returned
+		s.log.Infow("DEBUG character_extraction: processing char",
+			"ai_name", charData.Name,
+			"has_character_prompt", charData.CharacterPrompt != "",
+			"has_variant_prompt", charData.VariantPrompt != "",
+			"has_episode_descriptor", charData.EpisodeDescriptor != "",
+			"episode_descriptor", charData.EpisodeDescriptor,
+		)
+
+		// 检查是否已存在同名角色（支持 variant 命名: "Bubi (Pirate Captain)" → "Bubi"）
 		var existingCharacter models.Character
 		err := s.db.Where("drama_id = ? AND name = ?", episode.DramaID, charData.Name).First(&existingCharacter).Error
+		// DEBUG_TEMP
+		s.log.Infow("DEBUG character_extraction: exact name lookup", "name", charData.Name, "found", err == nil, "err", err)
+
+		if err != nil {
+			// Exact match failed — try base name match (strip " (State)" suffix)
+			// e.g. "Bubi (Pirate Captain)" → try "Bubi"
+			baseName := charData.Name
+			if idx := strings.Index(charData.Name, " ("); idx > 0 {
+				baseName = charData.Name[:idx]
+			}
+			if baseName != charData.Name {
+				err = s.db.Where("drama_id = ? AND name = ?", episode.DramaID, baseName).First(&existingCharacter).Error
+				// DEBUG_TEMP
+				s.log.Infow("DEBUG character_extraction: base name lookup", "base_name", baseName, "found", err == nil, "err", err)
+				if err == nil {
+					s.log.Infow("Matched character by base name",
+						"ai_name", charData.Name, "db_name", baseName)
+				}
+			}
+		}
 
 		if err == nil {
 			// 如果存在，更新 episode-specific variant fields (costume/state changes)
@@ -670,9 +734,20 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 			if charData.EpisodeDescriptor != "" {
 				variantUpdates["episode_descriptor"] = charData.EpisodeDescriptor
 			}
+<<<<<<< Updated upstream
 			if len(variantUpdates) > 0 {
 				if err := s.db.Model(&existingCharacter).Updates(variantUpdates).Error; err != nil {
 					s.log.Warnw("Failed to update variant fields for existing character", "error", err, "name", charData.Name)
+=======
+			// DEBUG_TEMP
+			s.log.Infow("DEBUG character_extraction: about to update", "name", existingCharacter.Name, "updates_count", len(variantUpdates), "updates", variantUpdates)
+			if len(variantUpdates) > 0 {
+				updateErr := s.db.Model(&existingCharacter).Updates(variantUpdates).Error
+				// DEBUG_TEMP
+				s.log.Infow("DEBUG character_extraction: update result", "name", existingCharacter.Name, "error", updateErr)
+				if updateErr != nil {
+					s.log.Warnw("Failed to update variant fields for existing character", "error", updateErr, "name", charData.Name)
+>>>>>>> Stashed changes
 				}
 			}
 			// 关联到当前 episode

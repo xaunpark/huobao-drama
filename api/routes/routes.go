@@ -110,6 +110,7 @@ func SetupRouter(cfg *config.Config, db *gorm.DB, log *logger.Logger, localStora
 		// 角色图片相关路由
 		characters := api.Group("/characters")
 		{
+			characters.GET("/:id", characterLibraryHandler.GetCharacter)
 			characters.PUT("/:id", characterLibraryHandler.UpdateCharacter)
 			characters.DELETE("/:id", characterLibraryHandler.DeleteCharacter)
 			characters.POST("/batch-generate-images", characterLibraryHandler.BatchGenerateCharacterImages)

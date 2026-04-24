@@ -1214,15 +1214,55 @@
               :placeholder="$t('workflow.timePlaceholder')"
             />
           </el-form-item>
-          <el-form-item :label="$t('workflow.imagePrompt')">
-            <el-input
-              v-model="editPrompt"
-              type="textarea"
-              :rows="8"
-              :loading="loadingPrompt"
-              :placeholder="loadingPrompt ? '加载完整提示词中...' : $t('workflow.imagePromptPlaceholder')"
-            />
-          </el-form-item>
+
+          <!-- For Characters: Extended Variant Fields -->
+          <template v-if="currentEditType === 'character'">
+            <el-form-item label="Episode Descriptor">
+              <el-input
+                v-model="currentEditItem.episode_descriptor"
+                type="textarea"
+                :rows="2"
+                placeholder="Short descriptor (e.g. 'a bald toddler in pirate coat')"
+              />
+            </el-form-item>
+            <el-form-item label="Character Prompt (T2I)">
+              <el-input
+                v-model="currentEditItem.character_prompt"
+                type="textarea"
+                :rows="4"
+                placeholder="Standalone prompt for Text-to-Image"
+              />
+            </el-form-item>
+            <el-form-item label="Variant Prompt (I2I)">
+              <el-input
+                v-model="currentEditItem.variant_prompt"
+                type="textarea"
+                :rows="4"
+                placeholder="Delta prompt for Image-to-Image with base reference"
+              />
+            </el-form-item>
+            <el-form-item label="Legacy Appearance">
+              <el-input
+                v-model="currentEditItem.appearance"
+                type="textarea"
+                :rows="2"
+                placeholder="Legacy appearance description"
+              />
+            </el-form-item>
+          </template>
+
+          <!-- For Scenes & Props: Standard Image Prompt -->
+          <template v-else>
+            <el-form-item :label="$t('workflow.imagePrompt')">
+              <el-input
+                v-model="editPrompt"
+                type="textarea"
+                :rows="8"
+                :loading="loadingPrompt"
+                :placeholder="loadingPrompt ? '加载完整提示词中...' : $t('workflow.imagePromptPlaceholder')"
+              />
+            </el-form-item>
+          </template>
           <el-form-item label="参考图片">
             <div class="reference-image-section">
               <div v-if="referenceImagePreview" class="reference-preview">
@@ -1259,14 +1299,26 @@
                   </div>
                 </el-upload>
               </div>
+              <!-- Warning: reference uploaded but VariantPrompt is empty → will fallback to T2I -->
               <el-alert
-                v-if="referenceImagePreview"
+                v-if="referenceImagePreview && !currentEditItem.variant_prompt"
+                type="warning"
+                :closable="false"
+                show-icon
+                style="margin-top: 8px;"
+              >
+                <strong>Variant Prompt (I2I) is empty.</strong> Generation will fall back to T2I mode.
+                Fill in the Variant Prompt field above to enable true I2I generation.
+              </el-alert>
+              <!-- Normal: reference + VariantPrompt both present → real I2I -->
+              <el-alert
+                v-else-if="referenceImagePreview && currentEditItem.variant_prompt"
                 type="success"
                 :closable="false"
                 show-icon
                 style="margin-top: 8px;"
               >
-                Reference image set. Generation will use I2I (Image-to-Image) mode
+                Reference image set + Variant Prompt ready. Generation will use I2I (Image-to-Image) mode.
               </el-alert>
             </div>
           </el-form-item>
@@ -1285,7 +1337,7 @@
               :loading="generatingFromDialogId === currentEditItem.id"
             >
               <el-icon><MagicStick /></el-icon>
-              {{ referenceImageUrl ? 'Save & Generate (I2I)' : 'Save & Generate (T2I)' }}
+              {{ (referenceImageUrl && currentEditItem.variant_prompt) ? 'Save & Generate (I2I)' : 'Save & Generate (T2I)' }}
             </el-button>
           </div>
         </template>
@@ -2548,22 +2600,28 @@ const saveShotEdit = async () => {
 // 对话框相关方法
 const loadingPrompt = ref(false);
 const openPromptDialog = async (item: any, type: "character" | "scene" | "prop") => {
-  currentEditItem.value = item;
+  currentEditItem.value = { ...item }; // shallow copy to avoid mutating list
   currentEditItem.value.name = item.name || item.location;
   currentEditType.value = type;
   clearReferenceImage();
   promptDialogVisible.value = true;
 
   if (type === "character") {
-    // 从后端获取完整提示词（包含风格和character sheet后缀）
+    // Fetch fresh full character data to get variant fields (character_prompt, variant_prompt, episode_descriptor)
     loadingPrompt.value = true;
     editPrompt.value = "";
     try {
-      const result = await characterLibraryAPI.getCharacterFullPrompt(item.id);
-      editPrompt.value = result.prompt || item.appearance || item.description || "";
+      const freshChar = await characterLibraryAPI.getCharacter(item.id);
+      // Merge fresh data into currentEditItem so v-model fields are populated
+      Object.assign(currentEditItem.value, freshChar);
     } catch (error) {
-      // 如果API失败，回退到本地数据
-      editPrompt.value = item.appearance || item.description || "";
+      // Fallback: try full-prompt endpoint
+      try {
+        const result = await characterLibraryAPI.getCharacterFullPrompt(item.id);
+        editPrompt.value = result.prompt || item.appearance || item.description || "";
+      } catch {
+        editPrompt.value = item.appearance || item.description || "";
+      }
     } finally {
       loadingPrompt.value = false;
     }
@@ -2591,7 +2649,10 @@ const savePrompt = async () => {
   try {
     if (currentEditType.value === "character") {
       await characterLibraryAPI.updateCharacter(currentEditItem.value.id, {
-        appearance: editPrompt.value,
+        appearance: currentEditItem.value.appearance,
+        character_prompt: currentEditItem.value.character_prompt,
+        variant_prompt: currentEditItem.value.variant_prompt,
+        episode_descriptor: currentEditItem.value.episode_descriptor,
       });
       ElMessage.success("提示词已保存");
       await loadDramaData();
@@ -2621,6 +2682,46 @@ const savePrompt = async () => {
 const clearReferenceImage = () => {
   referenceImageUrl.value = "";
   referenceImagePreview.value = "";
+};
+
+// After I2I generation with a custom reference image, the episode_descriptor
+// may no longer match the reference. Offer user a one-click sync from variant_prompt.
+const syncDescriptorAfterI2I = async (characterId: number | string, variantPrompt: string | undefined | null) => {
+  if (!variantPrompt) return;
+
+  // Derive a compact descriptor from variant_prompt: take first meaningful sentence
+  // up to ~30 words, strip "Given a reference image of [Name]," prefix if present
+  let derived = variantPrompt.trim();
+  // Remove common I2I prefix patterns
+  derived = derived.replace(/^given a reference image of [^,]+,\s*/i, "");
+  derived = derived.replace(/^given [^,]+,\s*/i, "");
+  // Trim to 30 words max
+  const words = derived.split(/\s+/);
+  if (words.length > 30) {
+    derived = words.slice(0, 30).join(" ") + "…";
+  }
+
+  try {
+    await ElMessageBox.confirm(
+      `Your reference image may differ from the current Episode Descriptor. Sync it from Variant Prompt?\n\nProposed: "${derived}"`,
+      "Sync Episode Descriptor?",
+      {
+        confirmButtonText: "Sync from Variant Prompt",
+        cancelButtonText: "Keep Current",
+        type: "info",
+      }
+    );
+    await characterLibraryAPI.updateCharacter(Number(characterId), {
+      episode_descriptor: derived,
+    });
+    // Update local state so shot prompts in this session reflect the new descriptor
+    if (currentEditItem.value && currentEditItem.value.id == characterId) {
+      currentEditItem.value.episode_descriptor = derived;
+    }
+    ElMessage.success("Episode Descriptor updated. Shot prompts will now reference this description.");
+  } catch {
+    // User chose "Keep Current" — no action needed
+  }
 };
 
 const beforeReferenceUpload = (file: any) => {
@@ -2667,7 +2768,10 @@ const saveAndGenerate = async () => {
     // 先保存提示词
     if (currentEditType.value === "character") {
       await characterLibraryAPI.updateCharacter(currentEditItem.value.id, {
-        appearance: editPrompt.value,
+        appearance: currentEditItem.value.appearance,
+        character_prompt: currentEditItem.value.character_prompt,
+        variant_prompt: currentEditItem.value.variant_prompt,
+        episode_descriptor: currentEditItem.value.episode_descriptor,
       });
     } else if (currentEditType.value === "prop") {
       await propAPI.update(currentEditItem.value.id, {
@@ -2700,6 +2804,10 @@ const saveAndGenerate = async () => {
         await pollImageStatus(imageGenId, async () => {
           await loadDramaData();
           ElMessage.success("角色图片生成完成！");
+          // After I2I generation with custom ref, offer to sync episode_descriptor
+          if (refUrl) {
+            syncDescriptorAfterI2I(currentEditItem.value.id, currentEditItem.value.variant_prompt);
+          }
         });
         generatingCharacterImages.value[currentEditItem.value.id] = false;
       } else {
