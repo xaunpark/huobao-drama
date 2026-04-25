@@ -329,30 +329,31 @@ func (s *CharacterLibraryService) BuildCharacterFullPrompt(characterID string) (
 }
 
 // buildCharacterPrompt builds the full prompt from character + drama info.
-// Prioritizes CharacterPrompt (if available) > Appearance > Description.
+// If the appearance already contains the character sheet marker (from a previous Edit Prompt save),
+// it is used as-is to avoid double-appending style and suffix.
 func (s *CharacterLibraryService) buildCharacterPrompt(character *models.Character, drama *models.Drama) string {
 	prompt := ""
 
-	// Priority 1: Use the explicit CharacterPrompt if available (from new AI template)
-	if character.CharacterPrompt != nil && *character.CharacterPrompt != "" {
-		prompt = *character.CharacterPrompt
-	} else if character.Appearance != nil && *character.Appearance != "" {
-		// Priority 2: Use Appearance field
+	// 优先使用appearance字段，它包含了最详细的外貌描述
+	if character.Appearance != nil && *character.Appearance != "" {
 		prompt = *character.Appearance
 	} else if character.Description != nil && *character.Description != "" {
-		// Priority 3: Use Description field
 		prompt = *character.Description
 	} else {
-		// Fallback
 		prompt = character.Name
 	}
 
-	// If the prompt already contains the character sheet marker,
-	// use it as-is to avoid double-appending style and suffix.
+	// If the appearance already contains the character sheet marker,
+	// it means the user has previously edited and saved the full prompt.
+	// Use it as-is to avoid double-appending style and suffix.
 	if strings.Contains(prompt, "character sheet") {
 		return prompt
 	}
 
+	// The Appearance field (if AI-extracted) already incorporates the necessary character design semantics.
+	// We no longer manually concatenate the massive style prefix to prevent confusing 
+	// downstream diffusion models with excessive LLM-oriented instructional text.
+	
 	// Add special character sheet requirements
 	prompt += ", t-pose, character sheet, turn around character, white background, no text overlay"
 
@@ -379,15 +380,8 @@ func (s *CharacterLibraryService) GenerateCharacterImage(characterID string, ima
 		return nil, err
 	}
 
-	// Choose prompt based on mode (T2I vs I2I variant)
-	var prompt string
-	if referenceImageURL != nil && *referenceImageURL != "" && character.VariantPrompt != nil && *character.VariantPrompt != "" {
-		// I2I Mode: generating a variant using an existing reference image
-		prompt = *character.VariantPrompt
-	} else {
-		// T2I Mode: generating character from scratch
-		prompt = s.buildCharacterPrompt(&character, &drama)
-	}
+	// 构建生成提示词 - 使用统一的方法构建完整提示词
+	prompt := s.buildCharacterPrompt(&character, &drama)
 
 	// 调用图片生成服务
 	dramaIDStr := fmt.Sprintf("%d", character.DramaID)
@@ -458,29 +452,14 @@ func (s *CharacterLibraryService) waitAndUpdateCharacterImage(characterID uint, 
 	s.log.Warnw("Character image generation timeout", "character_id", characterID, "image_gen_id", imageGenID)
 }
 
-// GetCharacterByID returns the full character record by ID (includes all variant fields)
-func (s *CharacterLibraryService) GetCharacterByID(characterID string) (*models.Character, error) {
-	var character models.Character
-	if err := s.db.Where("id = ?", characterID).First(&character).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("character not found")
-		}
-		return nil, err
-	}
-	return &character, nil
-}
-
 type UpdateCharacterRequest struct {
-	Name              *string `json:"name"`
-	Role              *string `json:"role"`
-	Appearance        *string `json:"appearance"`
-	Personality       *string `json:"personality"`
-	Description       *string `json:"description"`
-	ImageURL          *string `json:"image_url"`
-	LocalPath         *string `json:"local_path"`
-	CharacterPrompt   *string `json:"character_prompt"`
-	VariantPrompt     *string `json:"variant_prompt"`
-	EpisodeDescriptor *string `json:"episode_descriptor"`
+	Name        *string `json:"name"`
+	Role        *string `json:"role"`
+	Appearance  *string `json:"appearance"`
+	Personality *string `json:"personality"`
+	Description *string `json:"description"`
+	ImageURL    *string `json:"image_url"`
+	LocalPath   *string `json:"local_path"`
 }
 
 // UpdateCharacter 更新角色信息
@@ -526,15 +505,6 @@ func (s *CharacterLibraryService) UpdateCharacter(characterID string, req *Updat
 	}
 	if req.LocalPath != nil {
 		updates["local_path"] = *req.LocalPath
-	}
-	if req.CharacterPrompt != nil {
-		updates["character_prompt"] = *req.CharacterPrompt
-	}
-	if req.VariantPrompt != nil {
-		updates["variant_prompt"] = *req.VariantPrompt
-	}
-	if req.EpisodeDescriptor != nil {
-		updates["episode_descriptor"] = *req.EpisodeDescriptor
 	}
 
 	if len(updates) == 0 {
@@ -624,33 +594,23 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 	systemPrompt := dynamicPrompt + "\n\n" + fixedPrompt
 	userPrompt := fmt.Sprintf("《剧本内容》\n%s", script)
 
-	response, err := s.aiService.GenerateText(userPrompt, systemPrompt, ai.WithMaxTokens(6000))
+	response, err := s.aiService.GenerateText(userPrompt, systemPrompt, ai.WithMaxTokens(3000))
 	if err != nil {
 		s.taskService.UpdateTaskError(taskID, err)
 		return
 	}
-
-	// DEBUG_TEMP: dump first 3000 chars of raw AI response to diagnose field parsing
-	dumpLen := len(response)
-	if dumpLen > 3000 {
-		dumpLen = 3000
-	}
-	s.log.Infow("DEBUG character_extraction: raw AI response (first 3000 chars)", "response_preview", response[:dumpLen])
 
 	s.taskService.UpdateTaskStatus(taskID, "processing", 50, "正在整理角色数据...")
 
 	// AI returns object format: {narrator_voice_profile: "...", characters: [...]}
 	// Also support legacy array format for backward compatibility
 	type extractedChar struct {
-		Name              string `json:"name"`
-		Role              string `json:"role"`
-		Appearance        string `json:"appearance"`
-		Personality       string `json:"personality"`
-		Description       string `json:"description"`
-		VoiceStyle        string `json:"voice_style"`
-		CharacterPrompt   string `json:"character_prompt"`
-		VariantPrompt     string `json:"variant_prompt"`
-		EpisodeDescriptor string `json:"episode_descriptor"`
+		Name        string `json:"name"`
+		Role        string `json:"role"`
+		Appearance  string `json:"appearance"`
+		Personality string `json:"personality"`
+		Description string `json:"description"`
+		VoiceStyle  string `json:"voice_style"`
 	}
 
 	var charList []extractedChar
@@ -664,12 +624,8 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 	if err := utils.SafeParseAIJSON(response, &objectResult); err == nil && len(objectResult.Characters) > 0 {
 		charList = objectResult.Characters
 		narratorProfile = objectResult.NarratorVoiceProfile
-		// DEBUG_TEMP
-		s.log.Infow("DEBUG character_extraction: parsed as OBJECT format", "char_count", len(charList))
 	} else {
 		// Fallback: try array format
-		// DEBUG_TEMP
-		s.log.Infow("DEBUG character_extraction: object parse failed, trying array format", "object_err", err)
 		if err := utils.SafeParseAIJSON(response, &charList); err != nil {
 			s.log.Errorw("Failed to parse AI response for characters", "error", err, "response", response)
 			s.taskService.UpdateTaskError(taskID, fmt.Errorf("解析AI响应失败"))
@@ -689,62 +645,12 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 
 	var savedCharacters []models.Character
 	for _, charData := range charList {
-		// DEBUG_TEMP: log what AI returned
-		s.log.Infow("DEBUG character_extraction: processing char",
-			"ai_name", charData.Name,
-			"has_character_prompt", charData.CharacterPrompt != "",
-			"has_variant_prompt", charData.VariantPrompt != "",
-			"has_episode_descriptor", charData.EpisodeDescriptor != "",
-			"episode_descriptor", charData.EpisodeDescriptor,
-		)
-
-		// 检查是否已存在同名角色（支持 variant 命名: "Bubi (Pirate Captain)" → "Bubi"）
+		// 检查是否已存在同名角色
 		var existingCharacter models.Character
 		err := s.db.Where("drama_id = ? AND name = ?", episode.DramaID, charData.Name).First(&existingCharacter).Error
-		// DEBUG_TEMP
-		s.log.Infow("DEBUG character_extraction: exact name lookup", "name", charData.Name, "found", err == nil, "err", err)
-
-		if err != nil {
-			// Exact match failed — try base name match (strip " (State)" suffix)
-			// e.g. "Bubi (Pirate Captain)" → try "Bubi"
-			baseName := charData.Name
-			if idx := strings.Index(charData.Name, " ("); idx > 0 {
-				baseName = charData.Name[:idx]
-			}
-			if baseName != charData.Name {
-				err = s.db.Where("drama_id = ? AND name = ?", episode.DramaID, baseName).First(&existingCharacter).Error
-				// DEBUG_TEMP
-				s.log.Infow("DEBUG character_extraction: base name lookup", "base_name", baseName, "found", err == nil, "err", err)
-				if err == nil {
-					s.log.Infow("Matched character by base name",
-						"ai_name", charData.Name, "db_name", baseName)
-				}
-			}
-		}
 
 		if err == nil {
-			// 如果存在，更新 episode-specific variant fields (costume/state changes)
-			variantUpdates := map[string]interface{}{}
-			if charData.CharacterPrompt != "" {
-				variantUpdates["character_prompt"] = charData.CharacterPrompt
-			}
-			if charData.VariantPrompt != "" {
-				variantUpdates["variant_prompt"] = charData.VariantPrompt
-			}
-			if charData.EpisodeDescriptor != "" {
-				variantUpdates["episode_descriptor"] = charData.EpisodeDescriptor
-			}
-			// DEBUG_TEMP
-			s.log.Infow("DEBUG character_extraction: about to update", "name", existingCharacter.Name, "updates_count", len(variantUpdates), "updates", variantUpdates)
-			if len(variantUpdates) > 0 {
-				updateErr := s.db.Model(&existingCharacter).Updates(variantUpdates).Error
-				// DEBUG_TEMP
-				s.log.Infow("DEBUG character_extraction: update result", "name", existingCharacter.Name, "error", updateErr)
-				if updateErr != nil {
-					s.log.Warnw("Failed to update variant fields for existing character", "error", updateErr, "name", charData.Name)
-				}
-			}
-			// 关联到当前 episode
+			// 如果存在，只关联，不更新
 			if err := s.db.Model(&episode).Association("Characters").Append(&existingCharacter); err != nil {
 				s.log.Warnw("Failed to associate existing character", "error", err)
 			}
@@ -752,16 +658,13 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 		} else {
 			// 创建新角色
 			newCharacter := models.Character{
-				DramaID:           episode.DramaID,
-				Name:              charData.Name,
-				Role:              &charData.Role,
-				Appearance:        &charData.Appearance,
-				Personality:       &charData.Personality,
-				Description:       &charData.Description,
-				VoiceStyle:        &charData.VoiceStyle,
-				CharacterPrompt:   ptrIfNotEmpty(charData.CharacterPrompt),
-				VariantPrompt:     ptrIfNotEmpty(charData.VariantPrompt),
-				EpisodeDescriptor: ptrIfNotEmpty(charData.EpisodeDescriptor),
+				DramaID:     episode.DramaID,
+				Name:        charData.Name,
+				Role:        &charData.Role,
+				Appearance:  &charData.Appearance,
+				Personality: &charData.Personality,
+				Description: &charData.Description,
+				VoiceStyle:  &charData.VoiceStyle,
 			}
 			if err := s.db.Create(&newCharacter).Error; err != nil {
 				s.log.Errorw("Failed to create extracted character", "error", err)
@@ -781,12 +684,4 @@ func (s *CharacterLibraryService) processCharacterExtraction(taskID string, epis
 		"count":                  len(savedCharacters),
 		"narrator_voice_profile": narratorProfile,
 	})
-}
-
-// ptrIfNotEmpty returns nil for empty strings, pointer to value otherwise
-func ptrIfNotEmpty(s string) *string {
-	if s == "" {
-		return nil
-	}
-	return &s
 }

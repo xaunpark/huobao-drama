@@ -51,10 +51,6 @@ type Character struct {
 	ReferenceImages datatypes.JSON `gorm:"type:json" json:"reference_images"`
 	SeedValue       *string        `gorm:"type:varchar(100)" json:"seed_value"`
 	SortOrder       int            `gorm:"default:0" json:"sort_order"`
-	// Episode variant fields: support costume/state changes per episode
-	CharacterPrompt  *string `gorm:"type:text" json:"character_prompt"`           // Full standalone text-to-image prompt (200-400 words). Used when NO base reference image exists.
-	VariantPrompt    *string `gorm:"type:text" json:"variant_prompt"`             // Delta prompt describing ONLY changes from base ref (costume, injury, transformation). Used when base ref EXISTS.
-	EpisodeDescriptor *string `gorm:"type:varchar(500)" json:"episode_descriptor"` // Short descriptor for shot prompts (10-30 words). e.g. "a bald toddler in chef hat and white jacket"
 	CreatedAt       time.Time      `gorm:"not null;autoCreateTime" json:"created_at"`
 	UpdatedAt       time.Time      `gorm:"not null;autoUpdateTime" json:"updated_at"`
 	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`

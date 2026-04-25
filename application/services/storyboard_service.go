@@ -149,17 +149,12 @@ func (s *StoryboardService) GenerateStoryboard(episodeID string, model string, s
 		return "", fmt.Errorf("获取角色列表失败: %w", err)
 	}
 
-	// 构建角色列表字符串（包含ID和名称，以及短描述）
+	// 构建角色列表字符串（包含ID和名称）
 	characterList := "无角色"
 	if len(characters) > 0 {
 		var charInfoList []string
 		for _, char := range characters {
-			// Include episode descriptor if available to guide the AI's storyboard breakdown
-			desc := ""
-			if char.EpisodeDescriptor != nil && *char.EpisodeDescriptor != "" {
-				desc = fmt.Sprintf(`, "appearance": "%s"`, *char.EpisodeDescriptor)
-			}
-			charInfoList = append(charInfoList, fmt.Sprintf(`{"id": %d, "name": "%s"%s}`, char.ID, char.Name, desc))
+			charInfoList = append(charInfoList, fmt.Sprintf(`{"id": %d, "name": "%s"}`, char.ID, char.Name))
 		}
 		characterList = fmt.Sprintf("[%s]", strings.Join(charInfoList, ", "))
 	}
@@ -1306,7 +1301,7 @@ func (s *StoryboardService) saveVoiceoverShots(episodeID string, dramaID uint, s
 				allCharIDs[cid] = true
 			}
 		}
-		charDescMap := make(map[uint]string)  // charID -> "Name (descriptor)"
+		charDescMap := make(map[uint]string)  // charID -> "Name (appearance)"
 		charVoiceMap := make(map[uint]string) // charID -> "Name: voice style"
 		if len(allCharIDs) > 0 {
 			var ids []uint
@@ -1317,10 +1312,7 @@ func (s *StoryboardService) saveVoiceoverShots(episodeID string, dramaID uint, s
 			if err := tx.Where("id IN ?", ids).Find(&chars).Error; err == nil {
 				for _, c := range chars {
 					desc := c.Name
-					// Priority: EpisodeDescriptor > Appearance > Description
-					if c.EpisodeDescriptor != nil && *c.EpisodeDescriptor != "" {
-						desc += " (" + *c.EpisodeDescriptor + ")"
-					} else if c.Appearance != nil && *c.Appearance != "" {
+					if c.Appearance != nil && *c.Appearance != "" {
 						desc += " (" + *c.Appearance + ")"
 					} else if c.Description != nil && *c.Description != "" {
 						desc += " (" + *c.Description + ")"
@@ -1762,10 +1754,8 @@ func (s *StoryboardService) buildCharacterDescs(charIDs []uint) string {
 	var descs []string
 	for _, c := range chars {
 		desc := c.Name
-		// Priority: EpisodeDescriptor > Appearance > Description
-		if c.EpisodeDescriptor != nil && *c.EpisodeDescriptor != "" {
-			desc += " (" + *c.EpisodeDescriptor + ")"
-		} else if c.Appearance != nil && *c.Appearance != "" {
+		// Prefer Appearance (visual), fallback to Description
+		if c.Appearance != nil && *c.Appearance != "" {
 			desc += " (" + *c.Appearance + ")"
 		} else if c.Description != nil && *c.Description != "" {
 			desc += " (" + *c.Description + ")"
@@ -1892,10 +1882,7 @@ func (s *StoryboardService) saveStoryboards(episodeID string, storyboards []Stor
 			if err := tx.Where("id IN ?", ids).Find(&chars).Error; err == nil {
 				for _, c := range chars {
 					desc := c.Name
-					// Priority: EpisodeDescriptor > Appearance > Description
-					if c.EpisodeDescriptor != nil && *c.EpisodeDescriptor != "" {
-						desc += " (" + *c.EpisodeDescriptor + ")"
-					} else if c.Appearance != nil && *c.Appearance != "" {
+					if c.Appearance != nil && *c.Appearance != "" {
 						desc += " (" + *c.Appearance + ")"
 					} else if c.Description != nil && *c.Description != "" {
 						desc += " (" + *c.Description + ")"

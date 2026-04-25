@@ -210,22 +210,6 @@ func (h *CharacterLibraryHandler) AddCharacterToLibrary(c *gin.Context) {
 	response.Created(c, item)
 }
 
-// GetCharacter 获取单个角色完整信息（含 variant 字段）
-func (h *CharacterLibraryHandler) GetCharacter(c *gin.Context) {
-	characterID := c.Param("id")
-	character, err := h.libraryService.GetCharacterByID(characterID)
-	if err != nil {
-		if err.Error() == "character not found" {
-			response.NotFound(c, "角色不存在")
-			return
-		}
-		h.log.Errorw("Failed to get character", "error", err)
-		response.InternalError(c, "获取失败")
-		return
-	}
-	response.Success(c, character)
-}
-
 // UpdateCharacter 更新角色信息
 func (h *CharacterLibraryHandler) UpdateCharacter(c *gin.Context) {
 

@@ -12,12 +12,6 @@ Each character object has these fields:
 - personality: Core personality traits and behavioral patterns (string, 100-200 words). For state variants, keep the same personality as the base character.
 - description: Background story and character relationships (string, 100-200 words). For state variants, briefly describe what state this is and how it differs from the base state.
 - voice_style: Voice characteristics for TTS synthesis (string, 20-40 words). For non-living entities (vehicles, objects), use "none".
-- character_prompt: ALWAYS generate this field. A complete, standalone text-to-image prompt for generating this character WITHOUT any reference image (string, 200-400 words). Must include: complete physical description, clothing, pose ("standing in relaxed t-pose"), style tag ("3D CGI render, character turnaround sheet, front/side/back views, white background, no text"). This prompt must be self-contained — someone reading ONLY this field should be able to generate an accurate character image.
-- variant_prompt: ALWAYS REQUIRED — NEVER leave empty. A complete I2I prompt describing how this character appears IN THIS EPISODE, written for use when a reference image is provided (string, 100-200 words). This is the single source of truth for the character's episode-specific appearance. Three patterns depending on character type:
-  (a) Base character with no costume change: "Given a reference image of [Name], maintain the exact character design — same proportions, colors, and distinctive features. No modifications for this episode. Context: [brief episode context, e.g. 'maritime adventure']"
-  (b) Character with episode-specific costume/state: "Given a reference image of [Name], maintain base design but apply: [specific costume/accessory/state changes]. Keep all other features unchanged."
-  (c) State variant (BaseName (State) format): "Given a reference image of [Base Name], apply the following modifications: [specific physical changes]. All other base features unchanged."
-- episode_descriptor: A SHORT visual descriptor derived from the variant_prompt for this character as they appear in THIS episode (string, 10-30 words). IMPORTANT: derive this from the variant_prompt content, not from character_prompt. Extract the most visually distinctive elements: clothing, colors, key accessories. Used in shot prompts instead of character names. Must be purely visual — NO character names. Example: "a bald toddler in chef hat and white jacket" or "a large red flatbed truck loaded with timber logs secured by orange straps".
 
 [Script Reading Rules]
 - Pay SPECIAL ATTENTION to any text marked with [NOTE] tags in the script. These contain the user's explicit creative directions and custom descriptions for characters. Use these to accurately capture the specific character designs requested by the user.
@@ -71,10 +65,7 @@ Given a script about a logging truck adventure, the output should be:
       "appearance": "A large industrial flatbed truck with a bright red cab and chrome bumper. The cab has two round headlights and a tall exhaust pipe on the right side. The flatbed is empty and made of dark steel with wooden side rails. The truck has six large black rubber tires with muddy treads. A small company logo is painted in white on the driver door. The truck looks sturdy and well-maintained.",
       "personality": "Not applicable — this is a vehicle.",
       "description": "The main truck in its default empty state, before loading cargo. This is the base configuration seen at the start and after unloading.",
-      "voice_style": "none",
-      "character_prompt": "A large industrial flatbed truck with a bright red cab and chrome bumper, two round headlights, tall exhaust pipe on right side, empty dark steel flatbed with wooden side rails, six large black rubber tires with muddy treads, small white company logo on driver door, sturdy well-maintained appearance. Vehicle character sheet, front/side/back views, white background, no text, 3D CGI render.",
-      "variant_prompt": "Given a reference image of Truck (Empty), maintain the exact vehicle design — same red cab, chrome bumper, headlights, exhaust pipe, dark steel flatbed, rubber tires. No modifications for this episode. Context: base state before loading cargo.",
-      "episode_descriptor": "a large red flatbed truck with an empty dark steel flatbed"
+      "voice_style": "none"
     },
     {
       "name": "Truck (Loaded with Logs)",
@@ -82,10 +73,7 @@ Given a script about a logging truck adventure, the output should be:
       "appearance": "A large industrial flatbed truck with a bright red cab and chrome bumper. The cab has two round headlights and a tall exhaust pipe on the right side. The flatbed is now stacked high with large brown timber logs, approximately 20 logs arranged in three layers and secured with thick orange ratchet straps. The logs extend slightly beyond the rear of the flatbed. Sawdust and bark fragments are scattered on the truck bed. The truck sits lower on its suspension due to the heavy load. Six large black rubber tires with muddy treads.",
       "personality": "Not applicable — this is a vehicle.",
       "description": "The truck after being loaded with timber logs at the logging site. The heavy cargo is the key visual difference from the empty state.",
-      "voice_style": "none",
-      "character_prompt": "A large industrial flatbed truck with bright red cab and chrome bumper, two round headlights, tall exhaust pipe, flatbed stacked high with 20 large brown timber logs in three layers secured with thick orange ratchet straps, logs extending beyond rear, sawdust scattered on bed, truck sitting lower on suspension, six large muddy tires. Vehicle character sheet, front/side/back views, white background, no text, 3D CGI render.",
-      "variant_prompt": "Same truck now with flatbed stacked high with large brown timber logs, approximately 20 logs arranged in three layers secured with thick orange ratchet straps. Sawdust and bark fragments scattered on truck bed. Truck sits lower on suspension. Keep IDENTICAL red cab, chrome bumper, headlights, and tire design from reference image.",
-      "episode_descriptor": "a large red flatbed truck stacked high with timber logs secured by orange straps"
+      "voice_style": "none"
     },
     {
       "name": "Truck (Towed by Rescue Vehicle)",
@@ -109,19 +97,15 @@ Given a script about a logging truck adventure, the output should be:
       "appearance": "A 45-year-old Chinese man with a stocky build and weathered tan skin. He has short-cropped grey-black hair and deep-set brown eyes with crow's feet wrinkles. A broad face with a flat nose and thick eyebrows. He wears a faded blue denim work jacket over a white undershirt, dark green cargo pants with multiple pockets, and heavy brown work boots. A yellow hard hat sits on his head. He has rough, calloused hands.",
       "personality": "Hardworking and reliable, Wang has been driving trucks for over 20 years. He is calm under pressure and has a dry sense of humor.",
       "description": "The logging truck driver who experiences the accident. He is a veteran driver who knows the mountain roads well.",
-      "voice_style": "deep and gravelly male voice, mid-40s, slow and steady pacing with a rural accent",
-      "character_prompt": "A 45-year-old Chinese man with stocky build and weathered tan skin, short-cropped grey-black hair, deep-set brown eyes with crow's feet wrinkles, broad face, flat nose, thick eyebrows. Wearing faded blue denim work jacket over white undershirt, dark green cargo pants with multiple pockets, heavy brown work boots, yellow hard hat. Rough calloused hands. Standing in relaxed t-pose. Character turnaround sheet, front/side/back views, white background, no text, realistic 3D render.",
-      "variant_prompt": "Given a reference image of Driver Wang, maintain the exact character design — same stocky build, weathered tan skin, grey-black hair, and facial features. No costume modifications for this episode. Context: veteran logging truck driver in mountain road transport scenario.",
-      "episode_descriptor": "a stocky middle-aged man in blue denim jacket and yellow hard hat"
+      "voice_style": "deep and gravelly male voice, mid-40s, slow and steady pacing with a rural accent"
     }
   ]
 }
 
 Notice in the example above:
 - "Truck" has 3 variants because each state has MAJOR VISUAL ELEMENTS added/changed (logs, tow chain+lifted wheels)
-- "Rescue Truck" has NO character_prompt/variant_prompt shown (truncated for brevity) but MUST have them
-- "Driver Wang" now has variant_prompt populated: "Given a reference image... No costume modifications..." — because variant_prompt is ALWAYS REQUIRED even when no changes exist
-- variant_prompt for base/unchanged characters uses pattern (a): acknowledge reference image, state no modifications, provide episode context
-- episode_descriptor for all characters is derived from variant_prompt content, focusing on visual identifiers
+- "Rescue Truck" has NO variants — it looks the same throughout the story
+- "Driver Wang" has NO variants — his outfit doesn't change, expressions are handled by video prompts
+- Variants share the same base description but each adds the specific visual elements of that state
 
 ***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response, including ALL JSON field values, STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language. Do NOT use Chinese or any other language in the output JSON.
