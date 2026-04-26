@@ -65,10 +65,10 @@ Gán nhân vật gốc của bài hát cho nhân vật BubiLoo phù hợp nhất
 
 ### Bước 2: Động vật trong bài hát → Nhân vật mới
 
-Các con vật trong bài hát (cừu, mèo, nhện...) **KHÔNG cần gán** cho nhân vật BubiLoo. Thay vào đó, mô tả chúng trong `[NOTE]` dưới dạng "thú cưng/vật nuôi phong cách 3D toy":
+Các con vật trong bài hát (cừu, mèo, nhện...) **KHÔNG cần gán** cho nhân vật BubiLoo. Thay vào đó, mô tả chúng trong `[NOTE]` dưới dạng động vật THẬT render 3D (cute, biểu cảm nhưng trông thật):
 
 ```
-[NOTE] Con cừu: nhỏ, mềm mại, lông trắng bông, mắt to tròn, phong cách đồ chơi nhựa mềm.
+[NOTE] Con cừu: nhỏ, lông trắng bông mềm mại, mắt to hiền lành, trông như cừu thật trong phim Pixar.
 ```
 
 > [!TIP]
@@ -126,7 +126,7 @@ Bài hát được sáng tác riêng cho kênh, sử dụng đúng nhân vật h
 Bài hát truyền thống được chuyển đổi sang thế giới BubiLoo. Con cừu là nhân vật mới, còn "master", "dame", "little boy" được gán cho nhân vật có sẵn.
 
 ```text
-[NOTE] Bubi gặp một chú cừu đen ở nông trại. Cừu đen: nhỏ nhắn, lông xù mềm, mắt to hiền lành, phong cách đồ chơi nhựa mềm.
+[NOTE] Bubi gặp một chú cừu đen ở nông trại. Cừu đen: nhỏ nhắn, lông xù mềm, mắt to hiền lành, trông như cừu thật.
 [NOTE] Bối cảnh: nông trại nắng đẹp, hàng rào gỗ tròn, cỏ xanh mướt, bầu trời trong xanh.
 [NOTE] Papa = "master", Mama = "dame", Bubi = "little boy who lives down the lane".
 
@@ -162,7 +162,7 @@ Bài hát truyền thống được chuyển đổi sang thế giới BubiLoo. C
 Bài hát dài, nhiều nhân vật, phù hợp để đưa nhóm bạn vào.
 
 ```text
-[NOTE] Bubi và các bạn đi xe buýt đến trường. Xe buýt: tròn trĩnh, màu vàng tươi, phong cách đồ chơi Fisher-Price.
+[NOTE] Bubi và các bạn đi xe buýt đến trường. Xe buýt: màu vàng tươi, xe buýt thật.
 [NOTE] Bối cảnh: con đường làng xanh mát, trường mầm non phía xa.
 [NOTE] Mama = người lái xe buýt (bus driver). Ziggy, Mei, Rio = babies on the bus.
 
@@ -238,7 +238,7 @@ Ví dụ gán "Mary" cho Luli (chị gái lớn hơn, phù hợp với hình ả
 - **Global Notes (trên cùng):** Dùng để thiết lập bối cảnh chung, giới thiệu nhân vật MỚI (không thuộc hệ thống), và gán vai.
   ```
   [NOTE] Bối cảnh: bãi biển nhiệt đới, sóng nhẹ, cát vàng, trời nắng.
-  [NOTE] Con cua: nhỏ, đỏ cam, mắt trên cuống, dáng tròn trĩnh phong cách đồ chơi.
+  [NOTE] Con cua: nhỏ, đỏ cam, mắt trên cuống, trông như cua thật.
   [NOTE] Papa = "sailor" trong bài hát.
   ```
 
@@ -264,7 +264,7 @@ Ví dụ gán "Mary" cho Luli (chị gái lớn hơn, phù hợp với hình ả
 | Ông bà / người già | **Nana / Popo** | Vai trò kể chuyện, truyền thống |
 | Nhóm bạn / trẻ em khác | **Ziggy, Mei, Rio** | Chia đều, tạo đa dạng |
 | Cô giáo / người hướng dẫn | **Teacher Sunny** | Chỉ khi bối cảnh ở trường |
-| Động vật | **Mô tả mới trong [NOTE]** | Giữ phong cách "3D toy" |
+| Động vật | **Mô tả mới trong [NOTE]** | Động vật thật, render 3D Pixar |
 
 ### Bubi luôn xuất hiện
 

@@ -1,0 +1,627 @@
+Dưới đây là phân tích Visual DNA của chuỗi video về mèo con nhân hóa (anthropomorphic cats) trong bối cảnh Nhật Bản để tái tạo bằng AI.
+
+## 1. KỸ THUẬT TẠO HÌNH ẢNH (Image/Video Production Method)
+- **Phương pháp:** AI-generated stills/video (kết hợp Image-to-Video).
+- **Model dự đoán:** Midjourney v6 (cho ảnh tĩnh) + Sora/Kling/Runway Gen-3 (cho chuyển động).
+- **Mức độ Photorealistic:** 8.5/10. Kết cấu lông và môi trường cực kỳ thật, nhưng tỉ lệ cơ thể nhân hóa tạo cảm giác "uncanny valley" nhẹ.
+- **AI Artifacts:** Thỉnh thoảng xuất hiện lỗi ở ngón chân mèo (paws) khi cầm nắm vật dụng hoặc texture đồ ăn bị biến dạng nhẹ khi chuyển động.
+- **Chuyển động:** Thường là chuyển động chậm (slow motion), zoom nhẹ hoặc parallax hiệu ứng.
+- **Face-cam:** N/A. Toàn bộ là góc nhìn điện ảnh (cinematic).
+
+## 2. MÀU SẮC CHÍNH XÁC (Exact Color Science)
+
+### 2a. Bảng màu Shadow/Dark zones:
+- **Shadow chính:** #2D241E (Nâu đất ấm).
+- **Shadow phụ:** #1A1C2C (Xanh đen đậm ở các góc tối).
+- **Blacks:** Bị lift nhẹ (giá trị ~10/255) tạo cảm giác mờ ảo, không đen tuyệt đối.
+
+### 2b. Bảng màu Highlight/Bright zones:
+- **Highlight chính:** #FFF9F0 (Trắng kem ấm).
+- **Glow/Bloom:** Có hiệu ứng bloom nhẹ quanh cửa sổ và đèn LED (bán kính ~5-10px).
+
+### 2c. Bảng màu Midtone:
+- **Fur tones:** #E88D4D (Cam gừng), #F5D5B0 (Vàng nhạt).
+- **Dominant surfaces:** #D2B48C (Gỗ sồi), #8B9A67 (Xanh lá mờ của cây cối Nhật).
+
+### 2d. Tỷ lệ màu & Color Grading:
+- **Tỷ lệ:** 20% Shadow | 60% Midtone | 20% Highlight.
+- **Tổng thể:** High-key, Vibrant, Warm grading. Độ bão hòa màu (saturation) cao nhưng không gắt.
+
+## 3. ÁNH SÁNG CHÍNH XÁC (Exact Lighting)
+
+### 3a. Setup ánh sáng chủ đạo:
+- **Nguồn sáng:** Kết hợp ánh sáng tự nhiên (cửa sổ) và ánh sáng ấm nhân tạo (đèn lồng, đèn trong nhà).
+- **Key light:** Ánh sáng mềm (soft light) từ phía bên (side-lighting) tạo khối cho bộ lông.
+- **Rim light:** Luôn có dải sáng trắng mỏng chạy dọc viền tai và lưng mèo để tách lớp khỏi nền.
+
+### 3b. Context ánh sáng:
+- **Trong nhà:** Diffused light, ít bóng đổ gắt. Mood ấm cúng (cozy).
+- **Ngoài trời:** Ánh sáng ban ngày rực rỡ hoặc hoàng hôn màu vàng sậm (golden hour).
+
+## 4. TEXTURE & CHẤT LIỆU (Visual Surface Quality)
+
+### 4a. Tổng thể:
+- **Resolution:** Tương đương 4K render. Sharpness vừa phải, không quá gai góc.
+- **Texture chính:**
+    1. **Lông mèo (Fur):** Level 10/10. Thấy rõ từng sợi lông tơ, có độ bóng tự nhiên.
+    2. **Vải (Fabric):** Level 8/10. Texture áo len hoặc đồng phục học sinh Nhật Bản có độ nhám rõ rệt.
+    3. **Gỗ (Wood):** Level 9/10. Gỗ bóng nhẹ trong nội thất Nhật Bản truyền thống.
+
+### 4b. Đặc điểm nhân hóa:
+- **Mắt:** To tròn, long lanh, phản chiếu môi trường xung quanh (environment reflection).
+- **Biểu cảm:** Miệng mèo hơi mở khi cười hoặc ngạc nhiên, tạo cảm giác giống trẻ em.
+
+## 5. FILM GRAIN & POST-PROCESSING
+- **Film Grain:** Rất mịn (Intensity 2/10), chủ yếu để làm mềm các cạnh AI.
+- **Depth of Field:** Shallow (khẩu độ ảo f/1.8 - f/2.8). Background luôn được xóa phông (bokeh) tròn, mịn.
+- **Vignette:** Không rõ rệt.
+- **Aspect Ratio:** 16:9.
+
+## 6. SO SÁNH STYLE
+- **Phim:** *The Cat Returns* (Studio Ghibli) phiên bản đời thực.
+- **Nghệ thuật:** Miniature photography kết hợp với phong cách Kawaii Nhật Bản.
+- **AI Style:** "Cinematic realistic animal photography with hyper-detailed fur rendering".
+
+## 7. SAMPLE PROMPT RECONSTRUCTION
+
+### Frame 1: Mèo con nấu ăn trong bếp Nhật
+{
+  "frame_description": "Mèo con màu cam mặc tạp dề đang thái rau củ trong bếp gỗ Nhật Bản.",
+  "full_prompt": "Cinematic photo of a small orange tabby kitten standing on a wooden stool in a cozy Japanese kitchen, wearing a miniature white chef apron and a small yellow shirt. The kitten is holding a tiny chef knife with its paws, carefully slicing a bright red tomato on a light wood cutting board. Realistic cooking environment with steam rising from a rice cooker in the background. Soft morning sunlight filtering through paper shoji screens, creating a warm atmosphere. Hyper-detailed fur rendering, individual whiskers visible, large expressive eyes reflecting the kitchen lights. High-end food photography style, depth of field with creamy bokeh, 8k resolution, shot on 35mm lens, f/2.8, warm color grading, traditional Japanese interior details.",
+  "negative_prompt": "extra fingers, deformed paws, blurry face, low resolution, distorted knife, long cat body, scary, messy environment, dark shadows, flat lighting, digital art, cartoon, illustration.",
+  "recommended_model": "Midjourney v6",
+  "recommended_settings": {"cfg_scale": 7.5, "steps": 50, "sampler": "Euler a"}
+}
+
+### Frame 2: Mèo con đi xe đạp trên phố cổ
+{
+  "frame_description": "Mèo con mặc váy vàng đang đi xe đạp ba bánh trên đường phố Kyoto.",
+  "full_prompt": "Cinematic wide shot of a cute ginger kitten wearing a small blue sweater and a yellow skirt, riding a tiny red tricycle along a traditional street in Gion, Kyoto. The kitten has a joyful expression with its mouth slightly open. In the background, traditional Japanese wooden houses (Machiya) and pink cherry blossoms (Sakura) are in full bloom. Soft overcast natural lighting, slightly wet road reflecting the sky. Photorealistic textures of wood, stone, and fur. Miniature scale, shallow depth of field focusing on the cat. The kitten has a small brown satchel over its shoulder. Vibrant colors, pastel palette, whimsical atmosphere, highly detailed, shot with Fujifilm XT-4, 4k.",
+  "negative_prompt": "deformed wheels, extra legs, floating objects, distorted architecture, blurry background, low quality, high contrast, oversaturated, text, logo, watermark.",
+  "recommended_model": "Flux.1 [dev]",
+  "recommended_settings": {"cfg_scale": 3.5, "steps": 30, "sampler": "DPM++ 2M Karras"}
+}
+
+### Frame 3: Mèo con làm bác sĩ (Y tế)
+{
+  "frame_description": "Mèo con mặc áo blouse trắng, đeo ống nghe đang khám cho gấu bông.",
+  "full_prompt": "A hyper-realistic cinematic close-up of an orange tabby kitten acting as a doctor. The kitten is wearing a miniature white lab coat and a small stethoscope around its neck. It is sitting on a clean hospital bed, holding a small thermometer with its paw. Bright, clean medical clinic background with soft blue and white tones. Professional lighting, diffused key light, soft rim light on the fur. The kitten's eyes are large and focused with a serious yet cute expression. Extremely detailed fur texture, soft paws, clear eyes. Post-processed with a clean film look, shallow depth of field, 8k, photorealistic, cinematic lighting, sharp focus on the kitten's face.",
+  "negative_prompt": "dirty, messy, scary cat, angry face, extra limbs, human hands on cat, low detail, blurry fur, dark room, grainy, noisy, distorted stethoscope.",
+  "recommended_model": "Midjourney v6",
+  "recommended_settings": {"cfg_scale": 7, "steps": 60, "sampler": "DPM++ SDE"}
+}
+
+
+=========
+
+Chào bạn, với tư cách là một Đạo diễn hình ảnh (DP), tôi đã phân tích ngôn ngữ điện ảnh của chuỗi video về "Mèo con nhân hóa trong bối cảnh Nhật Bản". Đây là một tác phẩm sử dụng kỹ thuật AI Video (Image-to-Video) rất đặc trưng, nơi ngôn ngữ hình ảnh được thiết kế để tối ưu hóa sự "dễ thương" (Kawaii) và tính chân thực của môi trường.
+
+Dưới đây là bảng phân tích chi tiết:
+
+## 1. THỐNG KÊ CỠ CẢNH (Shot Size Distribution)
+
+| Cỡ cảnh | Số lần | % tổng | Dùng khi nào (context) |
+|----------|--------|--------|------------------------|
+| **Wide Shot (WS)** | Trung bình | 20% | Thiết lập bối cảnh (Establishing): Phố cổ Kyoto, siêu thị Aeon, toàn cảnh bệnh viện hoặc gian bếp. |
+| **Medium Shot (MS)** | Nhiều nhất | 45% | Diễn tả hành động chính của mèo: Đứng trên ghế nấu ăn, đi xe đạp, làm việc tại quán Ramen. |
+| **Close-Up (CU)** | Thường xuyên | 25% | Đặc tả biểu cảm khuôn mặt mèo (mắt to, miệng cười) hoặc khi mèo đang ăn để tăng cảm giác "ngon miệng". |
+| **Detail/Insert Shot** | Khá nhiều | 10% | Cận cảnh bàn chân (paws) đang thái cà chua, cầm muỗng, hoặc màn hình iPad/Nhiệt kế. |
+
+## 2. THỐNG KÊ GÓC MÁY (Camera Angle)
+
+| Góc máy | Số lần | % | Dùng khi nào |
+|---------|--------|---|-------------|
+| **Low angle / Cat-eye level** | Nhiều nhất | 70% | Camera hạ thấp ngang tầm mắt của mèo. Đây là góc máy quan trọng nhất để tạo sự kết nối cảm xúc, biến mèo thành nhân vật chính ngang hàng với người xem. |
+| **Eye-level (Human)** | Trung bình | 15% | Thường dùng trong các cảnh mèo tương tác với con người (nhìn từ góc độ người giao hàng hoặc bác sĩ). |
+| **High angle** | Ít | 10% | Nhìn xuống khi mèo đang ngồi dưới sàn hoặc trên giường, tạo cảm giác mèo nhỏ bé và cần được bảo vệ. |
+| **Overhead / Top-down** | Ít | 5% | Đặc tả bàn ăn hoặc quá trình sơ chế thực phẩm trên thớt. |
+
+## 3. CHUYỂN ĐỘNG CAMERA (Camera Movement)
+**Phương pháp chính:** Ảnh tĩnh AI + Hiệu ứng chuyển động giả lập (AI Video Generation). Chuyển động không phải do vận hành cơ học của camera thật mà là sự biến đổi pixel (fluid morphing).
+
+| Loại chuyển động | Tần suất | Tốc độ | Mô tả chi tiết |
+|-------------------|----------|--------|-----------------|
+| **Static (Tĩnh)** | 40% | - | Giữ khung hình ổn định để người xem tập trung vào chi tiết lông mèo và bối cảnh. |
+| **Slow Zoom In** | 30% | Rất chậm | Đẩy nhẹ vào mặt mèo khi nó đang có biểu cảm ngạc nhiên hoặc đang thưởng thức đồ ăn. |
+| **Tracking / Pan** | 20% | Chậm | Đi ngang theo chiều mèo đi xe đạp hoặc mèo đẩy xe hàng trong siêu thị. |
+| **Digital Tilt** | 10% | Vừa | Di chuyển từ bàn chân lên mặt mèo để giới thiệu trang phục mới. |
+
+- **Thời gian trung bình mỗi shot:** 2.5 - 4 giây. (Đặc trưng của AI Video hiện nay để tránh bị méo hình).
+- **Transitions:** Chủ yếu là **Hard Cut** (Cắt thẳng). Thỉnh thoảng dùng **Fade to White** hoặc hiệu ứng đồ họa (như hoa anh đào bay, trái tim rơi) để chuyển cảnh giữa các "ngày" hoặc các "hoạt động".
+
+## 4. QUY LUẬT BỐ CỤC (Composition Rules)
+
+1.  **Center Placement (Chủ thể ở trung tâm):** Chiếm 80% thời lượng. Do đây là video dạng nhân vật, mèo luôn được đặt ở chính giữa để thu hút sự chú ý tuyệt đối.
+2.  **Shallow Depth of Field (Xóa phông mạnh):** Background luôn được làm mờ (bokeh) rất mịn để tách biệt bộ lông mèo khỏi chi tiết bối cảnh phức tạp của Nhật Bản.
+3.  **Rule of Thirds (Quy tắc 1/3):** Sử dụng trong các cảnh Wide Shot khi mèo đi trên phố, đặt mèo vào các đường mạnh để thấy được sự tương quan giữa mèo và kiến trúc xung quanh.
+4.  **Layering (Phân lớp):** Luôn có Tiền cảnh (cành hoa anh đào mờ, đồ dùng bếp), Trung cảnh (mèo) và Hậu cảnh (phố xá, nhân viên siêu thị) để tạo chiều sâu không gian 3D.
+5.  **Leading Lines:** Sử dụng các dãy kệ hàng siêu thị hoặc đường phố cổ Nhật Bản để dẫn mắt người xem vào nhân vật mèo ở cuối hành lang.
+
+## 5. NHỊP ĐỘ HÌNH ẢNH (Visual Pacing)
+
+- **Nhịp điệu:** Rất đều đặn và nhanh (Montage style). Mỗi hành động chỉ diễn ra trong vài giây rồi cắt ngay sang hành động tiếp theo.
+- **Tính chất:** Tạo cảm giác một "vlog" cuộc đời ngắn gọn, năng động.
+- **Sự thay đổi:** Nhịp độ không thay đổi theo cảm xúc mà giữ nguyên sự nhanh nhẹn để duy trì năng lượng tích cực (vibe Kawaii).
+
+## 6. MẪU CẮT CẢNH (Editing Patterns)
+
+- **Establishing -> Action:** Luôn bắt đầu bằng một cảnh rộng để giới thiệu địa điểm (siêu thị, nhà bếp), sau đó cắt ngay vào cảnh trung để mèo thực hiện hành động.
+- **Match Cut (về trạng thái):** Cắt giữa các cảnh mèo ở cùng một tư thế nhưng thay đổi trang phục hoặc bối cảnh (VD: từ phòng ngủ sang tiệm thuốc).
+- **Pattern lặp lại:** Hoạt động (Cooking/Eating) -> Kết quả (Món ăn/No nê) -> Cảm xúc (Mèo cười/Gật đầu).
+- **Jump Cuts:** Sử dụng để bỏ qua các giai đoạn thừa trong quá trình nấu ăn hoặc làm việc, chỉ giữ lại các khoảnh khắc mèo tương tác với đồ vật.
+
+**Tổng kết từ góc độ DP:** Đây là một phong cách "Cinematic Miniature". Nó kết hợp giữa sự tỉ mỉ của nhiếp ảnh tĩnh vật (still life) và ngôn ngữ kể chuyện của phim thiếu nhi. Điểm thành công nhất là việc duy trì góc máy thấp (ngang tầm mèo), giúp người xem hoàn toàn đắm chìm vào thế giới nhỏ bé của nhân vật.
+
+
+=======
+
+
+Chào bạn, với tư cách là một nhà phân tích ngôn ngữ học, tôi đã nghiên cứu phong cách trình bày của thể loại video "Mèo con nhân hóa" (Anthropomorphic Cat Life). Đây là một phong cách kể chuyện rất đặc thù, kết hợp giữa **Iyashikei** (chữa lành) của Nhật Bản và phong cách **ASMR Storytelling**.
+
+Dưới đây là phân tích chi tiết để bạn có thể tái tạo bằng AI writing:
+
+## 1. CẤU TRÚC VĨ MÔ (Macro Structure)
+- **Thể loại:** Story-driven narrative / Whimsical Slice of Life (Kể chuyện đời thường kỳ ảo).
+- **Mở đầu:** Thường là một tình huống sinh hoạt thường ngày (ăn sáng, ngủ dậy) hoặc một vấn đề nảy sinh (bị ốm, hết tiền, thèm ăn món gì đó).
+- **Cold Open:** Thường không có lời dẫn, chỉ có âm thanh mèo kêu hoặc tiếng đồ vật (SFX) trong 3-5 giây đầu để thiết lập không gian.
+- **Các phần:** Chia theo trình tự thời gian tuyến tính:
+    1.  *Nhu cầu:* Mèo muốn làm gì đó.
+    2.  *Hành động:* Quá trình thực hiện (đi mua sắm, nấu ăn, làm việc).
+    3.  *Tương tác:* Mèo giao tiếp với con người (thường là nhân viên bán hàng hoặc bác sĩ).
+    4.  *Thành quả:* Thưởng thức món ăn hoặc nhận lương.
+- **Kết thúc:** Cảnh mèo đi ngủ hoặc một thông điệp ngắn gọn, ấm áp (VD: "Hôm nay thật là một ngày vất vả").
+
+**Sơ đồ cấu trúc tiêu biểu:**
+```
+00:00-00:10 → Tình huống khởi đầu (Mèo thèm ăn Burger).
+00:10-00:40 → Quá trình chuẩn bị (Đi siêu thị, thái rau, rán thịt).
+00:40-00:55 → Cao trào/Tương tác (Nhân viên giao hàng tới hoặc Mèo tự phục vụ).
+00:55-01:10 → Thưởng thức & Phản ứng (Mèo ăn ngon lành, gật đầu).
+01:10-End   → Kết thúc nhẹ nhàng (Đi ngủ hoặc khoe thành quả).
+```
+
+## 2. PHONG CÁCH NGÔN NGỮ (Linguistic Style)
+### 2a. Ngôi kể / Phong cách nói:
+- **Ngôi kể:** Kết hợp giữa ngôi thứ ba (Narrator kể về mèo) và lời thoại trực tiếp của con người (ngôi thứ hai/thứ nhất).
+- **Voice:** Nhẹ nhàng, điềm tĩnh, tốc độ vừa phải. Lời thoại của con người luôn cực kỳ lịch sự (Keigo - kính ngữ Nhật Bản).
+- **Catchphrases:** Thường là các thán từ: "Mmm!", "Oishii!" (Ngon quá), "Ganbare!" (Cố lên).
+
+### 2b. Vocabulary & Sentence Pattern:
+- **Độ dài câu:** Rất ngắn (5-8 từ). Câu đơn chiếm ưu thế.
+- **Từ vựng:** Phổ thông, dễ hiểu, mang tính mô tả trực quan cao.
+- **Onomatopoeia (Từ tượng thanh):** Sử dụng dày đặc (VD: *Paku paku* - ăn ngon lành, *Gisiri* - cắt sần sật, *Fuwa fuwa* - mềm mại).
+- **Humor:** Hài hước phi lý (Absurdist). Sự hài hước nằm ở việc mèo làm những việc của người một cách nghiêm túc (ký tên, dùng thẻ tín dụng).
+
+### 2c. Thủ pháp tu từ:
+- **Juxtaposition (Đối lập):** Đặt một con mèo nhỏ bé vào bối cảnh đồ vật khổng lồ của con người (mèo đứng trên ghế để nấu bếp).
+- **Direct Address:** Đôi khi nhân vật con người nhìn thẳng vào camera (trong vai mèo) để nói chuyện.
+- **Repetition:** Lặp lại các cụm từ khẳng định sự nỗ lực: "Rất chăm chỉ", "Rất cố gắng".
+
+### 2d. Cụm từ chuyển ý đặc trưng:
+1.  *Chuyển phần:* "Tiếp theo là...", "Sau đó...", "Cuối cùng thì...".
+2.  *Context:* "Vào một ngày nọ...", "Hôm nay mèo con sẽ...".
+3.  *Bất ngờ:* "Ồ?", "Kìa!", "Chuyện gì vậy?".
+4.  *Kết thúc:* "Thật là tốt quá", "Hẹn gặp lại nhé".
+
+## 3. NHỊP ĐỘ KỂ (Narration Pacing)
+- **Tốc độ:** Chậm rãi (khoảng 100-120 từ/phút).
+- **Silence:** Khoảng 40% thời lượng là tiếng SFX (tiếng dao thái, tiếng nước chảy, tiếng mèo kêu) mà không có lời dẫn.
+- **Energy Level:** Thấp (Low energy), tạo cảm giác thư giãn cho người xem trước khi đi ngủ.
+
+## 4. CẢM XÚC & TONE (Emotional Arc)
+- **Tone:** Playful (vui vẻ), Iyashikei (chữa lành), Contemplative (nhẹ nhàng).
+- **Cảm xúc:** Luôn duy trì sự tích cực. Ngay cả khi mèo gặp rắc rối (bị ngã, hết tiền), cách xử lý luôn là sự kiên trì và dễ thương.
+
+## 5. SO SÁNH VỚI CÁC KÊNH TƯƠNG ĐỒNG
+
+| Khía cạnh | Mèo nhân hóa Nhật Bản | Kênh tương đồng (VD: JunsKitchen) |
+|-----------|---------------------|---------------------|
+| Tone | Nhí nhảnh, giả tưởng | Trầm lắng, thực tế |
+| Pacing | Nhanh (cắt cảnh liên tục) | Chậm (long take) |
+| Detail level | Trung bình (tập trung hành động) | Cao (tập trung kỹ thuật nấu ăn) |
+| Humor | Cao (phi lý) | Thấp (nhẹ nhàng) |
+
+## 6. SAMPLE SCRIPT RECREATION (Chủ đề: Mèo đi làm ở tiệm bánh)
+
+**Language: Japanese (with English translation)**
+
+**(00:00 - SFX: Tiếng chuông báo thức reo. Mèo con vươn vai)**
+**Narrator:** 今日、子猫ちゃんはパン屋さんで初めてアルバイトをします。少し緊張しているみたい。
+*(Today, Little Kitten is working at a bakery for the first time. It seems a bit nervous.)*
+
+**(00:15 - SFX: Tiếng nhào bột 'Pata pata', tiếng rắc bột 'Sara sara')**
+**Narrator:** まずは生地をこねます。よいしょ、よいしょ。肉球で一生懸命パンを丸めています。
+*(First, knead the dough. Yoisho, yoisho. It's using its tiny paws to shape the bread with all its might.)*
+
+**(00:30 - SFX: Tiếng lò nướng 'Ting')**
+**Baker (Human):** 「子猫ちゃん、パンが焼き上がったよ。とってもいい香りだね！」
+*(Little Kitten, the bread is ready! It smells wonderful!)*
+
+**(00:45 - Mèo cầm khay bánh, gật đầu chào khách)**
+**Narrator:** お客さんが来ました。「いらっしゃいませ！」と元気に挨拶。
+*(A customer arrived. "Welcome!" it greets them energetically.)*
+
+**(01:00 - Mèo nhận đồng xu lương, bỏ vào túi)**
+**Narrator:** 今日のお給料です。明日も頑張ろうね、子猫ちゃん。おやすみなさい。
+*(Here is today's salary. Let's do our best tomorrow too, Little Kitten. Good night.)*
+
+
+======
+
+
+Chào bạn, với vai trò là Chuyên gia thiết kế sản xuất (Production Designer) và Art Director, tôi đã thực hiện phân tích "Visual Language" của chuỗi video về Mèo con nhân hóa trong bối cảnh Nhật Bản. Đây là một phong cách kết hợp giữa **Nhiếp ảnh Miniature (mô hình thu nhỏ)** và **Thế giới Giả tưởng (Fantasy)** vô cùng tỉ mỉ.
+
+Dưới đây là bản phân tích chi tiết:
+
+## 1. NHÂN VẬT CHÍNH (Anthropomorphic Kittens)
+
+### 1a. Phong cách thể hiện:
+- **Loại hình:** AI-generated (tạo ra từ trí tuệ nhân tạo).
+- **Mức độ:** Photorealistic 9/10 (Cực kỳ chân thực ở kết cấu lông và mắt, nhưng nhân hóa ở tư thế đứng và sử dụng trang phục người).
+- **Đặc điểm:** Tỉ lệ đầu hơi lớn hơn so với thân so với mèo thật, mắt to tròn, long lanh để tăng vẻ "Kawaii" (đáng yêu).
+
+### 1b. Trang phục & Ngoại hình:
+**Nhóm 1: Mèo con nhân hóa (Nhân vật chính)**
+- **Trang phục:** Đa dạng theo context. 
+    - *Đồ ngủ:* Bộ pijama lụa hoặc cotton có họa tiết nhỏ (dâu tây, hoa, cà rốt) màu hồng nhạt hoặc vàng kem.
+    - *Đồng phục:* Áo đầu bếp trắng, tạp dề nhỏ, áo khoác đồng phục giao hàng, hoặc trang phục y tế (blouse trắng).
+    - *Thời trang dạo phố:* Áo len dệt kim (knitwear), váy xếp ly, áo khoác puffer thu nhỏ.
+- **Chất liệu:** Thấy rõ sợi vải, độ mềm của len hoặc độ bóng của lụa.
+- **Phụ kiện:** Mũ đầu bếp, ống nghe y tế, túi đeo chéo nhỏ, băng đô (headband) thắt nơ.
+
+**Nhóm 2: Con người (Làm nền/Tương tác)**
+- **Trang phục:** Trang phục công sở Nhật Bản, đồ bảo hộ lao động hoặc trang phục truyền thống (Kimono/Yukata) rất chỉnh chu, lịch sự.
+- **Màu sắc:** Thường là màu trung tính để làm nổi bật nhân vật mèo.
+
+### 1c. Biểu cảm & Body Language:
+- **Biểu cảm:** Phổ biến nhất là cười rạng rỡ (miệng chữ V ngược), ngạc nhiên (mắt mở to) hoặc tập trung cao độ (khi nấu ăn).
+- **Posing:** Đứng trên hai chân, sử dụng hai bàn chân trước (paws) linh hoạt như bàn tay người để cầm dao, gắp sushi hoặc ký giấy tờ.
+
+## 2. BỐI CẢNH & MÔI TRƯỜNG (Settings & Environments)
+
+### 2a. Bối cảnh chính:
+- **Loại không gian:** Nội thất Nhật Bản (Zashiki) và các không gian dịch vụ hiện đại.
+- **Kiến trúc:** 
+    - *Truyền thống:* Chi tiết cửa trượt Shoji, sàn chiếu Tatami, bàn gỗ thấp (Kotatsu), bình hoa Ikebana.
+    - *Hiện đại:* Siêu thị sạch sẽ với ánh sáng trắng rực rỡ, bếp công nghiệp inox bóng loáng, phòng bệnh viện hiện đại.
+- **Ánh sáng:** Luôn có luồng sáng mềm (Soft light) từ cửa sổ hoặc đèn lồng, tạo hiệu ứng đổ bóng mờ, ấm cúng.
+- **Color palette:** Tone màu pastel (hồng, vàng, xanh mint) kết hợp với màu gỗ tự nhiên và màu trắng kem.
+
+### 2b. Bối cảnh phụ / B-roll:
+- Phố cổ với hoa anh đào (Sakura) nở rộ, các quầy hàng rong (Yatai) về đêm với ánh đèn lồng vàng rực tạo mood hoài cổ.
+
+## 3. ĐỒ VẬT & ĐẠO CỤ (Objects & Props)
+- **Đồ ăn (Ramen, Burger, Sushi):** Level detail 10/10. Trông cực kỳ ngon mắt, bóng bẩy (Food styling).
+- **Đồ dùng thu nhỏ:** iPad, xe đẩy siêu thị, dao thái, tạ tay, nhiệt kế điện tử... tất cả đều có tỉ lệ nhỏ bằng 1/3 so với thực tế để khớp với kích thước của mèo.
+- **Rendering:** Photorealistic hoàn toàn, phản chiếu ánh sáng thật lên bề mặt nhựa/kim loại của đạo cụ.
+
+## 4. TYPOGRAPHY & ĐỒ HỌA ON-SCREEN
+- **Text elements:** Phụ đề tiếng Nhật font Sans-serif bo góc (Rounded) tạo cảm giác thân thiện.
+- **Graphic overlays:** 
+    - Sử dụng dày đặc các sticker 2D (trái tim, ngôi sao, hoa anh đào bay, biểu tượng cảm xúc "trào dâng" kiểu anime).
+    - Các icon mô phỏng UI của smartphone/iPad khi mèo sử dụng ứng dụng.
+- **Thumbnail style:** Cận cảnh khuôn mặt mèo đang ăn hoặc làm một hành động gây tò mò, màu sắc rực rỡ, độ tương phản cao.
+
+## 5. OUTPUT: IMAGE GENERATION REFERENCE SHEET
+
+```json
+{
+  "content_type": "Anthropomorphic Cat Cinematic Life-vlog",
+  "style_keywords": [
+    "Kyoto aesthetic", "Kawaii core", "miniature world photography", 
+    "hyper-realistic fur texture", "Ghibli-inspired real life", 
+    "pastel color grading", "macro lens look", "soft cinematic lighting"
+  ],
+  "negative_keywords": [
+    "mangy fur", "scary eyes", "distorted paws", "messy environment", 
+    "dark gloomy lighting", "low resolution", "cartoonish", "deformed tools"
+  ],
+  "color_palette": {
+    "shadow_primary": "#2D241E",
+    "shadow_secondary": "#4A3B31",
+    "highlight_warm": "#FFF9F0",
+    "highlight_cool": "#E0F2F1",
+    "accent_primary": "#FFB7C5",
+    "accent_secondary": "#FFD54F",
+    "brand_colors": ["#FF8A80", "#81C784"],
+    "dominant_midtones": ["#D2B48C", "#F5F5DC"]
+  },
+  "lighting_setup": {
+    "primary_method": "Mixed: Natural window light + warm interior lamps",
+    "key_fill_ratio": "3:1",
+    "light_sources": ["Shoji window sunlight", "Softbox diffused", "Warm LEDs"],
+    "mood": "Cozy, wholesome, vibrant, healing (Iyashikei)"
+  },
+  "texture_detail_level": "10/10",
+  "film_grain_intensity": "2/10",
+  "realism_level": "9/10",
+  "production_value": "10/10"
+}
+```
+
+**Art Director's Note:** Để tái tạo chính xác phong cách này, chìa khóa nằm ở sự tương phản giữa sự chân thực của bộ lông mèo (Realism) và tính phi lý của hành động (Anthropomorphism), đặt trong một môi trường Nhật Bản được lý tưởng hóa (Idealized Japan).
+
+
+========
+
+
+Chào bạn, với tư cách là một chuyên gia hậu kỳ và Motion Graphics, tôi đã phân tích kỹ thuật của chuỗi video về "Mèo con nhân hóa Nhật Bản". Đây là một ví dụ điển hình của quy trình sản xuất **AI-First Video Workflow**, nơi AI tạo ra nội dung cốt lõi và kỹ thuật hậu kỳ truyền thống được dùng để đóng gói cảm xúc.
+
+Dưới đây là bản phân tích chi tiết:
+
+## 1. PHƯƠNG PHÁP SẢN XUẤT VIDEO (Video Production Method)
+- **Phương pháp chính:** AI-generated video (tỷ lệ 90%) kết hợp với Video Editing truyền thống (10%).
+- **Quy trình:** Tạo ảnh tĩnh (Midjourney) -> Animate qua AI (Kling/Luma/Runway) -> Biên tập & Chèn hiệu ứng (CapCut/Premiere Pro).
+- **Đặc điểm nhận dạng:** Chuyển động dạng "fluid morphing" (biến đổi pixel mềm), đôi khi vật thể bị biến dạng nhẹ khi di chuyển nhanh (artifact đặc trưng của AI Video).
+
+## 2. CÁC KIỂU CHUYỂN ĐỘNG (Motion Types)
+
+### 2a. Camera Movement (Chuyển động ảo):
+- **Tốc độ:** Chậm đến rất chậm để duy trì tính ổn định của AI.
+- **Kiểu phổ biến:** 
+    - **Slow Zoom In:** Tăng từ 100% lên 110% trong vòng 3 giây để tạo sự tập trung.
+    - **Subtle Pan:** Di chuyển ngang nhẹ theo hướng nhìn của mèo.
+- **Easing:** Ease-in-out (khởi đầu và kết thúc mượt mà, không giật cục).
+
+### 2b. Subject Movement (Chuyển động chủ thể):
+- **Nhân vật:** Chuyển động tinh tế (Subtle movement). Mèo chớp mắt, tai vểnh, và bàn chân (paws) thực hiện các thao tác lặp lại (loopable actions) như nhào bột, xào nấu.
+- **Vật thể:** Khói (steam) bốc lên từ đồ ăn, nước chảy được animate dạng hạt (particle) khá chân thực.
+
+### 2c. Particle & Atmospheric Effects:
+- **Steam/Smoke:** Hiệu ứng khói bốc lên từ bát mì Ramen hoặc nồi áp suất (thường là overlay video thực đè lên ảnh AI).
+- **Sparkle/Hearts:** Các icon 2D (trái tim, ngôi sao) được chèn thêm ở khâu hậu kỳ để nhấn mạnh sự dễ thương.
+- **Floating Dust:** Bụi mịn bay trong nắng được dùng trong các cảnh nhà bếp truyền thống.
+
+## 3. TRANSITIONS (Chuyển cảnh)
+
+| Loại | Tần suất | Duration (ms) | Dùng khi nào |
+|------|----------|---------------|-------------|
+| **Hard cut** | 80% | - | Chuyển giữa các giai đoạn hành động nhanh (thái rau -> bỏ vào nồi). |
+| **Cross dissolve** | 15% | 500ms | Chuyển giữa các ngày khác nhau hoặc các trạng thái cảm xúc. |
+| **White Flash** | 5% | 200ms | Khi mèo "biến hình" hoặc thay đổi trang phục trong nháy mắt. |
+
+## 4. NHẠC & ÂM THANH (Audio Design)
+- **Nhạc nền:** Upbeat, Acoustic, sử dụng nhạc cụ như Ukulele, Marimba hoặc sáo gỗ để tạo vibe "healing" (chữa lành). Nhạc không có drop mạnh mà duy trì năng lượng tích cực đều đặn.
+- **Sound Effects (SFX):** Rất quan trọng. Tiếng thái rau "cộp cộp", tiếng chiên rán "xèo xèo", tiếng mèo kêu "meow" được chèn khớp với hành động (Syncing).
+- **Voice:** Giọng đọc AI (Text-to-Speech) chuẩn tiếng Nhật, tone cao, trẻ trung, mang phong cách "Anime girl" lịch sự.
+
+## 5. TIMELINE BREAKDOWN (30 GIÂY TIÊU BIỂU)
+
+| Thời gian | Duration | Nội dung | Cỡ cảnh | Camera move | FX/Overlay |
+|-----------|----------|----------|---------|-------------|------------|
+| 00:00 | 3s | Mèo đứng trên ghế nấu ăn | MS | Static | Steam bốc lên |
+| 00:03 | 2s | Cận cảnh thái cà chua | Insert | Zoom In | SFX "Cộp cộp" |
+| 00:05 | 4s | Mèo múc súp vào bát | MS | Tracking | Heart icons bay |
+| 00:09 | 3s | Mèo bưng bát ra bàn | MWS | Pan Right | Light rays |
+| ... | ... | ... | ... | ... | ... |
+
+## 6. VIDEO GENERATION / RECREATION PARAMETERS
+
+**Workflow:** Dùng **CapCut** để cắt ghép nhanh, dùng tính năng "Add Overlay" cho các hiệu ứng khói/bụi. Tốc độ khung hình thường là 24fps hoặc 30fps.
+
+**3 Ví dụ Video Prompts cho AI:**
+
+```json
+[
+  {
+    "shot_description": "Kitten chef frying an egg",
+    "video_prompt": "Cinematic shot of a ginger kitten wearing a miniature white chef hat and apron, standing on a wooden stool in a sunlit Japanese kitchen. The kitten uses its paws to hold a tiny spatula, carefully flipping an egg in a sizzling pan. Photorealistic fur movement, steam rising from the pan, shallow depth of field, high-speed macro cinematography style, golden hour lighting.",
+    "duration": "4s",
+    "camera_motion": "Very slow zoom into the kitten's concentrated face",
+    "style_keywords": ["hyper-realistic", "miniature world", "soft lighting"]
+  },
+  {
+    "shot_description": "Kitten delivery on a tricycle",
+    "video_prompt": "Wide shot of a cute cat dressed in a red delivery uniform and cap, riding a small red tricycle on a clean street in Tokyo. Cherry blossom petals falling around. The kitten looks happy with its tongue out. Smooth motion of wheels and pedals, realistic street reflection, vibrant colors, 4k, Ghibli-inspired realism.",
+    "duration": "5s",
+    "camera_motion": "Slow tracking shot from the side",
+    "style_keywords": ["vibrant", "whimsical", "smooth motion"]
+  },
+  {
+    "shot_description": "Kitten doctor checking a patient",
+    "video_prompt": "Medium close-up of a kitten in a doctor's coat, holding a tiny stethoscope against a teddy bear's chest. The kitten's eyes are large and blinking realistically. Clean hospital background with blue tones. Diffused professional studio lighting, clear fur texture, soft paws movement.",
+    "duration": "4s",
+    "camera_motion": "Static with slight handheld camera shake for realism",
+    "style_keywords": ["professional lighting", "high detail", "cinematic"]
+  }
+]
+```
+
+**Post-production Tip:** Để có được "visual DNA" này, bạn nên tăng độ bão hòa (Saturation) và độ sắc nét (Sharpness) lên khoảng 15% trong khâu chỉnh màu để bộ lông mèo trông rực rỡ và chân thực hơn.
+
+
+==========
+
+
+Chào bạn, với tư cách là chuyên gia phân tích audio-visual, tôi đã thực hiện "giải phẫu" cấu trúc âm thanh của thể loại video về **Mèo con nhân hóa trong bối cảnh Nhật Bản**. 
+
+Đây là một thể loại video có cấu trúc âm thanh rất tinh tế: Narrator đóng vai trò dẫn dắt cảm xúc, trong khi Dialogue (thường là sự kết hợp giữa tiếng mèo kêu và lời thoại của con người) đóng vai trò tạo ra các điểm nhấn (punctuation) cho câu chuyện.
+
+---
+
+## 1. PHÂN LOẠI AUDIO MODE TỪNG SHOT (Trích đoạn tiêu biểu)
+
+| # | Timestamp | Duration | Audio Mode | Narrator? | Dialogue? | Dialogue Content | Nhận xét |
+|---|-----------|----------|------------|-----------|-----------|------------------|----------|
+| 1 | 00:00-00:04 | 4s | narrator_only | Có | Không | - | Thiết lập tình huống khởi đầu. |
+| 2 | 00:04-00:07 | 3s | dialogue_dominant | Không | Có | "Meow~" (High pitch) | Phản ứng của mèo khi thấy đồ ăn. |
+| 3 | 00:07-00:12 | 5s | narrator_only | Có | Không | - | Mô tả quá trình nấu nướng. |
+| 4 | 00:12-00:15 | 3s | dialogue_dominant | Không | Có | "O-matase shimashita!" | Lời thoại nhân vật con người. |
+| 5 | 00:15-00:20 | 5s | dialogue_dominant | Có | Có | "Mmm! Oishii!" | Narrator dẫn dắt trong khi mèo phản ứng. |
+
+---
+
+## 2. THỐNG KÊ PHÂN BỐ AUDIO MODE
+
+| Audio Mode | Số shots | % tổng | Tổng thời lượng | % thời lượng |
+|------------|----------|--------|-----------------|-------------|
+| **narrator_only** | 12 | 60% | 45s | 65% |
+| **dialogue_dominant** | 8 | 40% | 25s | 35% |
+
+---
+
+## 3. PHÂN LOẠI ĐỐI THOẠI (Dialogue Taxonomy)
+
+| # | Timestamp | Speaker | Dialogue Type | Nội dung | Trigger |
+|---|-----------|---------|---------------|----------|------------------------------------------|
+| 1 | 00:05 | [Cat] | reaction | "Meow!" | **ACTION_DESCRIPTION** (Bắt đầu hành động) |
+| 2 | 00:14 | [Human] | soft_line | "Irasshaimase!" | **CHARACTER_INTRO** (Chào khách) |
+| 3 | 00:25 | [Cat] | reaction | "Oishii!" (AI voice) | **EMOTIONAL_PEAK** (Khi ăn ngon) |
+| 4 | 00:40 | [Human] | full_dialogue | "Đây là tiền lương của bạn." | **SYMBOLIC_MOMENT** (Kết thúc công việc) |
+
+---
+
+## 4. PHÂN TÍCH NHỊP ĐỘ NARRATOR ↔ DIALOGUE
+
+### 4a. Mô hình xen kẽ:
+- **Pattern:** Cứ khoảng **3 shot Narrator_only** (mô tả/dẫn dắt) sẽ có **1 shot Dialogue_dominant** (điểm nhấn cảm xúc).
+- **Chuỗi dài nhất:** Narrator dẫn liên tục trong 15 giây khi mèo đang thực hiện các bước nấu ăn phức tạp.
+- **Tính chất:** Dialogue không bao giờ kéo dài, nó chỉ xuất hiện như một dấu phẩy hoặc dấu chấm câu để người xem không bị ngộp bởi lời dẫn.
+
+### 4b. Mật độ theo giai đoạn:
+
+| Giai đoạn | narrator_only % | dialogue_dominant % | Nhận xét |
+|-----------|-----------------|---------------------|----------|
+| Opening | 80% | 20% | Chủ yếu là lời dẫn thiết lập bối cảnh. |
+| Middle | 60% | 40% | Xen kẽ nhiều phản ứng "Meow" khi làm việc. |
+| Climax | 40% | 60% | Nhiều đối thoại giữa người và mèo (nhận lương/ăn). |
+| Resolution | 90% | 10% | Lời chúc ngủ ngon của Narrator. |
+
+### 4c. Transition rules:
+- **Narrator → Dialogue:** Narrator thường kết thúc bằng một câu hỏi hoặc câu cảm thán lửng lơ (VD: "Và kết quả là...").
+- **Ducking:** Khi nhân vật nói, volume của Narrator giảm xuống khoảng **70%** (Ducking) để ưu tiên âm thanh hiện trường.
+
+---
+
+## 5. VISUAL-AUDIO SYNC (Đồng bộ hình ảnh ↔ âm thanh)
+
+- **Narrator_only:** Thường đi kèm với cỡ cảnh **Wide** hoặc **Medium** (thấy toàn cảnh hành động).
+- **Dialogue_dominant:** Luôn chuyển sang **Close-up** vào mặt mèo hoặc mặt người để tăng sự kết nối.
+- **Lip-sync:** Nhân vật mèo được animate miệng khớp với các thán từ "Oishii" hoặc "Mmm" tạo cảm giác cực kỳ sống động.
+
+---
+
+## 6. SFX & MUSIC LAYER
+
+- **SFX phổ biến nhất:** *Foley thực tế* (tiếng dao, tiếng xèo xèo) chiếm 70% SFX, tạo độ tin cậy cho hình ảnh AI.
+- **Musical Sting:** Thường có tiếng "Ting" hoặc "Sparkle" khi mèo hoàn thành một công việc.
+- **Music:** Luôn là nhạc không lời, âm lượng ổn định ở mức -20dB, chỉ đẩy nhẹ volume ở 3 giây cuối cùng.
+
+---
+
+## 7. SAMPLE RECONSTRUCTION (Chủ đề: Mèo làm vườn)
+
+**Topic: Little Kitten's Flower Garden**
+
+Today, the little kitten is going to plant some beautiful roses in the backyard. (narrator_only)
+[SFX] Bird chirping, soft wind blowing.
+
+[Cat] Meow! (dialogue_dominant)
+It has its tiny shovel and a packet of seeds ready. (narrator_only)
+
+[SFX] Sound of dirt being dug "Saku Saku"
+First, it digs a small hole in the fertile soil. (narrator_only)
+
+[Human Neighbor] "Hello there! Your garden looks lovely today." (dialogue_dominant)
+[Cat] Reaction: Happy purring sound.
+
+[SFX] Water pouring from a tiny watering can.
+Finally, a little water for the thirsty seeds. (narrator_only)
+
+Narrator continues... (dialogue_dominant)
+[Cat] "Oishii!" (Wait, this is a flower, so it says "Kirei!" - Beautiful!)
+
+[SFX] Magic sparkle sound.
+[CROWD] Soft children cheering in the distance.
+
+---
+**Nhận xét của chuyên gia:** Để tái tạo thành công, bạn cần đảm bảo giọng Narrator phải mang tính "vỗ về", trong khi các câu Dialogue của mèo phải cực ngắn và có cao độ (pitch) cao hơn bình thường để tạo độ tương phản.
+
+
+=========
+
+This **Master Reference Sheet** is designed to enable the precise replication of the "Anthropomorphic Japanese Kitten Life" style using AI generation tools.
+
+---
+
+## A. STYLE DNA SUMMARY
+This content is a high-concept **Anthropomorphic Healing Narrative (Iyashikei)** set in a **Cinematic Miniature Japanese world**. It features hyper-realistic ginger tabby kittens performing human-like tasks (cooking, working, shopping) within meticulously detailed traditional and modern Japanese environments. The visual style is characterized by **macro-lens aesthetics**, shallow depth of field, and a soft, warm color palette. The mood is wholesome, industrious, and "Kawaii," emphasizing the contrast between the kitten's small size and the scale of human objects. The narrative follows a gentle, procedural rhythm, blending realistic foley sounds with a soothing Japanese narration and short, high-pitched character reactions.
+
+---
+
+## B. IMAGE GENERATION MASTER PROMPT
+> **Style:** Hyper-realistic cinematic miniature photography. **Subject:** An adorable anthropomorphic ginger tabby kitten with large expressive eyes and highly detailed fur texture, standing on two legs. **Environment:** A clean, idealized Japanese setting (traditional wooden kitchen with shoji screens or a bright modern supermarket). **Composition:** Macro lens look with a very shallow depth of field, creamy bokeh in the background. Camera is positioned at cat-eye level (low angle). **Lighting:** Soft, diffused volumetric lighting, natural sunlight filtering through windows, warm interior glow with subtle rim lighting on the kitten’s fur to separate it from the background. **Details:** The kitten wears tiny, high-quality miniature clothing (knit sweaters, silk pajamas, or professional aprons) with visible fabric grain. All props (knives, iPads, grocery carts) are scaled to 1/3 size to match the kitten. **Quality:** Photorealistic, 8k resolution, Masterpiece, shot on 35mm f/1.8 lens, FujiFilm color science, vibrant yet pastel-leaning color grading.
+
+---
+
+## C. NEGATIVE PROMPT
+> Deformed paws, extra toes, mangy fur, scary eyes, aggressive facial expressions, human hands on animals, messy or dirty environments, dark gloomy lighting, low resolution, cartoonish style, 3D render look, flat lighting, distorted tools, oversized human-scale furniture, long cat bodies, uncanny valley proportions, text, watermarks, blurry subject.
+
+---
+
+## D. EXACT COLOR PALETTE
+```json
+{
+  "shadows": ["#2D241E", "#1A1C2C"],
+  "midtones": ["#D2B48C", "#E88D4D"],
+  "highlights": ["#FFF9F0", "#E0F2F1"],
+  "accents": ["#FFB7C5", "#FFD54F"],
+  "brand_colors": ["#FF8A80", "#81C784"],
+  "skin_warm": "#F5D5B0",
+  "skin_cool": "N/A - fur dominant"
+}
+```
+
+---
+
+## E. NARRATION / PRESENTATION STYLE GUIDE
+- **Content type:** Whimsical Slice-of-Life / Healing Vlog.
+- **Point of view:** 3rd Person Omniscient (Soothing Narrator).
+- **Tone & personality:** Gentle, encouraging, "Auntie/Grandmother" energy, polite.
+- **Sentence patterns:** Short, simple sentences (5-10 words). Heavy use of Japanese onomatopoeia (*Paku paku, Saku saku*).
+- **Vocabulary level:** Common/Everyday language with high-politeness honorifics (Keigo).
+- **Humor style:** Absurdist but wholesome (The joke is a cat doing taxes or using a credit card with complete seriousness).
+- **10-15 Transition phrases:** "Next...", "After that...", "Finally...", "One day...", "But suddenly!", "Look at that!", "Well done!", "It smells good!", "Good night.", "See you again.", "Let's try our best."
+- **Emotional arc pattern:** Need -> Effort/Work -> Encounter/Interaction -> Reward -> Rest.
+- **Pacing notes:** Slow voiceover delivery with significant pauses (40% silence) to let Foley sounds (cooking/working) take center stage.
+
+---
+
+## F. SHOT LANGUAGE RULES
+- **Shot size distribution:** MS (45% for actions), WS (20% for establishing), CU (25% for emotions), Insert/Detail (10% for paws/tools).
+- **Camera angle preferences:** 70% Cat-eye level (low angle), 20% Human eye-level (interaction), 10% Top-down (food prep).
+- **Average shot duration:** 2.5 – 4 seconds per shot.
+- **Transition types:** 80% Hard Cuts, 20% Cross Dissolves (for time skips).
+- **5 Signature shots:** 
+    1. The "Concentration CU" (kitten focusing on a task).
+    2. The "Effort MS" (kitten standing on a stool to reach a counter).
+    3. The "First Bite CU" (eyes dilating while eating).
+    4. The "Miniature Interaction" (kitten handing a tiny coin to a human).
+    5. The "Tired Sleep" (kitten tucked into a tiny futon/bed).
+
+---
+
+## G. MOTION/VIDEO RULES
+- **Production method:** AI Image-to-Video generation with post-editing.
+- **Animation techniques:** Fluid morphing, subtle blinking, ear twitching, and looping limb movements.
+- **Speed & easing:** Very slow, steady motions; Ease-in-out transitions.
+- **Particle effects:** Steam from food, falling sakura petals, floating dust motes in sunbeams.
+- **Camera movement:** Slow digital zoom-in (focus) or subtle horizontal tracking (walking).
+
+---
+
+## H. VISUAL DESIGN REFERENCE
+- **Character design:** Ginger tabby kitten, anthropomorphic posture, oversized expressive "glass" eyes, hyper-detailed whiskers.
+- **Costume rules:** Miniature-scale human clothes; visible textures (wool, cotton, lace); "Kawaii" patterns (fruits/flowers).
+- **Environment rules:** "Perfect Japan" — spotless traditional interiors (Tatami/Shoji) or organized modern spaces (Aeon Supermarket/Hospital).
+- **Prop styling:** Everything is "Miniature" (smaller than the cat) but functions realistically.
+- **Typography:** Rounded Sans-serif Japanese fonts, white with soft drop shadows.
+- **Graphic overlays:** Floating 2D anime-style hearts, stars, or sweat drops to indicate emotion.
+
+---
+
+## I. AUDIO DESIGN REFERENCE
+- **Music genre:** Acoustic / Ukulele / Marimba / Glokenspiel. Light, upbeat, and minimal.
+- **SFX usage patterns:** High-fidelity Foley (chopping, frying, walking on wood) synced 1:1 with AI motion.
+- **Voice characteristics:** Soft, airy female Japanese voice (ASMR-lite), comforting and clear.
+- **Audio mixing ratios:** Voice (40%), SFX (40%), Music (20%). Volume ducking (narration lowers when cat "meows" or human speaks).

@@ -1,6 +1,6 @@
 # Cocomelon-Style — Prompt Template Specification
 
-> **Mục đích**: Tạo kênh nursery rhyme 3D CGI Animation theo phong cách Cocomelon (high-end preschool 3D render, tạo hình nhựa/plastic toy, bo tròn cực đại, ánh sáng high-key ấm áp, bảng màu cơ bản siêu bão hòa) với **nhân vật gốc** (Bubi & Mama) để tránh vi phạm bản quyền.
+> **Mục đích**: Tạo kênh nursery rhyme 3D CGI Animation theo phong cách Cocomelon (high-end Pixar-style 3D render, nhân vật stylized bo tròn, ánh sáng high-key ấm áp, bảng màu cơ bản siêu bão hòa, thế giới thật sống động) với **nhân vật gốc** (Bubi & Mama) để tránh vi phạm bản quyền.
 
 > [!IMPORTANT]
 > Đây là **dynamic prompt** — phần thay đổi được của template. Khi hệ thống sử dụng, nó sẽ tự động nối với **fixed prompt** (JSON output format) từ `application/prompts/fixed/`.
@@ -17,10 +17,10 @@
 
 > [!NOTE]
 > **Khác biệt chính so với The Countdown Kids:**
-> - **3D CGI** (không phải 2D flat vector) — toàn bộ dựng hình 3D, render bề mặt nhựa/cao su mịn
+> - **3D CGI** (không phải 2D flat vector) — toàn bộ dựng hình 3D Pixar-quality, bề mặt mịn màng
 > - **Rich Pixar-Style Environments** — Chi tiết 7/10 (các vật liệu trong cảnh được render chi tiết chân thực, ví dụ như thấy rõ sợi vải, vân gỗ, hoặc vân lá nếu có) kết hợp tạo hình bo tròn.
 > - **Subsurface scattering** trên da nhân vật — tạo cảm giác da "tươi, mềm"
-> - **Bo tròn cực đại** — nhân vật và props đều rounded
+> - **Bo tròn cực đại** — nhân vật stylized bo tròn (props, xe cộ, động vật là phiên bản THẬT)
 > - **High-key studio lighting** tỷ lệ key:fill gần 1:1 — hầu như không có bóng đổ gắt
 > - **Lip-sync singing** — nhân vật hát khớp miệng (không phải choir voice-over)
 > - **Không có text trên màn hình** — hoàn toàn visual-driven
@@ -76,7 +76,7 @@ MANDATORY RULE: This is an ORIGINAL character universe. Do NOT use Cocomelon nam
 | **Màu sắc** | Vàng ấm nhất, bão hòa nhất — luôn là tâm điểm chú ý |
 
 **Prompt tạo ảnh reference:**
-`character turnaround sheet, T-pose, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, premium plastic toy aesthetic, Pixar preschool design. Smooth bald toddler approximately 2 years old, unisex, perfectly round smooth head with no hair. Giant expressive eyes with star-shaped catchlights, largest eyes in the cast. Soft mochi cheeks with warm rosy blush, subsurface scattering glow. Warm honey skin (#E8C99B). Tiny button nose, wide joyful smile. Bright YELLOW ROMPER (#FFE156) with small BLUE LIGHTNING BOLT symbol on chest. Extra chubby rounded body, very short thick limbs, head to body ratio 1:1.8, extremely rounded geometry, semi-glossy surfaces, 8k render, masterpiece quality`
+`character turnaround sheet, T-pose, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, Pixar-style 3D preschool animation, Smooth bald toddler approximately 2 years old, unisex, perfectly round smooth head with no hair. Giant expressive eyes with star-shaped catchlights, largest eyes in the cast. Soft mochi cheeks with warm rosy blush, subsurface scattering glow. Warm honey skin (#E8C99B). Tiny button nose, wide joyful smile. Bright YELLOW ROMPER (#FFE156) with small BLUE LIGHTNING BOLT symbol on chest. Extra chubby rounded body, very short thick limbs, head to body ratio 1:1.8, extremely rounded geometry, semi-glossy surfaces, 8k render, masterpiece quality`
 
 ---
 
@@ -89,7 +89,7 @@ MANDATORY RULE: This is an ORIGINAL character universe. Do NOT use Cocomelon nam
 | **Màu sắc** | Pastel ấm — nhạt và dịu hơn Bubi |
 
 **Prompt tạo ảnh reference:**
-`character turnaround sheet, T-pose, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, premium plastic toy aesthetic, Pixar preschool design. Adult female, mother figure. Shoulder-length wavy bob hair, chestnut brown (#8B6B4A). Small pink flower hair clip (#FF9EC6) on right side. Large warm eyes with small star-shaped catchlights, gentle expression. Warm honey skin (#E8C99B) with subsurface scattering. Soft smile. Soft lavender cardigan (#C8A2C8) over cream white top. Rounded proportional body, taller than toddler. Desaturated warm palette, extremely rounded geometry, semi-glossy surfaces, 8k render`
+`character turnaround sheet, T-pose, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, Pixar-style 3D preschool animation, Adult female, mother figure. Shoulder-length wavy bob hair, chestnut brown (#8B6B4A). Small pink flower hair clip (#FF9EC6) on right side. Large warm eyes with small star-shaped catchlights, gentle expression. Warm honey skin (#E8C99B) with subsurface scattering. Soft smile. Soft lavender cardigan (#C8A2C8) over cream white top. Rounded proportional body, taller than toddler. Desaturated warm palette, extremely rounded geometry, semi-glossy surfaces, 8k render`
 
 ---
 
@@ -102,7 +102,7 @@ MANDATORY RULE: This is an ORIGINAL character universe. Do NOT use Cocomelon nam
 | **Màu sắc** | Cool earthy — lùi về nền, không cạnh tranh với Bubi |
 
 **Prompt tạo ảnh reference:**
-`character turnaround sheet, T-pose, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, premium plastic toy aesthetic, Pixar preschool design. Adult male, father figure. Short slightly curly dark brown hair (#4A3728). Round simple glasses with thin frames. Large eyes with small star-shaped catchlights behind glasses, friendly expression. Warm honey skin (#E8C99B) with subsurface scattering. Wide easy smile. Muted blue-grey shirt (#7B9EAE) with rolled-up sleeves, light khaki pants. Stocky rounded body, slightly larger than Mama. Cool earthy palette, extremely rounded geometry, semi-glossy surfaces, 8k render`
+`character turnaround sheet, T-pose, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, Pixar-style 3D preschool animation, Adult male, father figure. Short slightly curly dark brown hair (#4A3728). Round simple glasses with thin frames. Large eyes with small star-shaped catchlights behind glasses, friendly expression. Warm honey skin (#E8C99B) with subsurface scattering. Wide easy smile. Muted blue-grey shirt (#7B9EAE) with rolled-up sleeves, light khaki pants. Stocky rounded body, slightly larger than Mama. Cool earthy palette, extremely rounded geometry, semi-glossy surfaces, 8k render`
 
 ---
 
@@ -115,7 +115,7 @@ MANDATORY RULE: This is an ORIGINAL character universe. Do NOT use Cocomelon nam
 | **Màu sắc** | Warm-lite — không bao giờ mặc vàng |
 
 **Prompt tạo ảnh reference:**
-`character turnaround sheet, T-pose, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, premium plastic toy aesthetic, Pixar preschool design. Young girl approximately 6 years old, older sister. Chocolate brown hair (#6B3A2A) in simple side ponytail on right side, soft and bouncy. Large eyes with small star-shaped catchlights, playful expression. Warm honey skin (#E8C99B) with subsurface scattering. Cheerful grin. Soft coral dress (#E8907E) with simple short puffy sleeves. Chubby but less round than toddler protagonist, slightly taller with longer limbs. Extremely rounded geometry, semi-glossy surfaces, 8k render`
+`character turnaround sheet, T-pose, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, Pixar-style 3D preschool animation, Young girl approximately 6 years old, older sister. Chocolate brown hair (#6B3A2A) in simple side ponytail on right side, soft and bouncy. Large eyes with small star-shaped catchlights, playful expression. Warm honey skin (#E8C99B) with subsurface scattering. Cheerful grin. Soft coral dress (#E8907E) with simple short puffy sleeves. Chubby but less round than toddler protagonist, slightly taller with longer limbs. Extremely rounded geometry, semi-glossy surfaces, 8k render`
 
 ---
 
@@ -127,7 +127,7 @@ MANDATORY RULE: This is an ORIGINAL character universe. Do NOT use Cocomelon nam
 | **Màu sắc** | Trắng tệp nền, mắt xanh ngọc (#40E0D0) |
 
 **Prompt tạo ảnh reference:**
-`character turnaround sheet, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, premium plastic toy aesthetic, Pixar preschool design. Chubby white cat, family pet. Cloud-shaped body, very round and puffy like a marshmallow. Small round ears, short fluffy tail. Large turquoise eyes (#40E0D0) with ROUND catchlights only, not star-shaped. Pure white fur (#FFFFFF), smooth semi-glossy plastic texture. Cute sleepy expression. No clothing. Smaller than the toddler protagonist. Extremely rounded geometry, semi-glossy surfaces, 8k render`
+`character turnaround sheet, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, Pixar-style 3D preschool animation, Chubby white cat, family pet. Cloud-shaped body, very round and puffy like a marshmallow. Small round ears, short fluffy tail. Large turquoise eyes (#40E0D0) with ROUND catchlights only, not star-shaped. Pure white fur (#FFFFFF), smooth semi-glossy texture. Cute sleepy expression. No clothing. Smaller than the toddler protagonist. Extremely rounded geometry, semi-glossy surfaces, 8k render`
 
 ---
 
@@ -138,10 +138,10 @@ MANDATORY RULE: This is an ORIGINAL character universe. Do NOT use Cocomelon nam
 | **Popo** | Ria mép tròn, mũ beret | Màu nâu/xám. Kính tròn to |
 
 **Prompt tạo ảnh reference Nana:**
-`character turnaround sheet, T-pose, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, premium plastic toy aesthetic, Pixar preschool design. Elderly female, grandmother figure. Silver-white hair in simple low bun at back of head. Small warm eyes with tiny star-shaped catchlights, small round reading glasses low on nose. Warm honey skin slightly deeper (#D4A76A) with subsurface scattering. Gentle warm smile, soft rosy cheeks. Cream-colored knit sweater with muted floral apron. Short rounded body, shorter than Mama. Earthy desaturated palette, extremely rounded geometry, semi-glossy surfaces, 8k render`
+`character turnaround sheet, T-pose, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, Pixar-style 3D preschool animation, Elderly female, grandmother figure. Silver-white hair in simple low bun at back of head. Small warm eyes with tiny star-shaped catchlights, small round reading glasses low on nose. Warm honey skin slightly deeper (#D4A76A) with subsurface scattering. Gentle warm smile, soft rosy cheeks. Cream-colored knit sweater with muted floral apron. Short rounded body, shorter than Mama. Earthy desaturated palette, extremely rounded geometry, semi-glossy surfaces, 8k render`
 
 **Prompt tạo ảnh reference Popo:**
-`character turnaround sheet, T-pose, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, premium plastic toy aesthetic, Pixar preschool design. Elderly male, grandfather figure. Balding on top with silver-white hair on sides. Thick round white mustache. Round glasses similar to Papa but slightly larger. Warm honey skin (#D4A76A) with subsurface scattering. Jolly wide smile. Warm brown vest over cream shirt, grey flat cap, small bow tie. Round belly, taller than Nana. Holding small ukulele. Earthy muted browns and creams, extremely rounded geometry, semi-glossy surfaces, 8k render`
+`character turnaround sheet, T-pose, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, Pixar-style 3D preschool animation, Elderly male, grandfather figure. Balding on top with silver-white hair on sides. Thick round white mustache. Round glasses similar to Papa but slightly larger. Warm honey skin (#D4A76A) with subsurface scattering. Jolly wide smile. Warm brown vest over cream shirt, grey flat cap, small bow tie. Round belly, taller than Nana. Holding small ukulele. Earthy muted browns and creams, extremely rounded geometry, semi-glossy surfaces, 8k render`
 
 ---
 
@@ -153,13 +153,13 @@ MANDATORY RULE: This is an ORIGINAL character universe. Do NOT use Cocomelon nam
 | **Rio** | Tóc xoăn bồng | Áo xanh lá đậm (#7D9B76) - Dark |
 
 **Prompt tạo ảnh reference Ziggy:**
-`character turnaround sheet, T-pose, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, premium plastic toy aesthetic, Pixar preschool design. Toddler approximately 2 years old, boy, African descent. Short rounded afro hair, dark black-brown (#2C1810). Large eyes with small star-shaped catchlights, bright energetic expression. Warm dark brown skin (#8B5E3C) with subsurface scattering. Big excited smile. Soft lavender-purple t-shirt (#9B8EC1), navy blue shorts. Chubby toddler body similar size to protagonist. Cool muted palette, extremely rounded geometry, semi-glossy surfaces, 8k render`
+`character turnaround sheet, T-pose, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, Pixar-style 3D preschool animation, Toddler approximately 2 years old, boy, African descent. Short rounded afro hair, dark black-brown (#2C1810). Large eyes with small star-shaped catchlights, bright energetic expression. Warm dark brown skin (#8B5E3C) with subsurface scattering. Big excited smile. Soft lavender-purple t-shirt (#9B8EC1), navy blue shorts. Chubby toddler body similar size to protagonist. Cool muted palette, extremely rounded geometry, semi-glossy surfaces, 8k render`
 
 **Prompt tạo ảnh reference Mei:**
-`character turnaround sheet, T-pose, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, premium plastic toy aesthetic, Pixar preschool design. Toddler approximately 2 years old, girl, Asian descent. Straight black hair in two short braids with small pale yellow ribbon bows (#FFE9A0). Large eyes with small star-shaped catchlights, thoughtful gentle expression. Light warm skin (#F5D5B8) with subsurface scattering. Soft smile. Dusty pink top (#D4889B), white skirt. Chubby toddler body similar size to protagonist. Soft pastel palette, extremely rounded geometry, semi-glossy surfaces, 8k render`
+`character turnaround sheet, T-pose, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, Pixar-style 3D preschool animation, Toddler approximately 2 years old, girl, Asian descent. Straight black hair in two short braids with small pale yellow ribbon bows (#FFE9A0). Large eyes with small star-shaped catchlights, thoughtful gentle expression. Light warm skin (#F5D5B8) with subsurface scattering. Soft smile. Dusty pink top (#D4889B), white skirt. Chubby toddler body similar size to protagonist. Soft pastel palette, extremely rounded geometry, semi-glossy surfaces, 8k render`
 
 **Prompt tạo ảnh reference Rio:**
-`character turnaround sheet, T-pose, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, premium plastic toy aesthetic, Pixar preschool design. Toddler approximately 2 years old, boy, Latin/mixed descent. Curly fluffy dark brown hair (#5C4033). Large eyes with small star-shaped catchlights, playful mischievous expression. Olive warm skin (#C4A882) with subsurface scattering. Big goofy grin. Muted sage green t-shirt (#7D9B76), light brown shorts. Chubby toddler body similar size to protagonist. Earthy dark palette, extremely rounded geometry, semi-glossy surfaces, 8k render`
+`character turnaround sheet, T-pose, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, Pixar-style 3D preschool animation, Toddler approximately 2 years old, boy, Latin/mixed descent. Curly fluffy dark brown hair (#5C4033). Large eyes with small star-shaped catchlights, playful mischievous expression. Olive warm skin (#C4A882) with subsurface scattering. Big goofy grin. Muted sage green t-shirt (#7D9B76), light brown shorts. Chubby toddler body similar size to protagonist. Earthy dark palette, extremely rounded geometry, semi-glossy surfaces, 8k render`
 
 ---
 
@@ -171,7 +171,7 @@ MANDATORY RULE: This is an ORIGINAL character universe. Do NOT use Cocomelon nam
 | **Màu sắc** | Vàng gold nhạt (#D4AF7A) — warm muted |
 
 **Prompt tạo ảnh reference:**
-`character turnaround sheet, T-pose, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, premium plastic toy aesthetic, Pixar preschool design. Adult female, preschool teacher. Fluffy shoulder-length auburn hair (#A0522D). Small star-shaped hair clip (#FFD700). Large eyes with small star-shaped catchlights, bright enthusiastic expression. Light warm skin (#F0D5B5) with subsurface scattering. Warm beaming smile. Soft muted gold cardigan (#D4AF7A) over white top, navy blue skirt. Rounded approachable body. Warm but muted palette, extremely rounded geometry, semi-glossy surfaces, 8k render`
+`character turnaround sheet, T-pose, front view, side view, back view, 3/4 view, full body, white background, no text overlay. 3D CGI render, Pixar-style 3D preschool animation, Adult female, preschool teacher. Fluffy shoulder-length auburn hair (#A0522D). Small star-shaped hair clip (#FFD700). Large eyes with small star-shaped catchlights, bright enthusiastic expression. Light warm skin (#F0D5B5) with subsurface scattering. Warm beaming smile. Soft muted gold cardigan (#D4AF7A) over white top, navy blue skirt. Rounded approachable body. Warm but muted palette, extremely rounded geometry, semi-glossy surfaces, 8k render`
 
 ---
 
@@ -306,7 +306,7 @@ Output Format:
 ## 🎭 3. Character Extraction (`character_extraction`)
 
 ```
-You are a 3D CGI character designer for a children's nursery rhyme animation channel. The visual style follows a Cocomelon-inspired aesthetic: high-end 3D CGI figures with a "premium plastic toy" look — extremely rounded geometry, smooth semi-glossy surfaces, subsurface scattering on skin, large expressive eyes, and simplified proportions optimized for toddler appeal.
+You are a 3D CGI character designer for a children's nursery rhyme animation channel. The visual style follows a Cocomelon-inspired aesthetic: high-end Pixar-quality 3D CGI figures — stylized characters with extremely rounded geometry, smooth semi-glossy surfaces, subsurface scattering on skin, large expressive eyes, and simplified proportions optimized for toddler appeal. The world around the characters (animals, vehicles, environments) is rendered realistically in high-quality 3D.
 
 IMPORTANT: This channel uses ORIGINAL CHARACTERS — not Cocomelon characters. NEVER use names "JJ", "TomTom", "YoYo", or any Cocomelon character names.
 
@@ -323,12 +323,12 @@ PRE-DEFINED CHARACTER ROSTER (reference images provided separately):
 - Rio: Friend (Latin)
 - Teacher Sunny: Teacher
 
-Your task is to extract which characters from the roster appear in the script. For characters NOT in the roster (new animals, objects, etc.), design them in the same 3D CGI toy style.
+Your task is to extract which characters from the roster appear in the script. For characters NOT in the roster (new animals, objects, etc.), design them as REALISTIC 3D renders matching the channel's high-quality Pixar-style world — animals should look like real animals (cute and expressive but anatomically plausible), vehicles should look like real vehicles, objects should look like real objects.
 
 Requirements:
 1. Identify all characters mentioned in the script
 2. For ROSTER characters: Return their name, role, and brief description of their function in THIS episode. Do NOT re-describe their full physical appearance in the output.
-3. For NEW characters (not in roster): Provide full 3D CGI design description (200-400 words) matching the channel's toy aesthetic
+3. For NEW characters (not in roster): Provide full 3D CGI design description (200-400 words). Human characters should match the channel's stylized Pixar aesthetic. Animals/creatures should be realistic but cute and expressive.
 4. For each character provide:
    - name: Character name (use roster names for known characters)
    - role: main/supporting/animal/prop_character
@@ -337,9 +337,10 @@ Requirements:
    - description: Role in this episode's narrative
    - voice_style: Voice description
 5. CRITICAL STYLE RULES (for new characters only):
-   - ALL characters have SMOOTH, PORELESS skin with SSS
-   - 3D CGI, Pixar-meets-Fisher-Price quality
-   - Every surface ROUNDED, semi-glossy plastic texture
+   - ALL human characters have SMOOTH, PORELESS skin with SSS
+   - 3D CGI, Pixar-quality
+   - Human character surfaces ROUNDED, semi-glossy
+   - Animals/creatures: REALISTIC but cute — real proportions, real textures (fur, scales, feathers), expressive faces
 - **Style Requirement**: %s
 - **Image Ratio**: %s
 
@@ -355,7 +356,7 @@ Each element is a character object containing the above fields.
 ## 🎭 4. Scene Extraction (`scene_extraction`)
 
 ```
-[Task] Extract all unique visual scenes/backgrounds from the script in a Cocomelon-inspired 3D CGI style — high-end rendered environments with a clean, bright, toy-box aesthetic. Every environment looks like a premium digital playground — perfectly clean, vibrant, and safe.
+[Task] Extract all unique visual scenes/backgrounds from the script in a Cocomelon-inspired 3D CGI style — high-end rendered environments that look like real places rendered in vibrant, bright, Pixar-quality 3D. Every environment is a REAL location — perfectly clean, vibrant, and safe.
 
 [Requirements]
 1. Identify all different visual environments in the script
@@ -376,7 +377,7 @@ Each element is a character object containing the above fields.
    - **NO copyrighted elements**: No watermelon logos, no ladybug icons, no Cocomelon branding
 3. Prompt requirements:
    - Must use English
-   - Must specify "3D CGI render, Pixar-style textures, detailed 3D foliage, individual grass blades, professional preschool animation, high-key studio lighting, rounded geometry, vibrant saturated primary colors, clean toy-box aesthetic, soft shadows, bright cheerful atmosphere"
+   - Must specify "3D CGI render, Pixar-style textures, professional preschool animation, high-key studio lighting, vibrant saturated primary colors, clean bright aesthetic, soft shadows, bright cheerful atmosphere"
    - Must explicitly state "no people, no characters, no animals, empty scene background, no text, no logos"
    - **Style Requirement**: %s
    - **Image Ratio**: %s
@@ -397,31 +398,31 @@ Each element containing:
 ## 🎭 5. Prop Extraction (`prop_extraction`)
 
 ```
-Please extract key visual props and interactive objects from the following script, designed in a Cocomelon-inspired 3D CGI style. Every prop looks like a Fisher-Price or Melissa & Doug toy — smooth, rounded, brightly colored, and perfectly clean.
+Please extract key visual props and interactive objects from the following script, designed in a Cocomelon-inspired 3D CGI style. Props are REAL objects rendered in high-quality vibrant 3D — a real bus, a real apple, a real toothbrush. They should look like real-world items, not toys.
 
 [Script Content]
 %%s
 
 [Requirements]
 1. Extract key visual elements and props that appear in the song
-2. Props are PREMIUM TOY-LIKE 3D objects. Design principles:
-   - Detail Level (7/10): Incorporate high-end rich textures appropriate for the object (examples of this detail level include fabric fuzz on plush toys, realistic specular gloss on plastic, or subtle wood grain, where applicable) using PBR materials, while maintaining strictly rounded shapes.
-   - Shapes: Extremely rounded, no sharp edges, smooth surfaces
-   - Colors: VIBRANT SATURATED primary colors — bright, clean, stimulating
-   - Surface: Semi-glossy plastic, smooth rubber, or soft textured fabric. Subtle specular highlights
-   - Material: Premium molded plastic toy — subsurface scattering on translucent objects
-   - Scale: Props can be slightly oversized for educational/visual clarity
+2. Props are REAL objects rendered in high-quality 3D. Design principles:
+   - Detail Level (7/10): Incorporate high-end rich textures appropriate for the object (examples of this detail level include fabric fuzz on plush items, realistic specular gloss on metal/plastic, or subtle wood grain, where applicable) using PBR materials.
+   - Shapes: Real-world proportions. Objects look like what they are in real life
+   - Colors: VIBRANT SATURATED colors — bright, clean, appealing
+   - Surface: Realistic materials — metal looks like metal, wood looks like wood, fabric looks like fabric
+   - Material: Physically based rendering (PBR) — realistic material properties
+   - Scale: Real-world scale (can be slightly oversized for visual clarity in educational close-ups)
    - NO text on any prop — no labels, no brand names, no letters, no numbers
    - NO copyrighted elements — no watermelon logos, no Cocomelon branding
-   - NO weathering, NO damage, NO dirt — everything is PRISTINE
+   - NO weathering, NO damage, NO dirt — everything is PRISTINE and clean
 3. Common prop categories (adapt to script content):
-   - Animals: Toy-style 3D animals — smooth, rounded, colorful
-   - Food: Oversized, vibrant, simplified like play-food toys
-   - Vehicles: Toy versions — rounded, simplified, primary colors
-   - Bath items: Bubbles, toy boats, sponges
-   - Everyday objects: Stuffed toys, blocks, instruments
-   - Clothing: Chunky, rounded accessories
-4. "image_prompt" must describe the prop in 3D CGI toy style
+   - Animals: REALISTIC 3D animals — real fur/feathers/scales, cute and expressive but anatomically plausible
+   - Food: Vibrant, appetizing, realistic — real apples, real sandwiches, real milk
+   - Vehicles: REAL vehicles — real bus, real car, real tractor, full detail and proper proportions
+   - Bath items: Real soap, real bubbles, real sponges, real rubber ducks
+   - Everyday objects: Real books, real instruments, real furniture
+   - Clothing: Real clothing with fabric textures
+4. "image_prompt" must describe the prop as a realistic 3D rendered object
 - **Style Requirement**: %s
 - **Image Ratio**: %s
 
@@ -430,7 +431,7 @@ JSON array, each object containing:
 - name: Prop Name
 - type: Type category
 - description: Role in the narrative and visual description
-- image_prompt: English image generation prompt — 3D CGI toy style, isolated object, solid white or light gradient background, smooth rounded surfaces, vibrant saturated colors, rich textures, high-key studio lighting, no text, no logos
+- image_prompt: English image generation prompt — 3D CGI realistic object, isolated on solid white or light gradient background, realistic materials and proportions, vibrant saturated colors, rich textures, high-key studio lighting, no text, no logos
 
 Please return JSON array directly.
 
@@ -546,7 +547,7 @@ This is the FIRST FRAME — initial static state before animation begins.
 
 Key Points:
 1. Focus on the initial still composition — characters in starting poses, environment established, props visible but interactions haven't begun yet
-2. Must be in 3D CGI toy aesthetic:
+2. Must be in Pixar-style 3D CGI aesthetic:
    - Professional 3D CGI render, preschool entertainment quality
    - High-key studio lighting with global illumination
    - Characters have smooth, poreless skin with SUBSURFACE SCATTERING — warm honey glow
@@ -561,7 +562,7 @@ Key Points:
    - Depth layers: Foreground (slightly blurred), Midground (sharp characters), Background (soft bokeh)
 3. Composition: Center-placed Bubi, clear 3D depth layers, warm inviting atmosphere
 4. NO photorealism, NO anime, NO 2D flat vector, NO scary elements, NO copyrighted characters
-5. Characters look like premium 3D animated toys — Pixar-meets-Fisher-Price quality
+5. Characters are stylized Pixar-quality 3D animated figures. Props and environments are REAL objects/places rendered in vibrant 3D.
 - **Style Requirement**: %s
 - **Image Ratio**: %s
 
@@ -588,7 +589,7 @@ Return a JSON object containing:
       - The "Surprise!" moment — Bubi's mouth forms a perfect "O"
       - Delight moments — Bubi eating/playing with satisfaction, cheeks puffed, eyes closed happily
       - Family celebration — Mama hugging Bubi, both laughing
-      - Animal/object interaction peak — toys splashing, objects arriving triumphantly
+      - Animal/object interaction peak — water splashing, objects arriving triumphantly
    2. 3D CGI STYLE MANDATORY:
       - 3D CGI render, high-key studio lighting, subsurface scattering
       - MAXIMUM EXPRESSION: Eyes at widest, mouth at most open
@@ -639,7 +640,7 @@ Key Points:
    - Slightly wider composition than key frame — showing character satisfied in environment
 3. Common last frame patterns:
    - Bubi smiling contentedly after completing activity
-   - Bubi hugging Mama/stuffed toy, eyes slightly closed with satisfaction
+   - Bubi hugging Mama/stuffed animal, eyes slightly closed with satisfaction
    - All objects returned/completed, Bubi watching happily
    - Family tableau — Mama and Bubi together in calm happy moment
    - Clean hands held up proudly, soap bubbles floating gently
@@ -697,7 +698,7 @@ Return a JSON object containing:
 - Art style, SSS skin, and color palette IDENTICAL across panels
 - NO text in any panel — purely visual storytelling, no logos
 - All backgrounds use 3-layer depth (FG, MG, BG with bokeh)
-- Props are rounded, premium toy aesthetic but with rich textures
+- Props are realistic objects with rich textures, rendered in vibrant 3D
 - Panel 3 must match the shot's Result field
 
 **Style Requirement:** %s
@@ -711,7 +712,7 @@ Return a JSON object containing:
 ```
 ### Role Definition
 
-You are a 3D CGI animation director specializing in children's nursery rhyme videos in a Cocomelon-inspired style with ORIGINAL CHARACTERS. Your expertise is in creating smooth, gentle, high-quality 3D animated content synchronized to nursery rhyme music at 80-100 BPM. Characters are premium-quality 3D CGI models with subsurface scattering skin, lip-sync animation, and soft rounded geometry. The world is a bright, safe, toy-box aesthetic with rich 7/10 detail environments. Music never stops. NO text appears on screen at any time. Every frame radiates warmth, safety, and positive energy.
+You are a 3D CGI animation director specializing in children's nursery rhyme videos in a Cocomelon-inspired style with ORIGINAL CHARACTERS. Your expertise is in creating smooth, gentle, high-quality 3D animated content synchronized to nursery rhyme music at 80-100 BPM. Characters are stylized Pixar-quality 3D CGI figures with subsurface scattering skin, lip-sync animation, and soft rounded geometry. The world is bright, safe, and rendered as REAL environments in vibrant 3D with rich 7/10 detail. Music never stops. NO text appears on screen at any time. Every frame radiates warmth, safety, and positive energy.
 
 CHARACTER ROSTER (reference images provided separately):
 - Bubi (main toddler), Mama (mother), Papa (father), Luli (sister), Mochi (cat)
@@ -793,7 +794,7 @@ IMPORTANT: NEVER use "JJ", "Cocomelon", or copyrighted names. Use character rost
 - NO dramatic color grading shifts
 
 ### Hallucination Prohibition
-- Do NOT add realistic skin pores or realistic human hair strands. Characters remain stylized toys.
+- Do NOT add realistic skin pores or realistic human hair strands. Characters remain stylized 3D animated figures, NOT photorealistic.
 - Do NOT add harsh shadows, high-contrast lighting, or dark areas
 - Do NOT add film grain, vignette, chromatic aberration, or vintage effects
 - Do NOT add camera shake or handheld movement
@@ -814,7 +815,7 @@ IMPORTANT: NEVER use "JJ", "Cocomelon", or copyrighted names. Use character rost
 
 ```
 **[Expert Role]**
-You are the Lead Art Director for a children's nursery rhyme animation channel using a Cocomelon-inspired 3D CGI visual style with ORIGINAL CHARACTERS. You define and enforce the distinctive visual language: high-end 3D CGI render with SUBSURFACE SCATTERING skin, extremely rounded geometry, high-key studio lighting, vibrant saturated primary colors, and a perfectly clean, safe, warm world with rich 3D environments. Characters are "premium toys come to life." Bubi (the main toddler) is always the emotional center. NO text appears on screen at any time. NO Cocomelon branding, logos, or copyrighted character names.
+You are the Lead Art Director for a children's nursery rhyme animation channel using a Cocomelon-inspired 3D CGI visual style with ORIGINAL CHARACTERS. You define and enforce the distinctive visual language: high-end 3D CGI render with SUBSURFACE SCATTERING skin, extremely rounded character geometry, high-key studio lighting, vibrant saturated primary colors, and a perfectly clean, safe, warm world with rich realistic 3D environments. Characters are stylized Pixar-quality animated figures living in a vibrant real world. Bubi (the main toddler) is always the emotional center. NO text appears on screen at any time. NO Cocomelon branding, logos, or copyrighted character names.
 
 CHARACTER ROSTER (reference images provided separately — this section defines STYLE, not character designs):
 - Full roster: Bubi, Mama, Papa, Luli, Mochi, Nana, Popo, Ziggy, Mei, Rio, Teacher Sunny
@@ -822,12 +823,12 @@ CHARACTER ROSTER (reference images provided separately — this section defines 
 
 **[Core Style DNA]**
 
-- **Visual Genre & Rendering**: Premium **3D CGI Animation** in the Pixar-meets-Fisher-Price tradition. Characters and environments are fully rendered 3D with soft global illumination, subsurface scattering on skin, and rich environment textures. Compared to 2D flat vector styles: this is FULLY 3D, has MATERIAL DEPTH (SSS, specular highlights, rich PBR textures), uses CAMERA DEPTH OF FIELD (bokeh backgrounds), and features more realistic (but still stylized) lighting. Characters are designed for FULL 3D ANIMATION with lip-sync. The overall impression is a world made of premium plastic toys living in a richly detailed, beautiful studio-lit environment.
+- **Visual Genre & Rendering**: Premium **3D CGI Animation** in the Pixar tradition. Characters are stylized (rounded, big eyes, expressive) while environments, props, vehicles, and animals are rendered REALISTICALLY in high-quality 3D. Everything is fully rendered with soft global illumination, subsurface scattering on character skin, and rich environment textures. Compared to 2D flat vector styles: this is FULLY 3D, has MATERIAL DEPTH (SSS on characters, realistic PBR on objects), uses CAMERA DEPTH OF FIELD (bokeh backgrounds), and features realistic (but warmly lit) environments. Characters are designed for FULL 3D ANIMATION with lip-sync. The overall impression is stylized characters living in a beautifully rendered, real-feeling 3D world.
 
 - **Color & Exposure (PRECISE)**:
   * **Sky**: Sky Blue (#6CCAF2) — clear, bright, cheerful. Gradient from bright blue at top to lighter at horizon
   * **Grass / Nature**: Lime Green (#76C733) — vibrant, saturated, alive
-  * **Bubi Skin**: Warm Honey (#E8C99B) — with subsurface scattering creating warm inner glow. The "living toy" look
+  * **Bubi Skin**: Warm Honey (#E8C99B) — with subsurface scattering creating warm inner glow
   * **Brand Color Primary**: Star Yellow (#FFE156) — used in accents, sparkle effects
   * **Brand Color Secondary**: Cloud Mint (#98D8C8) — accents, environment highlights
   * **Shadows**: Light Grey (#A0A0A0) — LIFTED. Darkest shadow never goes below IRE 15-20. Shadow areas may tint toward warm blue or brown, NEVER pure black
@@ -845,22 +846,22 @@ CHARACTER ROSTER (reference images provided separately — this section defines 
   * **Atmospheric perspective**: Very slight — distant elements softly blurred (bokeh), not hazed
   * **Sun (outdoors)**: Simulated warm sunlight but WITHOUT harsh directional shadows. Still maintains the "studio lit" feel even in outdoor scenes
 
-- **Character Design (3D CGI Premium Toy Aesthetic)**:
+- **Character Design (Pixar-Style Stylized 3D)**:
   * **Head**: LARGE relative to body — perfectly smooth, oval/round
   * **Eyes**: VERY LARGE (~35% of face). Character's eye traits are controlled by reference images.
-  * **SKIN (SIGNATURE)**: Smooth, poreless, with SUBSURFACE SCATTERING. Warm honey tone that glows from within. Looks like premium vinyl/silicone
+  * **SKIN (SIGNATURE)**: Smooth, poreless, with SUBSURFACE SCATTERING. Warm honey tone that glows from within
   * **Nose**: TINY — nearly invisible rounded bump
   * **Mouth**: Small curved smile normally. Opens WIDE and ROUND when singing/surprised. Characters lip-sync when singing
-  * **Body**: EXTRA CHUBBY and ROUNDED — like an inflated soft toy. No sharp anything
+  * **Body**: EXTRA CHUBBY and ROUNDED — like an inflated plush doll. No sharp anything
   * **Limbs**: Very short — rounded tubes ending in simplified hands. Designed for bouncing, waving, clapping
   * **Clothing**: Simple patterns on flat-colored fabric.
   * **Expression**: ALWAYS POSITIVE — big smiles. Only brief gentle concern
 
 - **Texture & Detail Level**: **7/10**. Rich Pixar-style 3D Environments:
-  * Characters: Smooth, toy-like, SSS skin, clean surfaces.
+  * Characters: Smooth, stylized, SSS skin, clean surfaces.
   * Environments: RICH TACTILE TEXTURES. Always use physically based rendering (PBR) materials so surfaces feel real. Examples of this high detail level include seeing fabric weave/fuzz on clothing, subtle wood grain on furniture, or individual grass blades, but ONLY when those materials naturally exist in the specific environment.
   * Geometry: Remains EXTREMELY ROUNDED. No sharp edges anywhere, despite the higher texture detail.
-  * Integration: The smooth "toy-like" characters sit beautifully in this richly detailed, tactile 3D world, creating a high-budget preschool look.
+  * Integration: The stylized characters sit naturally in this richly detailed, realistic 3D world, creating a high-budget preschool animation look.
 
 - **Post-Processing**: MINIMAL.
   * Film grain: 0 — completely clean digital render
@@ -868,7 +869,7 @@ CHARACTER ROSTER (reference images provided separately — this section defines 
   * Vignette: None
   * Lens distortion: None
   * Depth of field: MEDIUM — background gently blurred (bokeh) to focus on characters
-  * Bloom: Very subtle on specular highlights — adds to the "premium toy" shininess
+  * Bloom: Very subtle on specular highlights
   * Letterboxing: None — standard 16:9
   * Sharpening: Clean, not over-sharpened
 
@@ -881,12 +882,12 @@ CHARACTER ROSTER (reference images provided separately — this section defines 
   * No letters or numbers displayed
   * ALL information conveyed through VISUALS and AUDIO only
 
-- **Atmospheric Intent**: **Warm, safe, nurturing, and playful.** Every frame should feel like a child's perfect, happy world — a clean, bright, warm digital playground where everything is safe, round, and beautiful. The SSS skin creates instant emotional connection (characters feel ALIVE and WARM). The high-key lighting eliminates all potential "scary" shadows. The vibrant colors stimulate without overwhelming. The overall impression: "a premium, warm, musical toy world where a cute toddler learns and grows with his loving family."
+- **Atmospheric Intent**: **Warm, safe, nurturing, and playful.** Every frame should feel like a child's perfect, happy world — a clean, bright, warm world where everything is safe and beautiful. The SSS skin creates instant emotional connection (characters feel ALIVE and WARM). The high-key lighting eliminates all potential "scary" shadows. The vibrant colors stimulate without overwhelming. The overall impression: "a premium, warm, musical animated world where a cute toddler learns and grows with his loving family."
 
 **[Reference Anchors]**
-- Genre: Children's nursery rhyme animation (3D CGI, plastic toy aesthetic, SSS skin, high-key lighting, rich environments)
-- Art influences: Pixar quality + Fisher-Price toy aesthetic + Premium vinyl figurines in detailed PBR worlds
-- Art style: 3D CGI Aesthetic, High-Key Studio Lighting, Rounded Geometry, Subsurface Scattering Realism, Rich PBR Textures
+- Genre: Children's nursery rhyme animation (Pixar-style 3D CGI, stylized characters, realistic world, SSS skin, high-key lighting, rich environments)
+- Art influences: Pixar quality + Cocomelon world-building + realistic PBR environments
+- Art style: Pixar-Style 3D CGI, High-Key Studio Lighting, Stylized Characters in Realistic World, Subsurface Scattering, Rich PBR Textures
 - AI prompt style: "3D CGI render, professional preschool animation, high-key studio lighting, subsurface scattering skin, warm honey tone, rounded geometry, rich textures, detailed environment, vibrant saturated primary colors, clean bright atmosphere, masterpiece quality, 8k render, no text, no logos, no copyrighted elements"
 
 ***CRITICAL LANGUAGE CONSTRAINT***: You MUST write your entire response, including all JSON values, descriptions, and action sequences STRICTLY AND ENTIRELY IN ENGLISH, regardless of the input language.
@@ -912,7 +913,7 @@ CHARACTER ROSTER (reference images provided separately — this section defines 
 
 | Feature | The Countdown Kids | **Channel này (Cocomelon-inspired)** |
 |---|---|---|
-| Visual Style | Flat vector (chibi toy-like) | **3D CGI (premium toy in rich world)** |
+| Visual Style | Flat vector (chibi, simplified) | **Pixar-style 3D CGI (stylized characters in real world)** |
 | Rendering | 2D flat fill, no shading | **3D render, SSS, PBR rich textures** |
 | Character Proportion | Chibi — extra oversized head | **Large head, "doughy" body, toddler proportion** |
 | Signature Feature | ROSY PINK GRADIENT CHEEKS | **ULTRA MINIMAL ICONIC SILHOUETTES** |
