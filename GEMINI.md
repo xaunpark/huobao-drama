@@ -1,18 +1,31 @@
-# Compound Project - Agent Configuration
+# Gemini Agent Configuration
 
-## Project Overview
+> **Start here → then load [AGENTS.md](AGENTS.md) for full routing.**
 
-This project implements the Compound Learning System for huobao-drama - a self-improving knowledge system based on the "Compounding Engineering" philosophy.
+## Quick Context
 
-## Core Principle
+- **Project**: Huobao Drama — AI Short Drama Production Platform
+- **Stack**: Go 1.23 (Gin/GORM/SQLite) + Vue 3 (TypeScript/Vite/Element Plus/TailwindCSS/Pinia)
+- **Architecture**: DDD 4-layer (api → application → domain → infrastructure)
+- **Full routing & context loading**: See [AGENTS.md](AGENTS.md)
 
-> **Each unit of engineering work should make subsequent units of work easier—not harder.**
+## Gemini-Specific Notes
 
-## Workflows Available
+1. **Memory**: This repo has a compound learning system. Check `docs/solutions/` before solving problems.
+2. **Plans**: Check `plans/` before starting significant work — there are 19+ active implementation plans.
+3. **Chinese comments**: Backend code has Chinese comments (中文注释). Preserve them. Don't translate or remove.
+4. **Large files**: `storyboard_service.go` is 77KB. Use targeted reads, not full-file loads.
+5. **Prompt templates**: Located in `application/prompts/*.txt`. These are AI system prompts, not code.
+
+## Compound Learning System
 
 > **Full index:** See [.agent/workflows/README.md](.agent/workflows/README.md) for all commands and quick start guide.
 
-Use these commands for systematic development:
+### Core Principle
+
+> **Each unit of engineering work should make subsequent units of work easier—not harder.**
+
+### Workflows Available
 
 | Command | When |
 |---------|------|
@@ -24,7 +37,7 @@ Use these commands for systematic development:
 | `/compound` | After solving problems ("that worked!") |
 | `/housekeeping` | Before git push (cleanup & archive) |
 
-## Knowledge Persistence
+### Knowledge Persistence
 
 Solutions are documented in `docs/solutions/` and explorations in `docs/explorations/` with:
 - YAML frontmatter for searchability
@@ -35,13 +48,13 @@ Solutions are documented in `docs/solutions/` and explorations in `docs/explorat
 
 **After solving a problem:** Run `/compound` to document it.
 
-## Compounding Loop
+### Compounding Loop
 
 ```
 /explore (optional) → /specs (large) → /plan (per phase) → /work → /review → /compound → /housekeeping → repeat
 ```
 
-## Important Directories
+### Important Directories
 
 ```
 .agent/workflows/     # All workflow commands
@@ -64,7 +77,7 @@ docs/specs/           # Multi-session specifications
 ├── archive/          # Completed specs
 ```
 
-## Agent Behavior
+### Agent Behavior
 
 -1. **Resume Context** - At the start of EVERY new session, read `skills/session-resume/SKILL.md` and follow the checklist to establish state.
 0. **Check active specs** - Before starting significant work, run `ls docs/specs/*/README.md` to find active multi-session initiatives
@@ -79,3 +92,10 @@ docs/specs/           # Multi-session specifications
 9. **Record architectural decisions** - When making technology/pattern/schema choices, create ADRs in `docs/decisions/`. Check existing ADRs before re-debating.
 10. **Check health daily** - Run `./scripts/compound-dashboard.sh` at session start. Target: Grade B or higher.
 11. **Instrument Skills** - Every new skill MUST include an `## Instrumentation` section in `SKILL.md` calling `./scripts/log-skill.sh`.
+
+## Retrieval Rules
+
+- For routing logic: Load [AGENTS.md](AGENTS.md) → follow Task-Based Routing section
+- For deep context: Load from `ai/` directory based on task type
+- For prior solutions: Search `docs/solutions/` first
+- For architecture: Load `ai/memory/architecture.md`
