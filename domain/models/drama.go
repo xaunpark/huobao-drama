@@ -151,6 +151,7 @@ type Storyboard struct {
 	// Per-shot distilled style fields (populated by StyleDistillService after storyboard creation)
 	ImageStyle      *string       `gorm:"type:text" json:"image_style,omitempty"`        // Distilled visual style for this specific shot
 	VideoStyle      *string       `gorm:"type:text" json:"video_style,omitempty"`        // Distilled video constraint for this specific shot
+	VideoPromptDistilled *string  `gorm:"type:text" json:"video_prompt_distilled,omitempty"` // AI-written narrative video prompt (distilled from template + shot context)
 	// Narrative MV fields (narrative_mv mode)
 	NarrativePart   *string       `gorm:"size:20" json:"narrative_part"`                 // "prologue" | "music_film" | "epilogue"
 	HasMusic        *bool         `json:"has_music"`                                     // false for parts 1 & 3

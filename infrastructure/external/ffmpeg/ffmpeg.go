@@ -105,6 +105,11 @@ func (f *FFmpeg) MergeVideos(opts *MergeOptions) (string, error) {
 }
 
 func (f *FFmpeg) downloadVideo(url, destPath string) (string, error) {
+	// 确保临时目录存在（Windows可能会清理临时目录）
+	if err := os.MkdirAll(filepath.Dir(destPath), 0755); err != nil {
+		return "", fmt.Errorf("failed to create temp dir: %w", err)
+	}
+
 	// 检查是否是本地文件路径
 	if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
 		// 这是本地文件路径，检查文件是否存在

@@ -360,22 +360,9 @@ func (s *VideoGenerationService) ProcessVideoGeneration(videoGenID uint) {
 	// 构建完整的提示词：风格提示词 + 约束提示词 + 用户提示词
 	prompt := videoGen.Prompt
 
-	// Prepend per-shot distilled video_style if available.
-	// This replaces the removed video_constraint injection with a concise,
-	// shot-specific constraint produced by StyleDistillService.
-	// See: plans/shot-style-distill.md (Phase 3: Integration, Task 11)
-	if videoGen.StoryboardID != nil {
-		var storyboard models.Storyboard
-		if err := s.db.First(&storyboard, *videoGen.StoryboardID).Error; err == nil {
-			if storyboard.VideoStyle != nil && *storyboard.VideoStyle != "" {
-				prompt = *storyboard.VideoStyle + "\n\n" + prompt
-				s.log.Infow("Prepended distilled video_style to prompt",
-					"id", videoGenID,
-					"storyboard_id", *videoGen.StoryboardID,
-					"video_style_length", len(*storyboard.VideoStyle))
-			}
-		}
-	}
+	// video_prompt_distilled is a unified prompt that already includes all style/rendering
+	// information. No separate video_style prepend is needed.
+	// See: video_distill_combined.txt — follows [Cinematography]+[Subject]+[Action]+[Context]+[Style] formula.
 
 	// 打印完整的提示词信息
 	s.log.Infow("Video generation prompts",

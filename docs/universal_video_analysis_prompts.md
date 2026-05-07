@@ -754,6 +754,25 @@ Bộ prompt này đã được thiết kế để phân tích tất cả các th
 | 🎨 Art / Animation | Corridor Crew, TheOdd1sOut | Process shots, animation style, tools |
 
 
+## Prompt 8: 🔄 PHÂN TÍCH MÀU PHIM
+Hãy đóng vai một Chuyên gia chỉnh màu phim (Senior Colorist) và Giám đốc hình ảnh (Cinematographer) chuyên nghiệp. Tôi sẽ cung cấp cho bạn một video (hoặc các khung hình từ video). Hãy phân tích chuyên sâu về phong cách Color Grading, Color Science và tính thẩm mỹ (aesthetic) tổng thể của nó.
+Vui lòng cấu trúc câu trả lời của bạn theo các tiêu chí sau và đưa ra ví dụ cụ thể từ hình ảnh:
+Ấn tượng tổng thể & Phong cách:
+Video này mang phong cách Giả lập phim nhựa (Film Emulation/Analog) hay Kỹ thuật số hiện đại (Clean Digital/Commercial Rec.709)?
+Cảm giác/vibe tổng thể mà hình ảnh mang lại là gì (ví dụ: cinematic, hoài cổ, rực rỡ, u ám, cyberpunk...)?
+Nhiệt độ màu & Bảng màu (Color Temperature & Palette):
+Tông màu chủ đạo là ấm (warm) hay lạnh (cool)? Cân bằng trắng (White balance) nghiêng về sắc thái nào?
+Cách xử lý các màu sắc cụ thể: Màu đỏ, xanh lá, xanh dương, màu da (skin tone - nếu có) hiển thị như thế nào? (Có bị ám màu, làm nhạt đi thành pastel, hay giữ nguyên độ rực rỡ chuẩn xác?)
+Độ tương phản & Dải nhạy sáng (Contrast & Dynamic Range):
+Độ tương phản tổng thể là cao (High contrast/punchy) hay thấp/mềm (Low/Soft contrast)?
+Vùng tối (Shadows): Có bị đen kịt (crushed blacks) hay được nâng lên (lifted/faded)?
+Vùng sáng (Highlights): Chuyển sắc (roll-off) mượt mà hay gắt? Có bị cháy sáng không?
+Kết cấu & Độ chi tiết (Texture & Clarity):
+Hình ảnh sắc nét theo kiểu kỹ thuật số (digital sharpness) hay mềm mại (softness) theo kiểu ống kính vintage?
+Có xuất hiện hạt phim (Film grain) hay nhiễu kỹ thuật số (Digital noise) không?
+Kết luận & Dự đoán Reference:
+Dựa trên các phân tích trên, phong cách màu này khiến bạn liên tưởng đến loại phim nhựa nào (ví dụ: Kodak Portra, Fujifilm Pro 400H, CineStill...) hay phong cách phim điện ảnh nào (ví dụ: Teal & Orange Hollywood, phim độc lập A24, Anime...)? Giải thích ngắn gọn lý do."
+
 ## Prompt 7: 🔄 META-PROMPT — TỔNG HỢP TẤT CẢ (Final Synthesis)
 
 > **Mục đích:** Sau khi có kết quả từ Prompt 1-5, dùng prompt này để đúc kết thành template hoàn chỉnh

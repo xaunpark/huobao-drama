@@ -44,6 +44,12 @@ type shotContext struct {
 	Movement      string `json:"movement,omitempty"`
 	Characters    string `json:"characters,omitempty"`
 	NarrativePart string `json:"narrative_part,omitempty"` // "prologue" | "music_film" | "epilogue"
+	// Additional context for video prompt distillation
+	Dialogue           string `json:"dialogue,omitempty"`
+	NarratorScript     string `json:"narrator_script,omitempty"`
+	SoundEffect        string `json:"sound_effect,omitempty"`
+	CharacterVoices    string `json:"character_voices,omitempty"`
+	AudioMode          string `json:"audio_mode,omitempty"`
 }
 
 // distilledImageStyle is the expected JSON output from the image distill LLM call.
@@ -58,10 +64,17 @@ type distilledVideoStyle struct {
 	VideoStyle string `json:"video_style"`
 }
 
+// distilledVideoCombined is the expected JSON output from the unified video distill LLM call.
+// Produces a single video_prompt per shot following [Cinematography]+[Subject]+[Action]+[Context]+[Style].
+type distilledVideoCombined struct {
+	ShotNumber  int    `json:"shot_number"`
+	VideoPrompt string `json:"video_prompt"`
+}
+
 const maxShotsPerBatch = 20
 
-// BatchDistillStyles runs 2 parallel LLM calls to distill style_prompt and video_constraint
-// into per-shot image_style and video_style for all storyboards in an episode.
+// BatchDistillStyles runs 3 parallel LLM calls to distill style_prompt and video_constraint
+// into per-shot image_style, video_style, and video_prompt_distilled for all storyboards in an episode.
 func (s *StyleDistillService) BatchDistillStyles(episodeID uint, dramaID uint) {
 	s.log.Infow("Starting batch style distillation",
 		"episode_id", episodeID,
@@ -121,10 +134,10 @@ func (s *StyleDistillService) BatchDistillStyles(episodeID uint, dramaID uint) {
 			"episode_id", episodeID, "music_dna_length", len(narrativeMusicDNA))
 	}
 
-	// 5. Run distillation in parallel
+	// 5. Run distillation in parallel (2 goroutines: image + video combined)
 	var wg sync.WaitGroup
 	var imageStyles []distilledImageStyle
-	var videoStyles []distilledVideoStyle
+	var videoCombined []distilledVideoCombined
 	var imageErr, videoErr error
 
 	if hasStylePrompt {
@@ -144,9 +157,20 @@ func (s *StyleDistillService) BatchDistillStyles(episodeID uint, dramaID uint) {
 		go func() {
 			defer wg.Done()
 			if usePartAwareDistill {
-				videoStyles, videoErr = s.distillPartAwareVideo(videoConstraint, narrativeMusicDNA, shotContexts)
+				// Part-aware mode: use separate video style distill (has its own specialized logic)
+				var partVideoStyles []distilledVideoStyle
+				partVideoStyles, videoErr = s.distillPartAwareVideo(videoConstraint, narrativeMusicDNA, shotContexts)
+				// Convert to combined format — part-aware mode only produces style constraints,
+				// which serve as the video prompt for narrative_mv shots
+				for _, vs := range partVideoStyles {
+					videoCombined = append(videoCombined, distilledVideoCombined{
+						ShotNumber:  vs.ShotNumber,
+						VideoPrompt: vs.VideoStyle,
+					})
+				}
 			} else {
-				videoStyles, videoErr = s.distillVideoStyles(videoConstraint, shotContexts)
+				// Combined mode: single LLM call produces both video_style + video_prompt
+				videoCombined, videoErr = s.distillVideoCombined(videoConstraint, shotContexts)
 			}
 		}()
 	}
@@ -159,18 +183,18 @@ func (s *StyleDistillService) BatchDistillStyles(episodeID uint, dramaID uint) {
 			"error", imageErr, "episode_id", episodeID)
 	}
 	if videoErr != nil {
-		s.log.Errorw("Video style distillation failed, shots will use fallback behavior",
+		s.log.Errorw("Video distillation failed, shots will use fallback behavior",
 			"error", videoErr, "episode_id", episodeID)
 	}
 
 	// 7. Save distilled styles to DB
-	s.saveDistilledStyles(storyboards, imageStyles, videoStyles)
+	s.saveDistilledStyles(storyboards, imageStyles, videoCombined)
 
 	s.log.Infow("Batch style distillation completed",
 		"episode_id", episodeID,
 		"total_shots", len(storyboards),
 		"image_styles_distilled", len(imageStyles),
-		"video_styles_distilled", len(videoStyles))
+		"video_combined_distilled", len(videoCombined))
 }
 
 // buildShotContexts creates the shot context array for the LLM prompt.
@@ -203,14 +227,35 @@ func (s *StyleDistillService) buildShotContexts(storyboards []models.Storyboard)
 			ctx.Movement = *sb.Movement
 		}
 
-		// Load character names for this storyboard
+		// Load character names + voice styles for this storyboard
 		var characters []models.Character
 		if err := s.db.Model(&sb).Association("Characters").Find(&characters); err == nil && len(characters) > 0 {
 			names := make([]string, len(characters))
+			voices := make([]string, 0)
 			for i, c := range characters {
 				names[i] = c.Name
+				if c.VoiceStyle != nil && *c.VoiceStyle != "" {
+					voices = append(voices, c.Name+": "+*c.VoiceStyle)
+				}
 			}
 			ctx.Characters = strings.Join(names, ", ")
+			if len(voices) > 0 {
+				ctx.CharacterVoices = strings.Join(voices, "; ")
+			}
+		}
+
+		// Dialogue & narration context for video prompt distillation
+		if sb.Dialogue != nil && *sb.Dialogue != "" {
+			ctx.Dialogue = *sb.Dialogue
+		}
+		if sb.NarratorScript != nil && *sb.NarratorScript != "" {
+			ctx.NarratorScript = *sb.NarratorScript
+		}
+		if sb.SoundEffect != nil && *sb.SoundEffect != "" {
+			ctx.SoundEffect = *sb.SoundEffect
+		}
+		if sb.AudioMode != nil && *sb.AudioMode != "" {
+			ctx.AudioMode = *sb.AudioMode
 		}
 
 		// Narrative MV: include narrative_part for part-aware distillation
@@ -246,7 +291,10 @@ func (s *StyleDistillService) distillImageStyles(stylePrompt string, shots []sho
 			return nil, fmt.Errorf("failed to marshal shot contexts: %w", err)
 		}
 
-		prompt := fmt.Sprintf(template, stylePrompt, string(shotsJSON))
+		// Strip Negative Steering from the guide so LLM won't copy it.
+		// Backend hard-injects it after LLM response.
+		cleanGuide := stripNegativeSteering(stylePrompt)
+		prompt := fmt.Sprintf(template, cleanGuide, string(shotsJSON))
 
 		response, err := s.aiService.GenerateText(prompt, "", ai.WithMaxTokens(4000))
 		if err != nil {
@@ -263,6 +311,17 @@ func (s *StyleDistillService) distillImageStyles(stylePrompt string, shots []sho
 		}
 
 		allResults = append(allResults, batchResults...)
+	}
+
+	// Hard-inject Negative Steering from the style_prompt into each image style.
+	negativeSteering := extractNegativeSteering(stylePrompt)
+	if negativeSteering != "" {
+		for i := range allResults {
+			allResults[i].ImageStyle = allResults[i].ImageStyle + " " + negativeSteering
+		}
+		s.log.Infow("Appended negative steering to image styles",
+			"negative_steering", negativeSteering,
+			"shot_count", len(allResults))
 	}
 
 	return allResults, nil
@@ -312,16 +371,76 @@ func (s *StyleDistillService) distillVideoStyles(videoConstraint string, shots [
 	return allResults, nil
 }
 
-// saveDistilledStyles updates each storyboard with its distilled image_style and video_style.
-func (s *StyleDistillService) saveDistilledStyles(storyboards []models.Storyboard, imageStyles []distilledImageStyle, videoStyles []distilledVideoStyle) {
+// distillVideoCombined calls the LLM once to produce both video_style (constraint)
+// and video_prompt (narrative) for each shot. This saves 1 API call compared to
+// running distillVideoStyles and distillVideoPrompts separately.
+func (s *StyleDistillService) distillVideoCombined(videoConstraint string, shots []shotContext) ([]distilledVideoCombined, error) {
+	template := prompts.Get("video_distill_combined.txt")
+	if template == "" {
+		return nil, fmt.Errorf("video_distill_combined.txt prompt not found")
+	}
+
+	var allResults []distilledVideoCombined
+
+	for i := 0; i < len(shots); i += maxShotsPerBatch {
+		end := i + maxShotsPerBatch
+		if end > len(shots) {
+			end = len(shots)
+		}
+		batch := shots[i:end]
+
+		shotsJSON, err := json.Marshal(batch)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal shot contexts: %w", err)
+		}
+
+		// Strip Negative Steering from the guide so LLM won't copy it.
+		// Backend hard-injects it after LLM response.
+		cleanGuide := stripNegativeSteering(videoConstraint)
+		prompt := fmt.Sprintf(template, cleanGuide, string(shotsJSON))
+
+		// Higher token limit: producing both constraint + narrative per shot
+		response, err := s.aiService.GenerateText(prompt, "", ai.WithMaxTokens(8000))
+		if err != nil {
+			return nil, fmt.Errorf("LLM call failed for video combined distill: %w", err)
+		}
+
+		var batchResults []distilledVideoCombined
+		if err := parseJSONArray(response, &batchResults); err != nil {
+			s.log.Warnw("Failed to parse video combined distill response, trying robust extraction",
+				"error", err, "response_length", len(response))
+			if err := parseJSONArray(extractJSONArray(response), &batchResults); err != nil {
+				return allResults, fmt.Errorf("failed to parse video combined response: %w", err)
+			}
+		}
+
+		allResults = append(allResults, batchResults...)
+	}
+
+	// Hard-inject Negative Steering from the video_constraint into each prompt.
+	negativeSteering := extractNegativeSteering(videoConstraint)
+	if negativeSteering != "" {
+		for i := range allResults {
+			allResults[i].VideoPrompt = allResults[i].VideoPrompt + " " + negativeSteering
+		}
+		s.log.Infow("Appended negative steering to video prompts",
+			"negative_steering", negativeSteering,
+			"shot_count", len(allResults))
+	}
+
+	return allResults, nil
+}
+
+// saveDistilledStyles updates each storyboard with its distilled image_style, video_style, and video_prompt_distilled.
+func (s *StyleDistillService) saveDistilledStyles(storyboards []models.Storyboard, imageStyles []distilledImageStyle, videoCombined []distilledVideoCombined) {
 	// Build lookup maps by shot_number
 	imageMap := make(map[int]string)
 	for _, is := range imageStyles {
 		imageMap[is.ShotNumber] = is.ImageStyle
 	}
-	videoMap := make(map[int]string)
-	for _, vs := range videoStyles {
-		videoMap[vs.ShotNumber] = vs.VideoStyle
+	videoPromptMap := make(map[int]string)
+	for _, vc := range videoCombined {
+		videoPromptMap[vc.ShotNumber] = vc.VideoPrompt
 	}
 
 	for _, sb := range storyboards {
@@ -330,8 +449,8 @@ func (s *StyleDistillService) saveDistilledStyles(storyboards []models.Storyboar
 		if style, ok := imageMap[sb.StoryboardNumber]; ok && style != "" {
 			updates["image_style"] = style
 		}
-		if style, ok := videoMap[sb.StoryboardNumber]; ok && style != "" {
-			updates["video_style"] = style
+		if prompt, ok := videoPromptMap[sb.StoryboardNumber]; ok && prompt != "" {
+			updates["video_prompt_distilled"] = prompt
 		}
 
 		if len(updates) > 0 {
@@ -435,3 +554,60 @@ func (s *StyleDistillService) distillPartAwareVideo(coreConstraint, musicDNA str
 	return allResults, nil
 }
 
+// extractNegativeSteering finds the "Negative Steering" section in a template
+// and returns its content as a string. Used for hard-injecting after LLM call.
+func extractNegativeSteering(templateText string) string {
+	markers := []string{"### Negative Steering", "**[Negative Steering]**"}
+	for _, marker := range markers {
+		idx := strings.Index(templateText, marker)
+		if idx == -1 {
+			continue
+		}
+		after := templateText[idx+len(marker):]
+		lines := strings.Split(after, "\n")
+		var content []string
+		for _, line := range lines {
+			trimmed := strings.TrimSpace(line)
+			if trimmed == "" {
+				continue
+			}
+			if strings.HasPrefix(trimmed, "###") || strings.HasPrefix(trimmed, "**[") || strings.HasPrefix(trimmed, "***") || strings.HasPrefix(trimmed, "```") {
+				break
+			}
+			content = append(content, trimmed)
+		}
+		if len(content) > 0 {
+			return strings.Join(content, " ")
+		}
+	}
+	return ""
+}
+
+// stripNegativeSteering removes the entire Negative Steering section from a
+// template text so the LLM never sees it and won't echo it in its output.
+func stripNegativeSteering(templateText string) string {
+	markers := []string{"### Negative Steering", "**[Negative Steering]**"}
+	for _, marker := range markers {
+		idx := strings.Index(templateText, marker)
+		if idx == -1 {
+			continue
+		}
+		after := templateText[idx+len(marker):]
+		lines := strings.Split(after, "\n")
+		endOffset := len(after)
+		running := 0
+		for _, line := range lines {
+			running += len(line) + 1
+			trimmed := strings.TrimSpace(line)
+			if trimmed == "" {
+				continue
+			}
+			if strings.HasPrefix(trimmed, "###") || strings.HasPrefix(trimmed, "**[") || strings.HasPrefix(trimmed, "***") || strings.HasPrefix(trimmed, "```") {
+				endOffset = running - len(line) - 1
+				break
+			}
+		}
+		return templateText[:idx] + templateText[idx+len(marker)+endOffset:]
+	}
+	return templateText
+}

@@ -2213,8 +2213,9 @@ func (s *StoryboardService) TriggerStyleDistillation(episodeIDStr string) error 
 
 	// Clear existing styles to force re-distillation and trigger frontend reactive banner
 	if err := s.db.Model(&models.Storyboard{}).Where("episode_id = ?", episodeID).Updates(map[string]interface{}{
-		"image_style": gorm.Expr("NULL"),
-		"video_style": gorm.Expr("NULL"),
+		"image_style":            gorm.Expr("NULL"),
+		"video_style":            gorm.Expr("NULL"),
+		"video_prompt_distilled": gorm.Expr("NULL"),
 	}).Error; err != nil {
 		return fmt.Errorf("failed to clear existing styles: %w", err)
 	}

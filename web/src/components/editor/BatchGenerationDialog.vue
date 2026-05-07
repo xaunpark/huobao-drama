@@ -546,7 +546,7 @@ const processVideo = async (sb: Storyboard, image: any) => {
     const result = await videoAPI.generateVideo({
       drama_id: props.dramaId.toString(),
       storyboard_id: Number(sb.id),
-      prompt: sb.video_prompt || sb.action || "Cinematic video",
+      prompt: sb.video_prompt_distilled || sb.action || "Cinematic video",
       duration: 5,
       provider: provider,
       model: selectedVideoModel.value,
