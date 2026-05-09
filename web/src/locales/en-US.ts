@@ -668,6 +668,7 @@ export default {
       defaultModel: 'Default',
       r2vMode: 'Action Sequence',
       keyframeMode: 'Keyframe',
+      firstFrameMode: 'First Frame',
       runAll: 'Run All Phases',
       onlyPrompt: 'Extract Prompts Only',
       onlyImage: 'Generate Images Only',

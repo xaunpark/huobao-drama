@@ -37,6 +37,7 @@
           <div class="config-item">
             <span class="label">{{ $t('professionalEditor.batch.generationMode') }}</span>
             <el-select v-model="generationMode" size="small" style="width: 150px">
+              <el-option :label="$t('professionalEditor.batch.firstFrameMode')" value="first" />
               <el-option :label="$t('professionalEditor.batch.keyframeMode')" value="key" />
               <el-option :label="$t('professionalEditor.batch.r2vMode')" value="action" />
             </el-select>
@@ -150,7 +151,7 @@ import axios from 'axios'
 import { useI18n } from 'vue-i18n'
 import { workerDelay } from '@/utils/worker-timer'
 import { dramaAPI } from '@/api/drama'
-import { generateFramePrompt } from '@/api/frame'
+import { generateFramePrompt, getStoryboardFramePrompts } from '@/api/frame'
 import { imageAPI } from '@/api/image'
 import { videoAPI } from '@/api/video'
 import { taskAPI } from '@/api/task'
@@ -184,7 +185,7 @@ const isBatching = ref(false)
 const isDownloadingZip = ref(false)
 const isReviewing = ref(false)
 const shouldStop = ref(false)
-const generationMode = ref<'key'|'action'>('action')
+const generationMode = ref<'first'|'key'|'action'>('action')
 
 // Video review state
 const reviewScores = reactive<Record<string, any>>({})
@@ -255,34 +256,40 @@ const clearBatchData = async () => {
   }
 }
 
+// Map UI generation mode to video generation_mode for DB filtering
+const getVideoGenerationMode = (mode: string): string => {
+  if (mode === 'first') return 'i2v_s'
+  return 'shot_i2v'
+}
+
 const initTaskStates = async () => {
   // Fetch fresh data from DB before determining status
   await refreshStoryboardsFromDB()
   
   // Also check image/video records per storyboard from DB for accurate status
   for (const sb of localStoryboards.value) {
-    // Check if prompt exists in DB ONLY. 
-    // AND it must NOT be the backend-generated default fallback ("first frame" or "continuous movement progression")
-    const isFallback = typeof sb.image_prompt === 'string' && (
-      sb.image_prompt.trim().endsWith('first frame') || 
-      sb.image_prompt.trim().endsWith('continuous movement progression')
-    )
-    const hasPrompt = sb.image_prompt && String(sb.image_prompt) !== 'null' && String(sb.image_prompt) !== 'undefined' && String(sb.image_prompt).trim().length > 0 && !isFallback;
+    // Check if prompt exists for the SELECTED frame_type in frame_prompts table
+    let hasPrompt = false
+    try {
+      const fpRes = await getStoryboardFramePrompts(Number(sb.id))
+      const matchingPrompt = fpRes.frame_prompts?.find(
+        (fp: any) => fp.frame_type === generationMode.value && fp.prompt?.trim().length > 0
+      )
+      hasPrompt = !!matchingPrompt
+    } catch { /* ignore */ }
     
-    // Check image status from DB (not just from storyboard fields)
-    let hasImage = !!sb.composed_image || !!sb.image_url
-    if (!hasImage) {
-      try {
-        const imgRes = await imageAPI.listImages({ storyboard_id: Number(sb.id), frame_type: generationMode.value as any })
-        const completedImg = imgRes.items?.find((i: any) => i.status === 'completed' && (i.image_url || i.local_path))
-        if (completedImg) hasImage = true
-      } catch { /* ignore */ }
-    }
+    // Check image status from DB filtered by frame_type (no storyboard field fallback)
+    let hasImage = false
+    try {
+      const imgRes = await imageAPI.listImages({ storyboard_id: Number(sb.id), frame_type: generationMode.value as any })
+      const completedImg = imgRes.items?.find((i: any) => i.status === 'completed' && (i.image_url || i.local_path))
+      if (completedImg) hasImage = true
+    } catch { /* ignore */ }
     
     let videoState = 'pending'
     let activeVideoId = null
     try {
-      const vidRes = await videoAPI.listVideos({ storyboard_id: String(sb.id) })
+      const vidRes = await videoAPI.listVideos({ storyboard_id: String(sb.id), generation_mode: getVideoGenerationMode(generationMode.value) })
       // Find latest relevant video
       const completedVidHd = vidRes.items?.find((v: any) => v.status === 'upscaled' || (v.status === 'completed' && v.is_upscaled))
       const upscalingVid = vidRes.items?.find((v: any) => v.status === 'upscaling')
@@ -301,12 +308,8 @@ const initTaskStates = async () => {
       } else if (failedWithBase) {
         videoState = 'done'
         activeVideoId = failedWithBase.id
-      } else if (sb.video_url) {
-        videoState = 'done' // fallback
       }
-    } catch { 
-      if (sb.video_url) videoState = 'done'
-    }
+    } catch { /* ignore */ }
     
     let progress = 0
     if (videoState === 'hd') progress = 100
@@ -542,17 +545,28 @@ const processVideo = async (sb: Storyboard, image: any) => {
   try {
     const provider = extractProviderFromModel(selectedVideoModel.value)
     
-    // 构建 R2V 请求
-    const result = await videoAPI.generateVideo({
+    // 根据 generationMode 选择正确的视频生成模式
+    const videoParams: any = {
       drama_id: props.dramaId.toString(),
       storyboard_id: Number(sb.id),
       prompt: sb.video_prompt_distilled || sb.action || "Cinematic video",
       duration: 5,
       provider: provider,
       model: selectedVideoModel.value,
-      reference_mode: 'multiple',
-      reference_image_urls: [image.local_path || image.image_url]
-    })
+    }
+
+    if (generationMode.value === 'first') {
+      // First Frame 模式: 使用 I2V_S (单图首帧生成)
+      videoParams.reference_mode = 'single'
+      videoParams.image_url = image.local_path || image.image_url
+      videoParams.generation_mode = 'i2v_s'
+    } else {
+      // Keyframe / Action Sequence 模式: 使用 R2V (多图参考)
+      videoParams.reference_mode = 'multiple'
+      videoParams.reference_image_urls = [image.local_path || image.image_url]
+    }
+
+    const result = await videoAPI.generateVideo(videoParams)
     
     // 轮询视频直到完成 (视频生成通常耗时较长)
     while (true) {
@@ -956,6 +970,11 @@ const downloadAllVideos = async () => {
 
 watch(() => props.modelValue, (newVal) => {
   if (newVal) initTaskStates()
+})
+
+// Re-initialize states when generation mode changes
+watch(generationMode, () => {
+  if (visible.value) initTaskStates()
 })
 
 // Also expose storyboards for the table display

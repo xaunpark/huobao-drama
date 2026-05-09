@@ -51,24 +51,31 @@
 - **Impact**: Type mismatches cause runtime errors
 - **Locations**: `web/src/types/` vs `domain/models/`
 
+### 9. Video Generation Mode Silent Misrouting
+- **Risk**: If frontend doesn't explicitly send `generation_mode`, backend defaults to `"shot_i2v"` which maps to FlowTool's **R2V** mode. First Frame images should use **I2V_S** instead.
+- **Impact**: Videos generated with wrong FlowTool endpoint — R2V treats the image as loose reference (style/character guide), I2V_S treats it as the exact starting frame. Wrong mode = wrong video output, no error reported.
+- **Pattern**: Any new frame type or generation mode must verify the full chain: frontend `generation_mode` → backend `GenerationMode` field → `flowtool_video_client.go` mode resolution → FlowTool API `mode` parameter.
+- **Fix applied**: 2026-05-08, D-013 in `decisions.md`
+- **Watch for**: Adding Last Frame or Panel batch modes would need similar explicit routing.
+
 ## 🟡 Medium Risks
 
-### 9. Storyboard Model Field Explosion
+### 10. Storyboard Model Field Explosion
 - **Risk**: `Storyboard` model has 50+ fields (voice-over, nursery, MV, rapid cut...)
 - **Impact**: Large DB rows, complex queries, migration risk
 - **Evidence**: Fields added incrementally per mode — `domain/models/drama.go`
 
-### 10. No Authentication
+### 11. No Authentication
 - **Risk**: No user authentication or authorization
 - **Impact**: Anyone with network access can control the system
 - **Design**: Intended for single-user/local use, but exposed on 0.0.0.0
 
-### 11. Debug Print Statements
+### 12. Debug Print Statements
 - **Risk**: `fmt.Printf` used extensively in AI clients instead of structured logging
 - **Impact**: Noisy logs, potential credential leakage in log output
 - **Locations**: `pkg/ai/openai_client.go`, `pkg/ai/gemini_client.go`
 
-### 12. Root-Level Utility Scripts
+### 13. Root-Level Utility Scripts
 - **Risk**: 10+ Go and Python utility scripts at project root (`check_db.go`, `fix_dates.py`, etc.)
 - **Impact**: Confusion about what's part of the application vs one-off scripts
 - **Evidence**: `check_db.go`, `check_db2.go`, `dump.go`, `fix_dates.py`, `fix_empty_dates.py`, etc.

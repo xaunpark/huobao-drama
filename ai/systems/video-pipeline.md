@@ -37,6 +37,44 @@ type VideoClient interface {
 | FlowTool | `flowtool_video_client.go` | Task ID + polling | API aggregation |
 | Chatfire | `chatfire_client.go` | Task ID + polling | Custom API |
 
+#### FlowTool Generation Mode Routing
+
+FlowTool supports 4 video modes. The `generation_mode` field in the video generation request controls which mode is used:
+
+| FlowTool Mode | Meaning | `generation_mode` values that map here | Images |
+|:---:|:---:|:---:|:---:|
+| **T2V** | Text-to-Video | `"t2v"` | None |
+| **I2V_S** | Image-to-Video (Start frame) | `"i2v_s"` | 1 first-frame image |
+| **I2V_SE** | Image-to-Video (Start+End) | `"first_last"`, `*first_last*` | 2 images (first + last) |
+| **R2V** | Reference-to-Video | `"direct_r2v"`, `"shot_r2v"`, `"shot_i2v"` | 1-N reference images |
+
+**Routing logic** (`flowtool_video_client.go:69-77`):
+```
+if known R2V aliases → R2V
+else if contains "first_last" → I2V_SE
+else if "t2v" → T2V
+else → strings.ToUpper(generation_mode)   // catches "i2v_s" → "I2V_S"
+```
+
+> [!WARNING]
+> If `generation_mode` is not explicitly sent from frontend, backend defaults to `"shot_i2v"` → which maps to **R2V**, not I2V_S. This was a bug that silently misrouted First Frame shots to R2V.
+
+#### Batch Action Studio Generation Modes
+
+The Batch Action Studio (`BatchGenerationDialog.vue`) exposes 3 generation modes:
+
+| UI Label | `generationMode` value | Image `frame_type` | Video `generation_mode` | FlowTool Mode |
+|:---:|:---:|:---:|:---:|:---:|
+| First Frame | `'first'` | `'first'` | `'i2v_s'` | **I2V_S** |
+| Keyframe | `'key'` | `'key'` | (default→`'direct_r2v'`) | **R2V** |
+| Action Sequence | `'action'` | `'action'` | (default→`'direct_r2v'`) | **R2V** |
+
+#### Manual Editor (ProfessionalEditor) Auto-Detection
+
+When using single reference mode, the editor checks `selectedImage.frame_type`:
+- `frame_type === 'first'` → sends `generation_mode: 'i2v_s'` → FlowTool **I2V_S**
+- Other frame types → no explicit `generation_mode` → backend defaults → FlowTool **R2V**
+
 #### Async Pattern
 1. Submit generation request → receive task_id
 2. Poll provider API periodically for status

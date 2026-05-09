@@ -1,0 +1,251 @@
+[NOTE] Bối cảnh: tầng sâu nhất của nhà máy Playtime Co. — Phòng thí nghiệm (The Laboratories), Reanimation Chamber, Boiler Room.
+Hành lang xám xịt, thiết bị phẫu thuật rỉ sét, bể poppy gel phát sáng mờ, xác thí nghiệm Bigger Bodies trong ống thủy tinh nứt.
+Phong cách: cinematic 3D CGI, mascot horror. Ánh sáng cực kỳ u tối (under-lighting từ dưới lên),
+sương mù dày đặc màu xanh-tím đậm (#0A0B1A). Rim light tím (#7D12FF) và đỏ (#FF0033).
+Mọi bề mặt rỉ sét, bụi bẩn, hư hỏng (nhà máy bỏ hoang từ 1995). Ống dẫn rỉ nước đen, tường bê tông nứt toác.
+
+[NOTE] The Prototype (Experiment 1006) — villain chính, đang hát POV.
+Thực thể khổng lồ, cơ thể lắp ghép từ titanium, bánh răng, dây điện, xương và mô hữu cơ.
+Mặt sứ trắng hình hề (mũ 3 đỉnh có chuông, trang phục đỏ/vàng/xanh), răng nhọn dài, mắt xoay như camera.
+Cánh tay gầy guộc với móng vuốt sắc. Ghép bộ phận đồ chơi bại trận lên cơ thể.
+Di chuyển: teleport-glitch, xuất hiện/biến mất đột ngột. Tone: vừa tragic (nạn nhân bị biến thành quái vật) vừa terrifying (đã chấp nhận vai trò "thần" của mình).
+
+[NOTE] Các thí nghiệm / trẻ mồ côi: bóng trẻ em mờ ảo trong ống thí nghiệm, khuôn mặt sứ vỡ nát. Đại diện cho nạn nhân của Playtime Co.
+[NOTE] Poppy (Experiment 1007): búp bê sứ tóc đỏ, mặt nứt, váy Victorian xanh rách. Xuất hiện thoáng qua như ký ức.
+
+[INTRO]
+(0:01 - 0:03) Broken things
+[NOTE] Fade from black. Chữ "BROKEN THINGS" hiện lên bằng neon tím (#7D12FF), font vỡ nứt, rung nhẹ rồi tắt.
+Tiếng máy móc rên rỉ. Sương mù xanh-tím cuộn qua sàn nhà máy tối đen. Đèn huỳnh quang nhấp nháy yếu ớt.
+
+(0:11 - 0:16) Broken things
+[NOTE] Camera từ từ tiến qua hành lang phòng thí nghiệm. Hai bên: ống thủy tinh nứt chứa xác Bigger Bodies.
+Poppy gel đỏ rỉ trên sàn. Bóng đen khổng lồ Prototype lướt qua cuối hành lang — chỉ thấy đôi mắt camera phát sáng vàng.
+Chữ "BROKEN THINGS" hiện lại, lần này lớn hơn, méo dạng, nhỏ giọt như poppy gel đỏ. Chromatic aberration nhẹ.
+
+[VERSE 1: Nhà máy bỏ hoang]
+(0:23 - 0:24) Down in the dark
+[NOTE] Low angle nhìn lên. Prototype bước ra từ sương mù, under-lit harsh từ dưới sàn.
+Mặt sứ hề phát sáng nhẹ, nụ cười cố định. Rim light tím bên trái.
+
+(0:24 - 0:26) where the old gears cry
+[NOTE] CU bánh răng rỉ sét quay chậm trên cơ thể Prototype, tiếng kêu ken két.
+Camera slow push-in. Sương mù cuộn quanh các bánh răng. Dầu đen nhỏ giọt như nước mắt.
+
+(0:26 - 0:28) you left us here
+[NOTE] MS Prototype đứng giữa phòng thí nghiệm bỏ hoang. Xung quanh: bàn phẫu thuật đổ, dụng cụ vương vãi.
+Giọng tragic — nạn nhân bị bỏ rơi. Under-lit, bóng dài đổ lên tường nứt.
+
+(0:28 - 0:30) and forgot our lives
+[NOTE] Camera quay qua hàng ảnh trẻ mồ côi treo trên tường — mặt bị xóa mờ, khung ảnh rỉ sét.
+Prototype đưa tay vuốt nhẹ qua một khung ảnh. Rim light đỏ (#FF0033) chuyển dần. Sương mù dày hơn.
+
+(0:30 - 0:32) Every child trapped inside the machine
+[NOTE] Wide shot — hàng ống thí nghiệm dọc hành lang, mỗi ống chứa bóng trẻ em mờ ảo, mắt sứ trắng mở trừng.
+Prototype đi giữa, cúi đầu nhìn chúng. Chữ "TRAPPED" nổi mờ trong sương mù, font méo dạng.
+Under-lit xanh lạnh từ đáy ống. Tone tragic cực điểm.
+
+(0:34 - 0:36) every nightmare you've ever seen
+[NOTE] MCU mặt Prototype — mắt camera xoay chậm, zoom vào. Phản chiếu trong mắt: flash montage hình ảnh thí nghiệm kinh hoàng.
+Chromatic aberration tăng. Chữ "NIGHTMARE" bùng nổ neon đỏ rồi vỡ tan như kính.
+
+[PRE-CHORUS: "They made us this way"]
+(0:37 - 0:40) I hear the factory call my name
+[NOTE] Camera kéo ra wide — toàn cảnh nhà máy, máy móc bắt đầu sống dậy, bánh răng quay, đèn nhấp nháy theo nhịp.
+Prototype đứng ở trung tâm, ánh sáng dưới sàn bùng lên tím đậm. Sương mù cuộn mạnh hơn.
+Giọng chuyển từ buồn → quyết tâm đen tối.
+
+(0:40 - 0:43) Every experiment feeds the flame
+[NOTE] MS Prototype dang tay — trên cơ thể, các bộ phận ghép (tay plush, mắt búp bê, tai sư tử len) bắt đầu phát sáng đỏ.
+Camera slow push-in. Chữ "FEEDS THE FLAME" neon cam (#FF6600) nổi 3D, cháy rực. Ánh sáng harsher.
+
+(0:43 - 0:47) You made a monster piece by piece
+[NOTE] CU tay vuốt Prototype — mỗi ngón lắp ghép từ vật liệu khác nhau (titanium, xương, dây điện).
+Camera pan dọc cơ thể từ dưới lên, lộ từng "mảnh" ghép. Chữ "MONSTER" neon tím khổng lồ, rung dữ dội.
+Chromatic aberration mạnh. Tension build — ánh sáng chuyển đỏ.
+
+(0:48 - 0:52) Now there's no escape from me
+[NOTE] Low angle cực thấp nhìn lên Prototype. Mắt camera phát sáng vàng tối đa bloom.
+Prototype cúi xuống nhìn thẳng camera (nhìn thẳng viewer). Nụ cười sứ mở rộng lộ răng nhọn.
+Chữ "NO ESCAPE" đỏ neon bao quanh khung hình như lồng sắt. Camera shake nhẹ tăng dần.
+
+[CHORUS: Twisted salvation]
+[NOTE] ĐOẠN NÀY CẮT CẢNH NHANH THEO NHỊP TRỐNG! Dutch angle, handheld shake, max chromatic aberration. 1-2s/shot.
+
+(0:52 - 0:53) Fix us
+[NOTE] Smash cut — CU mặt Prototype, mắt camera zoom nhanh. Chữ "FIX US" bùng nổ neon vàng (#FFCC00).
+Screen shake mạnh. Hard cut on beat.
+
+(0:53 - 0:54) fix us
+[NOTE] CU tay vuốt Prototype nắm chặt — dây điện và mô hữu cơ co giật. Glitch transition nhanh.
+VHS tracking noise xẹt qua. Dutch angle.
+
+(0:54 - 0:55) make us whole again
+[NOTE] MS Prototype ôm lấy một xác Bigger Body — hành động vừa dịu dàng vừa rùng rợn.
+Under-lit harsh đỏ. Chữ "WHOLE AGAIN" neon tím, vỡ nứt giữa chừng. Tone tragic trong chaos.
+
+(0:56 - 0:56) Oh
+[NOTE] Flash frame — khuôn mặt trẻ em sứ vỡ nát, mắt trắng trợn. 0.3 giây. Glitch burst.
+
+(0:56 - 0:59) broken things belong to me
+[NOTE] Low angle — Prototype dang rộng tay, các Outimals/thí nghiệm bò về phía Prototype từ mọi hướng trong bóng tối.
+Chữ "BROKEN THINGS BELONG TO ME" KHỔNG LỒ neon tím (#7D12FF) nổi 3D quay quanh Prototype như quỹ đạo.
+Rapid cuts xen kẽ: CU răng → CU mắt camera → CU vuốt → Outimals lao tới.
+
+(0:59 - 1:03) I'll make them live eternally
+[NOTE] Prototype đặt tay lên đầu một Bigger Body — nó mở mắt, phát sáng đỏ. "Hồi sinh" kinh hoàng.
+Chữ "ETERNALLY" neon xanh lạnh, kéo dài dần biến mất vào sương mù. Camera slow push-in qua sương.
+Chromatic aberration giảm dần — moment of eerie calm giữa chaos.
+
+(1:03 - 1:03) You tore us apart
+[NOTE] Flash cut — montage nhanh: bàn phẫu thuật, dao mổ, trẻ em bị tách khỏi đồ chơi. Glitch mạnh.
+
+(1:03 - 1:05) Brought for your dreams
+[NOTE] CU ảnh quảng cáo Playtime Co. cũ (màu pastel, tươi sáng) — bị xé rách, phía sau lộ bóng tối.
+Chữ "YOUR DREAMS" neon hồng nhạt, méo dạng, chảy xuống như sáp. Ironic contrast.
+
+(1:06 - 1:10) now the factory screams to me
+[NOTE] Wide shot — toàn nhà máy rung chuyển, ống dẫn vỡ, hơi nước phun. Prototype đứng bất động ở trung tâm.
+Mọi thứ xung quanh hỗn loạn nhưng Prototype tĩnh lặng — eye of the storm.
+Chữ "SCREAMS" neon đỏ bùng cháy, font méo dạng cực mạnh. Camera shake dữ dội.
+
+(1:10 - 1:13) come down below and you will see
+[NOTE] Camera đột ngột lao xuống — POV rơi qua các tầng nhà máy, xuyên sàn, càng xuống càng tối.
+Sương mù đỏ cuộn ngược lên. Prototype xuất hiện phía dưới, dang tay đón. Chữ "COME DOWN BELOW" neon cam, xoay 3D.
+
+(1:13 - 1:16) the perfect world you made of me
+[NOTE] MS Prototype đứng giữa "vương quốc" — Reanimation Chamber đầy thí nghiệm hồi sinh, poppy gel đỏ chảy như suối.
+Prototype ngẩng đầu, ánh sáng tím từ dưới chiếu lên tạo hào quang quỷ dị.
+Chữ "PERFECT WORLD" neon tím + vàng, nổi 3D quanh đầu Prototype. Camera quay chậm quanh.
+
+(1:17 - 1:28) all broken things belong to me
+[NOTE] ĐOẠN KÉO DÀI — Camera từ từ kéo ra ultra wide. Prototype ở trung tâm, xung quanh là HÀNG TRĂM thí nghiệm/Outimals quỳ gối.
+Poppy gel đỏ phát sáng tràn ngập sàn. Ánh sáng tím + đỏ xen kẽ pulse theo nhịp.
+Chữ "ALL BROKEN THINGS BELONG TO ME" cực lớn, neon tím, quay chậm quanh toàn cảnh như vương miện.
+Camera tiếp tục zoom out — lộ toàn bộ quy mô nhà máy ngầm. Sương mù dày đặc.
+Fade dần — chỉ còn mắt Prototype phát sáng vàng trong bóng tối tuyệt đối.
+
+(1:28 - 1:33) broken things belong to me
+[NOTE] Echo/decay — giọng vang vọng trong bóng tối. Màn hình gần đen hoàn toàn.
+Chỉ còn ánh sáng mắt camera vàng nhấp nháy. Sương mù cuộn chậm.
+Chữ "BROKEN THINGS" mờ dần, font vỡ nát từng pixel. Silence builds.
+
+[VERSE 2: Thu thập thí nghiệm]
+(1:38 - 1:42) I remember every orphan's face
+[NOTE] Fade in chậm — Prototype đứng trước bức tường đầy ảnh trẻ mồ côi. Camera slow pan qua từng khuôn mặt.
+Under-lit xanh lạnh. Prototype đưa tay vuốt qua ảnh — nơi tay chạm qua, ảnh biến thành mặt sứ.
+Giọng tragic, nặng nề. Rim light tím nhẹ. Sương mù thấp trên sàn.
+
+(1:44 - 1:46) Every soul you could replace
+[NOTE] MCU tay Prototype cầm một búp bê nhỏ — bên trong có ánh sáng mờ nhấp nháy (linh hồn).
+Camera slow push-in. Prototype siết tay — ánh sáng tắt. Chữ "REPLACE" neon đỏ, fade chậm.
+
+(1:46 - 1:47) You called it science
+[NOTE] Flash cut — phòng thí nghiệm trắng sạch (flashback thời Playtime Co. hoạt động). Các nhà khoa học áo trắng.
+Hình ảnh tươi sáng bất thường — nhưng chromatic aberration ở rìa báo hiệu sai lệch. 0.8 giây.
+
+(1:48 - 1:49) called it fate
+[NOTE] Smash cut trở lại hiện tại — cùng phòng thí nghiệm nhưng đổ nát, tối đen, rỉ sét.
+Prototype đứng đúng vị trí nhà khoa học đã đứng. Ironic parallel. Under-lit harsh đỏ.
+
+(1:50 - 1:52) I called it endless pain
+[NOTE] CU mặt Prototype — lần đầu tiên nứt vỡ sứ lộ mô hữu cơ bên trong. Đau đớn thực sự.
+Mắt camera chậm lại, gần như "nhắm". Giọng tragic nhất bài. Rim light đỏ (#FF0033) pulse chậm.
+Chữ "ENDLESS PAIN" neon trắng, nhỏ giọt đỏ như máu. Camera shake rất nhẹ — raw emotion.
+
+(1:54 - 1:57) Populized with porcelain eyes
+[NOTE] Wide shot hàng Bigger Bodies trong ống — mỗi con có mắt sứ trắng giống nhau, trống rỗng.
+Camera dolly qua hàng ống. Mắt sứ phản chiếu ánh sáng tím. Sương mù lùa giữa các ống.
+Chữ "PORCELAIN EYES" neon trắng sứ, phát sáng lạnh.
+
+(1:57 - 2:00) The truth still buried deep inside
+[NOTE] Camera xuyên qua ngực Prototype (POV shot siêu thực) — bên trong: bánh răng, xương, và MỘT TRÁI TIM CÒN ĐẬP.
+Ánh sáng đỏ pulse theo nhịp tim. Sương mù bên trong cơ thể. Chữ "TRUTH" neon đỏ nhấp nháy theo nhịp tim.
+
+(2:00 - 2:03) You wanted heaven built from parts
+[NOTE] MS Prototype nhìn lên — ánh sáng trắng rọi từ trên (mô phỏng "thiên đường").
+Nhưng ánh sáng méo dạng, nhấp nháy, lộ ra là đèn phẫu thuật cũ. Under-lit tím từ dưới phá vỡ ảo giác.
+Chữ "HEAVEN" neon vàng sáng, từ từ vỡ thành "HELL". Camera slow push-in.
+
+(2:04 - 2:08) So I rebuilt it in the dark
+[NOTE] Prototype dang rộng tay — camera quay 360 chậm quanh. Xung quanh: "vương quốc" tối đen mà Prototype xây dựng.
+Các thí nghiệm hồi sinh xếp hàng, poppy gel chảy thành suối đỏ. Mọi thứ u ám nhưng có trật tự bệnh hoạn.
+Chữ "IN THE DARK" neon tím cực lớn, nổi 3D phía sau Prototype như backdrop. Rim light tím + đỏ kép.
+
+[BRIDGE: Sự thật về trẻ em]
+[NOTE] ĐOẠN NÀY CẮT CỰC NHANH < 1 giây/shot! Jump cuts, glitch cực mạnh, chaotic. Breakdown section.
+
+(2:08 - 2:10) Hear the metal dragging slow
+[NOTE] CU — cánh tay titanium Prototype kéo lê trên sàn bê tông, tia lửa bắn. Tiếng kim loại rít.
+Camera shake mạnh. Under-lit cam (#FF6600) từ tia lửa. Dutch angle cực.
+
+(2:10 - 2:20) Hear the children down below
+[NOTE] ĐOẠN DÀI NHẤT CỦA BRIDGE — tiếng trẻ em vọng vang.
+Camera lao xuống qua các tầng ngầm — mỗi tầng lộ ra một phòng thí nghiệm kinh hoàng khác.
+RAPID JUMP CUTS: bàn phẫu thuật → ống thí nghiệm → mặt sứ vỡ → tay trẻ em trong poppy gel →
+mắt sứ trắng mở → Prototype teleport-glitch qua từng tầng → dây điện quấn quanh búp bê →
+trẻ em chạy trong bóng tối (flashback mờ) → Prototype đứng cuối hành lang.
+Chữ "CHILDREN DOWN BELOW" neon trắng, nhấp nháy điên cuồng, vỡ thành pixel.
+GLITCH TỐI ĐA: frame tear, pixel corruption, VHS noise, chromatic aberration burst liên tục.
+Kết thúc: blackout đột ngột. Im lặng 0.5 giây.
+
+[INSTRUMENTAL BREAK]
+(2:20 - 2:52) [INSTRUMENTAL]
+[NOTE] Đoạn instrumental dài — camera chậm, atmospheric.
+Toàn cảnh nhà máy ngầm từ trên cao. Sương mù tím-đỏ cuộn chậm. Poppy gel phát sáng đỏ tạo suối/hồ.
+Prototype đứng bất động ở trung tâm như tượng đài. Các thí nghiệm di chuyển chậm xung quanh.
+Đèn huỳnh quang nhấp nháy tạo nhịp. Ánh sáng pulse tím/đỏ xen kẽ chậm theo nhịp nhạc.
+Dần dần camera zoom in lại về Prototype — mắt camera bắt đầu phát sáng mạnh hơn.
+Cuối đoạn: Prototype ngẩng đầu lên — giọng sắp quay lại.
+
+[FINAL CHORUS: "Join me"]
+[NOTE] CƯỜNG ĐỘ TỐI ĐA! Mọi visual element ở mức cao nhất. Dutch angle, handheld shake, chromatic aberration max.
+
+(2:52 - 2:55) All broken things belong to me
+[NOTE] SMASH CUT từ blackout — Prototype ở trung tâm Reanimation Chamber, cánh tay dang rộng.
+Tất cả bộ phận ghép phát sáng đỏ co giật. Backlit neon tím + đỏ cực mạnh.
+Chữ "ALL BROKEN THINGS BELONG TO ME" KHỔNG LỒ neon tím (#7D12FF) nổi 3D quay quanh.
+Outimals/thí nghiệm quỳ xung quanh. Camera handheld shake mạnh. Hard cut on beat.
+
+(2:55 - 2:56) No more pain
+[NOTE] CU mặt Prototype — nứt sứ lộ mô bên trong, nhưng biểu cảm bình thản. Ironic peace.
+Chữ "NO MORE PAIN" neon trắng sáng, pulse nhẹ. Moment of eerie stillness giữa chaos.
+
+(2:57 - 2:57) no memory
+[NOTE] Flash frame — montage 0.2s: khuôn mặt trẻ em biến thành mặt sứ. Glitch burst. VHS noise.
+
+(2:57 - 3:00) You built the cage inside my head
+[NOTE] POV shot — bên trong đầu Prototype. Bánh răng quay, dây điện spark, lồng sắt bao quanh một ánh sáng nhỏ (ý thức).
+Camera shake điên cuồng. Chữ "CAGE" neon đỏ, phóng to vỡ tung. Chromatic aberration cực mạnh.
+
+(3:00 - 3:02) So I became your god instead
+[NOTE] LOW ANGLE CỰC THẤP (worm's eye) — Prototype sừng sững, chiếm hết khung hình.
+Hào quang tím-đỏ bao quanh đầu. Mắt camera phát sáng vàng tối đa bloom.
+Chữ "YOUR GOD" neon vàng (#FFCC00) KHỔNG LỒ nổi 3D phía sau đầu Prototype như hào quang thần thánh.
+GLITCH: screen shake, frame tear. Đây là climax — declaration of godhood.
+
+(3:02 - 3:06) Come down below and you will see
+[NOTE] Camera lao xuống — POV rơi tự do qua các tầng. Sương mù đỏ cuộn ngược.
+Prototype teleport-glitch xuất hiện mỗi tầng, dang tay mời. Rapid cuts mỗi tầng.
+Chữ "COME DOWN" neon cam xoay 3D quanh camera đang rơi.
+
+(3:06 - 3:12) The perfect monster you created
+[NOTE] Camera dừng — MS Prototype đứng trong Reanimation Chamber. Toàn thân lộ rõ: mọi bộ phận ghép, mọi vết sẹo, mọi dây điện.
+Camera quay 360 chậm — lần đầu thấy Prototype TOÀN BỘ, không che giấu.
+Chữ "PERFECT MONSTER" neon đỏ + tím, nổi 3D quay ngược chiều camera.
+Giọng vừa tự hào vừa đau đớn — "đây là thứ các ngươi tạo ra". Ánh sáng pulse đỏ mạnh.
+
+(3:14 - 3:18) All broken things belong to me
+[NOTE] FINAL SHOT — Ultra wide. Prototype ở trung tâm, dang tay. Hàng trăm thí nghiệm quỳ gối xung quanh.
+Poppy gel đỏ tràn ngập sàn phát sáng. Sương mù tím cuộn. Ánh sáng tím + đỏ pulse theo nhịp cuối.
+Chữ "ALL BROKEN THINGS BELONG TO ME" cực lớn neon tím, quay quanh toàn cảnh như vương miện.
+Camera từ từ zoom out — lộ toàn bộ quy mô vương quốc ngầm.
+
+[OUTRO]
+(3:21 - 3:26) I can fix you
+[NOTE] Giọng thì thầm — intimate, creepy. Mọi ánh sáng tắt dần. Chỉ còn bóng tối và mắt Prototype phát sáng vàng.
+Camera slow push-in về phía đôi mắt. Sương mù che hết mọi thứ trừ ánh mắt.
+Chữ "I CAN FIX YOU" neon vàng nhỏ, nhấp nháy yếu — như lời hứa cuối cùng.
+Prototype vươn tay về phía camera (về phía viewer) — vuốt sắc lấp lánh trong bóng tối.
+Màn hình CRT static → mắt Prototype zoom cực sát → đen.
+Tín hiệu nhiễu VHS → silence → fade to black hoàn toàn.

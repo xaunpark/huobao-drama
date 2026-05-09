@@ -571,6 +571,7 @@ export default {
       defaultModel: '默认模型',
       r2vMode: 'Action Sequence',
       keyframeMode: 'Keyframe',
+      firstFrameMode: 'First Frame',
       runAll: '执行全流程 (Run All)',
       onlyPrompt: '仅提取提示词',
       onlyImage: '仅生成图片',

@@ -75,3 +75,15 @@
 - **Rationale**: Detailed aesthetic specifications need rich formatting and examples
 - **Consequences**: 50-80KB files that are reference docs, not runtime config
 - **Status**: Active — new channel templates added regularly
+
+## D-013: Explicit FlowTool Generation Mode Routing
+- **Date**: 2026-05-08
+- **Decision**: Frontend must explicitly send `generation_mode: 'i2v_s'` for First Frame video generation instead of relying on backend defaults
+- **Rationale**: Backend defaults `generation_mode` to `"shot_i2v"` when not specified, which FlowTool maps to **R2V** (Reference-to-Video). For First Frame images, the correct FlowTool mode is **I2V_S** (Image-to-Video Start frame), which produces semantically different results (video starts exactly from the provided frame vs using it loosely as reference). The default mapping silently misrouted all First Frame shots to R2V.
+- **Consequences**: 
+  - Batch Action Studio conditionally sets `generation_mode` based on `generationMode` dropdown value
+  - Manual Editor auto-detects `frame_type === 'first'` on selected image and sets `generation_mode: 'i2v_s'`
+  - `video.ts` type union widened to include `'i2v_s'`
+  - Backend Go code unchanged — `generation_mode` is a pass-through string field
+- **Files changed**: `BatchGenerationDialog.vue`, `ProfessionalEditor.vue`, `web/src/types/video.ts`
+- **Status**: Active

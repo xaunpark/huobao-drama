@@ -72,6 +72,14 @@ ImageGeneration Records (DB, with local images)
       → Creates VideoGeneration records
       → resource_transfer_service downloads URL → local storage
       │
+      ├─ [Generation Mode Routing (FlowTool)]
+      │   Frontend frame_type → generation_mode → FlowTool mode:
+      │     'first'  + generation_mode='i2v_s'     → I2V_S  (start frame strict)
+      │     'key'    + (default='shot_i2v')         → R2V    (reference)
+      │     'action' + (default='direct_r2v')       → R2V    (reference)
+      │     'first_last' + generation_mode='first_last' → I2V_SE (start+end)
+      │   See: ai/systems/video-pipeline.md for full routing matrix
+      │
       ├─ [Video Upscale]  (optional)
       │   POST /api/v1/videos/:id/upscale
       │   → video_generation_service.go:UpscaleVideo()

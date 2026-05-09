@@ -28,7 +28,7 @@ export interface VideoGeneration {
   updated_at: string
   completed_at?: string
   is_upscaled?: boolean
-  generation_mode?: 'direct_r2v' | 'shot_i2v'
+  generation_mode?: 'direct_r2v' | 'shot_i2v' | 'i2v_s'
 }
 
 export type VideoStatus = 'pending' | 'processing' | 'upscaling' | 'completed' | 'failed' | 'upscaled' | 'upscale_failed'
@@ -55,7 +55,7 @@ export interface GenerateVideoRequest {
   first_frame_url?: string  // 首帧图片URL
   last_frame_url?: string   // 尾帧图片URL
   reference_image_urls?: string[]  // 多图参考模式
-  generation_mode?: 'direct_r2v' | 'shot_i2v'
+  generation_mode?: 'direct_r2v' | 'shot_i2v' | 'i2v_s'
 }
 
 export interface VideoGenerationListParams {

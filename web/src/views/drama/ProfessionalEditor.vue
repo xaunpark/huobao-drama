@@ -3951,6 +3951,10 @@ const generateVideo = async () => {
           requestParams.image_url = selectedImage.image_url;
         }
         requestParams.image_gen_id = selectedImage.id;
+        // 如果选中的是 First Frame 类型的图片，使用 I2V_S 模式
+        if (selectedImage.frame_type === 'first') {
+          requestParams.generation_mode = 'i2v_s';
+        }
         break;
 
       case "first_last":
