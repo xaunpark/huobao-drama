@@ -23,14 +23,29 @@ type ChatMessage struct {
 	Content string `json:"content"`
 }
 
+// ResponseFormat specifies the output format for the model response.
+// Supports "json_object" (basic JSON mode) and "json_schema" (structured outputs).
+type ResponseFormat struct {
+	Type       string      `json:"type"`                  // "json_object" or "json_schema"
+	JSONSchema *JSONSchema `json:"json_schema,omitempty"` // required when Type="json_schema"
+}
+
+// JSONSchema defines the schema for structured JSON output.
+type JSONSchema struct {
+	Name   string                 `json:"name"`             // schema identifier
+	Schema map[string]interface{} `json:"schema"`           // JSON Schema object
+	Strict *bool                  `json:"strict,omitempty"` // enforce strict schema adherence
+}
+
 type ChatCompletionRequest struct {
-	Model               string        `json:"model"`
-	Messages            []ChatMessage `json:"messages"`
-	Temperature         float64       `json:"temperature,omitempty"`
-	MaxTokens           *int          `json:"max_tokens,omitempty"`
-	MaxCompletionTokens *int          `json:"max_completion_tokens,omitempty"`
-	TopP                float64       `json:"top_p,omitempty"`
-	Stream              bool          `json:"stream,omitempty"`
+	Model               string          `json:"model"`
+	Messages            []ChatMessage   `json:"messages"`
+	Temperature         float64         `json:"temperature,omitempty"`
+	MaxTokens           *int            `json:"max_tokens,omitempty"`
+	MaxCompletionTokens *int            `json:"max_completion_tokens,omitempty"`
+	TopP                float64         `json:"top_p,omitempty"`
+	Stream              bool            `json:"stream,omitempty"`
+	ResponseFormat      *ResponseFormat `json:"response_format,omitempty"`
 }
 
 type ChatCompletionResponse struct {
@@ -234,6 +249,28 @@ func WithMaxTokens(tokens int) func(*ChatCompletionRequest) {
 func WithTopP(topP float64) func(*ChatCompletionRequest) {
 	return func(req *ChatCompletionRequest) {
 		req.TopP = topP
+	}
+}
+
+// WithResponseFormatJSON sets response_format to {"type": "json_object"}.
+// The prompt should instruct the model to return JSON.
+func WithResponseFormatJSON() func(*ChatCompletionRequest) {
+	return func(req *ChatCompletionRequest) {
+		req.ResponseFormat = &ResponseFormat{Type: "json_object"}
+	}
+}
+
+// WithResponseFormatJSONSchema sets response_format with a JSON Schema for structured outputs.
+// The proxy (AIClient2API) will auto-convert this to Gemini's responseSchema format.
+func WithResponseFormatJSONSchema(name string, schema map[string]interface{}) func(*ChatCompletionRequest) {
+	return func(req *ChatCompletionRequest) {
+		req.ResponseFormat = &ResponseFormat{
+			Type: "json_schema",
+			JSONSchema: &JSONSchema{
+				Name:   name,
+				Schema: schema,
+			},
+		}
 	}
 }
 

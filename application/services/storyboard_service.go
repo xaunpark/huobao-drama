@@ -99,7 +99,7 @@ type VoiceoverShot struct {
 	NarratorEnabled bool   `json:"narrator_enabled"`
 	NarratorDucking bool   `json:"narrator_ducking"`
 	DialogueType    string `json:"dialogue_type"`
-	DialogueText    string `json:"dialogue_text"`
+	DialogueText    string `json:"dialogue"`
 	AmbienceType    string `json:"ambience_type"`
 	AmbienceLevel   string `json:"ambience_level"`
 	MusicMood       string `json:"music_mood"`
@@ -686,7 +686,7 @@ func buildStructuredAnalysis(blocks []ShotBlock) string {
 	sb.WriteString("6. For fields marked 'auto', infer the best value from shot content and [Tags]\n")
 	sb.WriteString("\nTAG MAPPING RULES:\n")
 	sb.WriteString("- Lines WITHOUT [tags] = NARRATOR → audio_mode='narrator_only'\n")
-	sb.WriteString("- [Character Name] = DIALOGUE → audio_mode='dialogue_dominant', use text as dialogue_text\n")
+	sb.WriteString("- [Character Name] = DIALOGUE → audio_mode='dialogue_dominant', use text as dialogue\n")
 	sb.WriteString("- [CROWD] = CROWD → audio_mode='dialogue_dominant', dialogue_type='crowd'\n")
 	sb.WriteString("- [SFX] text → put in sound_effect field. Does NOT change audio_mode\n")
 	sb.WriteString("- [BGM] text → put in bgm_prompt field. Does NOT change audio_mode\n")
@@ -827,7 +827,7 @@ func parseMarkedScript(script string) (segments []ScriptSegmentInfo, analysisTex
 
 	sb.WriteString("\nRULES FOR MARKED SCRIPTS:\n")
 	sb.WriteString("1. Lines WITHOUT [tags] are NARRATOR — set audio_mode to 'narrator_only'\n")
-	sb.WriteString("2. Lines with [Character Name] are DIALOGUE — set audio_mode to 'dialogue_dominant', dialogue_text = the text, narrator_enabled = false\n")
+	sb.WriteString("2. Lines with [Character Name] are DIALOGUE — set audio_mode to 'dialogue_dominant', dialogue = the text, narrator_enabled = false\n")
 	sb.WriteString("3. Lines with [CROWD] are CROWD — set audio_mode to 'dialogue_dominant', dialogue_type = 'crowd', narrator_ducking = true\n")
 	sb.WriteString("4. Lines with [SFX] are sound effect cues — include in sound_effect field\n")
 	sb.WriteString("5. DO NOT invent or add dialogue that isn't in the script\n")
@@ -1180,7 +1180,7 @@ func (s *StoryboardService) processVisualUnitGeneration(taskID, episodeID string
 			s.log.Debugw("Structured shot post-processing",
 				"shot_id", shots[i].ShotID,
 				"narrator_text_len", len(shots[i].NarratorText),
-				"dialogue_text_len", len(shots[i].DialogueText),
+				"dialogue_len", len(shots[i].DialogueText),
 				"audio_mode", shots[i].AudioMode,
 				"narrator_preview", narratorPreview,
 			)
@@ -1391,7 +1391,7 @@ func (s *StoryboardService) saveVoiceoverShots(episodeID string, dramaID uint, s
 					"shot_id", shot.ShotID,
 					"narrator_text_len", len(shot.NarratorText),
 					"audio_mode", shot.AudioMode,
-					"dialogue_text_len", len(shot.DialogueText),
+					"dialogue_len", len(shot.DialogueText),
 				)
 				// Force inject narrator text
 				videoPrompt = strings.Replace(videoPrompt,

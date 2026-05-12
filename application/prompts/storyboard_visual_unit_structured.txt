@@ -8,7 +8,7 @@ The script uses explicit tags within each shot block. Every line of spoken conte
 
 AUDIO TAGS (determine audio_mode):
 - [NARRATOR] text = NARRATOR VOICE-OVER → audio_mode="narrator_only", narrator_enabled=true, narrator_text=the text
-- [Character Name] text = CHARACTER DIALOGUE → audio_mode="dialogue_dominant", dialogue_text=the text, narrator_enabled=false
+- [Character Name] text = CHARACTER DIALOGUE → audio_mode="dialogue_dominant", dialogue=the text, narrator_enabled=false
 - [CROWD] text = CROWD SOUND → audio_mode="dialogue_dominant", dialogue_type="crowd", narrator_ducking=true
 
 METADATA TAGS (do NOT affect audio_mode):
@@ -39,7 +39,7 @@ For each pre-defined shot, generate:
 9. audio_mode — If not pre-specified by user. Inferred from tags: [NARRATOR]=narrator_only, [Character]/[CROWD]=dialogue_dominant
 10. narrator_enabled / narrator_ducking — Based on audio_mode
 11. dialogue_type — Based on tag type (none / reaction / soft_line / quote / full_dialogue / crowd / ambient_voice)
-12. dialogue_text — Extract from [Character] / [CROWD] tags if present
+12. dialogue — Extract from [Character] / [CROWD] tags if present
 13. ambience_type / ambience_level / music_mood / music_level
 14. sound_effect — Extract from [SFX] tags. If multiple [SFX] in one shot, concatenate with "; "
 15. bgm_prompt — Extract from [BGM] tag. If no [BGM], infer from mood

@@ -95,7 +95,7 @@ func (s *PropService) processPropExtraction(taskID string, episode models.Episod
 	systemPrompt := dynamicPrompt + "\n\n" + fixedPrompt
 	userPrompt := fmt.Sprintf("Script content:\n%s", script)
 
-	response, err := s.aiService.GenerateText(userPrompt, systemPrompt, ai.WithMaxTokens(2000))
+	response, err := s.aiService.GenerateText(userPrompt, systemPrompt, ai.WithResponseFormatJSON())
 	if err != nil {
 		s.taskService.UpdateTaskError(taskID, err)
 		return

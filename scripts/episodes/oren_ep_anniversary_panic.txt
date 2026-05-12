@@ -1,0 +1,277 @@
+// SHOT 01 | 4s | WS
+[BGM] Warm lo-fi beat, lazy afternoon vibe
+[SFX] Apartment AC hum; distant city traffic; coffee maker dripping
+[CAM] Handheld approach, eye-level
+[NOTE] Wide shot of Oren's studio apartment interior. Afternoon sun through window. Oren sits at his desk with laptop open, headphones around neck, one hand on coffee mug. MIDI keyboard, records on wall, takeout containers on counter. Skateboard propped by the door.
+
+// SHOT 02 | 2s | INSERT
+[SFX] Phone buzzing on desk; notification chime
+[CAM] Overhead, static
+[NOTE] Insert shot of Oren's phone on the desk next to the laptop. Screen lights up with a calendar reminder: "ANNIVERSARY TOMORROW" with a heart emoji. A second notification below: text from Pinki — "Can't wait for tomorrow babe!"
+
+// SHOT 03 | 3s | CU
+[SFX] Coffee mug set down; Oren exhale
+[Oren] Oh. That's tomorrow.
+[CAM] Static, eye-level
+[NOTE] Close-up of Oren picking up the phone, reading the screen. Expression shifts from relaxed to eyebrows raised, eyes widening slightly. He sets the coffee mug down slowly without looking. Mouth presses into a thin line.
+
+// SHOT 04 | 3s | MS
+[SFX] Laptop keyboard tapping; mouse clicking; page loading
+[CAM] Over-shoulder, static
+[NOTE] Medium shot from behind Oren at his desk. He types on the laptop, pulls up a restaurant website. A rooftop restaurant page loads — skyline photos, candlelit tables, elegant plating. He leans forward, scrolling through the gallery. One hand taps the desk rhythmically.
+
+// SHOT 05 | 2s | INSERT
+[SFX] Mouse scroll clicking; Oren sharp inhale through teeth
+[CAM] Static close-up of laptop screen
+[NOTE] Insert of laptop screen showing the restaurant menu page. Prices visible next to dishes: "$45", "$52", "$68", "$71". The cheapest appetizer: "$38". Oren's cursor hovers over the prices. A small banner reads "Prix Fixe Dinner — $120 per person."
+
+// SHOT 06 | 3s | CU
+[SFX] Wallet leather creaking open; cards shuffling
+[Oren] Nah... nah nah nah.
+[CAM] Static, slight push-in
+[NOTE] Close-up of Oren's hands opening his wallet on the desk. Inside: a crumpled electricity bill, a grocery store loyalty card, a maxed-out credit card, and two single dollar bills. No other cash. He fans the contents out with his thumb, staring down at them.
+
+// SHOT 07 | 2s | INSERT
+[SFX] Phone screen tap; banking app loading chime
+[CAM] Overhead, static
+[NOTE] Insert of Oren's phone. Banking app open: balance "$23.11". Recent transactions: "Uber Eats — $16.50", "Spotify — $10.99", "Venmo — Rent — $850.00". Oren's thumb just rests on the screen, motionless.
+
+// SHOT 08 | 3s | CU
+[SFX] Long slow exhale; hand rubbing back of neck
+[Oren] Aw man...
+[CAM] Static, eye-level
+[NOTE] Close-up of Oren leaning back in desk chair, one hand rubbing the back of his neck, eyes closed. He tilts his head back toward the ceiling. Antenna droop. He opens one eye and looks sideways across the apartment.
+
+// SHOT 09 | 3s | MS
+[SFX] Chair creaking; footsteps on hardwood; Oren humming thoughtfully
+[BGM] Beat shifts — pensive, thinking energy
+[CAM] Handheld follow, tracking left
+[NOTE] Medium shot. Oren stands up from the desk, walks slowly through the apartment scanning for things to sell. Passes the MIDI keyboard — shakes his head. Passes the skateboard — touches it, shakes his head. His gaze drifts to the corner of the room.
+
+// SHOT 10 | 3s | MS
+[SFX] Footsteps stopping; fingers tapping on wooden crate
+[CAM] Static, eye-level
+[NOTE] Medium shot. Oren stands in front of a wooden crate filled with vinyl records stacked vertically against the wall. Two more small stacks sit beside it. He crouches down, runs his fingers along the record spines, pulling a few out to inspect. He nods slowly to himself.
+
+// SHOT 11 | 3s | MS
+[SFX] Records sliding into crate; cardboard scraping; jacket zipper
+[CAM] Handheld, slight high angle
+[NOTE] Medium shot. Oren loads records into a cardboard box on the floor — stacking them carefully, about fifteen records total. He puts on his jacket, slides headphones onto his head, and picks up the box with both arms. The box comes up to his chin. He adjusts grip and heads for the door.
+
+// SHOT 12 | 3s | WS
+[SFX] Apartment door closing; footsteps on stairs; street ambient — birds, distant car
+[BGM] Beat picks up slightly — mission mode
+[CAM] Handheld follow from behind
+[NOTE] Wide shot from behind. Oren walks down the sidewalk carrying the box of records. Jacket on, headphones on, determined stride. He passes parked cars and a fire hydrant. A hand-painted sign ahead reads "VINYL VAULT — Buy Sell Trade" with a record logo.
+
+// SHOT 13 | 4s | WS
+[SFX] Shop bell dinging; vinyl record playing faintly on store speakers — old jazz standard
+[CAM] Static wide, from inside store looking toward entrance
+[NOTE] Wide establishing shot inside the record store. Wooden shelves lined with vinyl records. A turntable display near the window. Vintage band posters on the walls. A bearded man in flannel sits behind the counter reading a magazine. The store is warmly lit but clearly quiet — no other customers visible. Oren pushes through the front door carrying his box.
+
+// SHOT 14 | 3s | MWS | dialogue_dominant
+[SFX] Box thudding on counter; records shifting inside
+[Oren] Hey man. Got some records to sell.
+[CAM] Static, eye-level
+[NOTE] Medium wide two-shot at the counter. Oren sets the box down on the glass counter. The store owner puts down his magazine, adjusts his glasses, and peers into the box. Both standing at the same height — peer interaction. Owner pulls out the first record, tilts it toward the light.
+
+// SHOT 15 | 3s | MS
+[SFX] Record sleeves sliding; owner humming; flipping through stack
+[CAM] Handheld, over-shoulder from behind Oren
+[NOTE] Medium shot from behind Oren. The owner methodically flips through records one by one, pulling some out, pushing others aside. He sets three records to the left, puts the rest back in the box. His expression is flat, unimpressed. Oren watches, hands on counter, fingers drumming.
+
+// SHOT 16 | 3s | CU | dialogue_dominant
+[SFX] Record tapping on counter; owner clearing throat
+[Owner] I can do forty for the lot.
+[CAM] Static, eye-level
+[NOTE] Close-up of the store owner. He pushes his glasses up, taps the small stack of selected records with one finger. Deadpan expression. Shrugs one shoulder casually. Magazine still open behind him on the counter.
+
+// SHOT 17 | 2s | CU | dialogue_dominant
+[SFX] Oren's fingers stop drumming; brief silence
+[Oren] Forty? For all of these?
+[CAM] Static, eye-level
+[NOTE] Close-up of Oren. Eyebrows raised, mouth slightly open. He glances down at the box then back at the owner. One hand gestures toward the records. Disbelief but controlled — adult composure, not a tantrum.
+
+// SHOT 18 | 3s | MS | dialogue_dominant
+[SFX] Owner shrugging; cash register drawer sliding open
+[Owner] Market's slow, man. Take it or leave it.
+[CAM] Static, wider
+[NOTE] Medium shot. Owner opens the cash register drawer, pulls out two twenties, lays them flat on the counter between them. He leans back on his stool with arms crossed. Oren looks at the money, then at the box. He exhales through his nose and nods reluctantly.
+
+// SHOT 19 | 3s | MS
+[SFX] Records sliding out of box one by one; owner stacking them behind counter
+[CAM] Handheld, eye-level, tracking Oren's hands
+[NOTE] Medium shot focused on the counter. Oren lifts records out of the box and hands them across the counter one by one. The owner stacks them neatly behind the register. The box gets lighter. Oren reaches the bottom of the stack — his hand slows down as he touches the last record.
+
+// SHOT 20 | 3s | INSERT
+[SFX] Fingers sliding across vinyl sleeve; a quiet beat of silence
+[CAM] Close-up, static, slight push-in
+[NOTE] Insert shot of the last vinyl record in Oren's hands. The sleeve is worn at the edges — clearly handled hundreds of times. A small hand-drawn star in marker on the corner. The album art shows a jazz trio silhouette. A tiny sticky note on the inner sleeve reads "first beat I ever sampled" in messy handwriting.
+
+// SHOT 21 | 3s | CU
+[SFX] Oren swallowing; fingers tightening on the record sleeve
+[CAM] Static, eye-level, very slow push-in
+[NOTE] Close-up of Oren looking down at the record in his hands. His grip tightens — knuckles pressing into the cardboard sleeve. Eyes soften. Jaw clenches. He blinks twice. A small exhale. His thumb traces the hand-drawn star on the corner.
+
+// SHOT 22 | 3s | MWS
+[SFX] Record sliding across glass counter slowly; owner's hand reaching for it
+[CAM] Static, eye-level, wider to show both
+[NOTE] Medium wide two-shot at counter level. Oren slides the record slowly across the glass counter toward the owner. The owner reaches his hand out to take it. Oren's fingers are still on the edge of the sleeve. The record sits between them — Oren hasn't let go.
+
+// SHOT 23 | 2s | INSERT
+[SFX] Sharp vinyl scrape on glass counter
+[CAM] Close-up, static
+[NOTE] Insert shot of the counter surface. Two hands on the record — owner's fingers on the far edge, Oren's hand flat on the near edge. A beat of stillness. Then Oren's hand pulls the record back sharply toward himself in one quick motion. The owner's fingers close on empty counter.
+
+// SHOT 24 | 2s | CU | dialogue_dominant
+[SFX] Record pressing against jacket fabric
+[Oren] Nah. Not this one.
+[CAM] Static, slight low angle
+[NOTE] Close-up of Oren clutching the vinyl record against his chest with one arm, pressing it flat against his jacket. His other hand picks up the two twenties from the counter. Small headshake — firm but quiet. Eyes down at the record, then up at the owner.
+
+// SHOT 25 | 2s | CU
+[SFX] Owner shrugging; magazine pages flipping
+[Owner] Your call, man.
+[CAM] Static, eye-level
+[NOTE] Close-up of the owner. Casual shrug, unbothered. He picks his magazine back up and starts reading again. Zero judgment — just business. He waves a hand dismissively.
+
+// SHOT 26 | 3s | MS
+[SFX] Oren's phone tapping; calculator app beeping
+[CAM] Over-shoulder, static
+[NOTE] Medium shot. Oren stands to the side of the counter, phone in one hand, vinyl tucked under his other arm. Calculator app open: "$40 + $23 = $63". He looks at the restaurant menu bookmarked in browser — "$120 minimum". He presses his lips together. Not enough.
+
+// SHOT 27 | 4s | WS
+[SFX] Store ambient — very quiet; a wall clock ticking; the jazz record on the store speaker playing a slow, sleepy, generic instrumental
+[CAM] Slow pan right, wide
+[NOTE] Wide shot panning across the record store interior. The store is empty — no customers at all. Aisles of vinyl untouched. The owner sits behind counter, chin resting on his palm, elbow on counter, eyes half-closed with boredom. A small bluetooth speaker on the shelf behind him plays the music. The store window shows people walking past outside without entering. A "SALE" sign in the window that nobody is reading. Afternoon light making dust particles visible.
+
+// SHOT 28 | 2s | INSERT
+[SFX] Tinny speaker playing generic smooth jazz; owner sighing
+[CAM] Close-up, static
+[NOTE] Insert shot of the small bluetooth speaker on the shelf behind the counter. A phone connected to it via cable shows a playlist titled "Chill Background Mix" — generic stock music. The speaker emits thin, lifeless audio. The volume bar on the phone screen is low.
+
+// SHOT 29 | 3s | MS
+[SFX] Oren's head tilting; fingers start tapping on a record shelf rhythmically
+[CAM] Static, eye-level
+[NOTE] Medium shot of Oren standing in an aisle, looking toward the empty store, then at the weak speaker, then at the bored owner. His head tilts. His fingers start tapping a beat on the record shelf beside him. His eyes narrow slightly — an idea forming. He looks down at his phone, then back at the speaker setup.
+
+// SHOT 30 | 3s | MWS | dialogue_dominant
+[SFX] Oren's footsteps approaching counter; laptop bag unzipping
+[Oren] Hey — mind if I plug in? I'll get some people in here.
+[CAM] Static, eye-level
+[NOTE] Medium wide two-shot. Oren walks back to the counter, sets his laptop down, and points at the speaker setup behind the owner. The owner looks at him, looks at the empty store, looks back at Oren. He gestures "go ahead" with a wave of his hand. Oren pulls an aux cable from his jacket pocket.
+
+// SHOT 31 | 2s | INSERT
+[SFX] Aux cable clicking in; laptop booting a music program; EQ bars appearing
+[CAM] Close-up, static
+[NOTE] Insert of Oren's hands plugging the aux cable from his laptop into the speaker system. His laptop screen shows a DJ software interface with EQ visualizer bars. His finger hovers over the play button.
+
+// SHOT 32 | 3s | MS
+[SFX] First beat drops — a warm, groovy lo-fi hip-hop track with vinyl crackle and head-nodding drums
+[BGM] Shift to Oren's beat — groovy, warm, inviting, funky lo-fi
+[CAM] Handheld, slight low angle, slow push-in
+[NOTE] Medium shot of Oren behind the counter beside the owner, laptop open, one hand adjusting the volume, other hand bobbing to the beat. His head nods. His foot taps. The music fills the store — EQ bars bouncing on screen. The owner lifts his head from his palm, eyebrows rising.
+
+// SHOT 33 | 3s | WS
+[SFX] Music reverberating through store; a passerby slowing down outside the window
+[CAM] Static wide, from inside store looking at entrance
+[NOTE] Wide shot of the store interior with the front door and window visible. The music is playing. Through the window, a person walking on the sidewalk slows down, turns their head toward the store. They stop, peer through the glass. The door pushes open and they step inside. The owner straightens up in his chair.
+
+// SHOT 34 | 3s | MWS
+[SFX] Door bell dinging; second set of footsteps; records being flipped through
+[CAM] Handheld, panning across store
+[NOTE] Medium wide shot panning across the store. Now three customers browsing the aisles — one flipping through records, another bobbing their head to the beat, a third taking a photo of a vinyl display. The energy has shifted. Oren stands behind the counter adjusting the music on his laptop, small satisfied smirk.
+
+// SHOT 35 | 3s | MS
+[SFX] Cash register ringing; shopping bag rustling; customer laughing
+[CAM] Static, eye-level
+[NOTE] Medium shot at the counter. The owner rings up a sale — a customer hands over cash for two records. The owner puts them in a paper bag and hands it over. He glances at Oren with an impressed nod. More people visible in the background browsing. The store feels alive now.
+
+// SHOT 36 | 3s | CU | dialogue_dominant
+[SFX] Venmo notification sound on owner's phone; owner chuckling
+[Owner] Alright, I see you. That's a nice tip right there — you earned it.
+[CAM] Static, eye-level
+[NOTE] Close-up of the store owner holding his phone, tapping on Venmo. He looks up at Oren with a genuine grin, points at him with the phone hand. Oren gives a small head nod of thanks.
+
+// SHOT 37 | 2s | INSERT
+[SFX] Venmo notification chime on Oren's phone
+[CAM] Close-up, static
+[NOTE] Insert of Oren's phone screen. Venmo notification: "Vinyl Vault sent you $50.00 — fire DJ set man." Below it his calculator app still open: "$40 + $23 + $50 = $113". Getting close.
+
+// SHOT 38 | 2s | CU | dialogue_dominant
+[SFX] Cash folding; wallet closing
+[Oren] That's fire. Appreciate it, man.
+[CAM] Static, eye-level
+[NOTE] Close-up of Oren tucking the two twenties into his wallet alongside the phone showing the Venmo. Contained smile — genuine, not over-the-top. He extends a fist. Owner meets it with a bump off-screen.
+
+// SHOT 39 | 3s | WS
+[SFX] Grocery store automatic doors; shopping cart wheels; store PA announcement
+[BGM] Beat shifts — lighter, warmer, romantic anticipation
+[CAM] Handheld follow from behind
+[NOTE] Wide shot. Oren walks through a grocery store. He carries a hand basket, picking items off shelves — a baguette, a block of cheese, a small container of strawberries, a bottle of sparkling water. He walks with purpose, checking his phone list. Evening light through the store windows.
+
+// SHOT 40 | 2s | INSERT
+[SFX] Items beeping at self-checkout; receipt printing
+[CAM] Close-up, static
+[NOTE] Insert of the self-checkout screen. Total: "$31.47". Oren's hand feeds a twenty and two tens into the machine. Change dispensed: "$8.53". Receipt prints. His hand grabs the bag.
+
+// SHOT 41 | 3s | WS
+[SFX] Apartment building exterior — evening crickets; streetlight buzzing on; Oren's footsteps on metal stairs
+[CAM] Low angle, static, looking up
+[NOTE] Wide shot from below looking up at the apartment building fire escape. Evening sky turning purple and orange. Oren climbs the fire escape stairs carrying two grocery bags in one hand, a rolled-up blanket under the other arm. His silhouette against the sunset sky.
+
+// SHOT 42 | 4s | MS
+[SFX] Blanket unfolding; fairy lights clicking on — warm glow; glass plates being set down
+[CAM] Handheld, eye-level, tracking his movements
+[NOTE] Medium shot on the fire escape landing. Oren lays out a blanket on the metal grate floor. He strings fairy lights along the railing — they click on with a warm golden glow. He sets out two plates, two glasses, arranges the baguette on a cutting board, fans out the strawberries. His movements are careful, deliberate.
+
+// SHOT 43 | 2s | INSERT
+[SFX] Turntable needle dropping; vinyl crackle; a warm jazz melody begins
+[CAM] Close-up, static
+[NOTE] Insert shot of a small portable turntable on the fire escape floor next to the railing. Oren's hand places the saved vinyl record — the one with the hand-drawn star — onto the turntable. The needle drops. The record spins. The jazz trio begins to play.
+
+// SHOT 44 | 3s | WS
+[SFX] Jazz music playing softly; city ambient below; candle flame flickering
+[CAM] Static wide, eye-level on the fire escape
+[NOTE] Wide shot of the complete setup on the fire escape. Fairy lights glowing along the railing. Two place settings on the blanket. Candles in small jars. The portable turntable playing. City skyline in the background — buildings with lit windows, distant traffic lights. Oren stands to the side adjusting a final detail, then steps back to admire it. He puts hands in pockets.
+
+// SHOT 45 | 3s | MS
+[SFX] Phone buzzing in pocket; apartment buzzer; footsteps approaching from inside
+[CAM] Static, eye-level, facing the window/door from fire escape
+[NOTE] Medium shot. Oren leans against the railing, phone in hand, texting. He hears footsteps approaching from inside the apartment. He straightens up, slides the phone into his pocket, turns toward the window that leads to the fire escape. He takes a breath.
+
+// SHOT 46 | 3s | MS
+[SFX] Window sliding open; Pinki gasping; fairy light reflections in her eyes
+[CAM] Static, eye-level, from Oren's perspective toward the window
+[NOTE] Medium shot facing the apartment window. Pinki climbs through the window onto the fire escape. She stops mid-step, one hand still on the window frame. She sees the setup — fairy lights, food, candles, vinyl playing. Her eyes widen, her mouth opens into a surprised laugh. One hand comes up to cover her mouth.
+
+// SHOT 47 | 3s | CU | dialogue_dominant
+[SFX] Pinki's laugh — bright, genuine; her hand dropping from her mouth
+[Pinki] You did NOT. Oh my god, babe.
+[CAM] Static, eye-level
+[NOTE] Close-up of Pinki. Eyes glistening, wide smile, shaking her head in happy disbelief. Fairy light reflections in her eyes. She looks around at the setup, then directly at Oren. Her expression is pure warmth.
+
+// SHOT 48 | 2s | CU | dialogue_dominant
+[SFX] Oren's small laugh; jacket shifting
+[Oren] Happy anniversary.
+[CAM] Static, eye-level
+[NOTE] Close-up of Oren. Small genuine smile — not cocky, not shy, just real. Eyes soft, half-lidded. He does a tiny casual shrug with one shoulder. Headphones hang around his neck. Fairy lights reflected on his jacket.
+
+// SHOT 49 | 3s | MWS
+[SFX] Fabric rustling; tight embrace; Pinki laughing into his shoulder
+[CAM] Static, slight slow zoom-out
+[NOTE] Medium wide two-shot. Pinki steps forward and hugs Oren. He wraps one arm around her, other hand still in his pocket for a beat before he brings it around too. She laughs into his shoulder. The fairy lights glow behind them. City skyline in the deep background.
+
+// SHOT 50 | 4s | MWS
+[SFX] Sparkling water pouring; glasses clinking gently; Pinki humming along to the vinyl
+[CAM] Static, slight high angle
+[NOTE] Medium wide shot from slightly above. Oren and Pinki sit cross-legged on the blanket facing each other. Plates of food between them — baguette slices, cheese, strawberries. Oren pours sparkling water into her glass. They clink glasses. Pinki leans forward and picks a strawberry off his plate. He gives a mock-offended look, then grins.
+
+// SHOT 51 | 5s | WS | dialogue_dominant
+[SFX] Vinyl record crackling softly; city sounds below fading; evening breeze
+[Oren] ...same record almost got sold today.
+[Pinki] What? Why?
+[Oren] Long story. It's good now.
+[BGM] Jazz from the vinyl fades into warm lo-fi — mellow, full circle
+[CAM] Very slow zoom-out, static, wide
+[NOTE] Wide shot pulling back. Oren and Pinki on the fire escape, seen from across the alley. Fairy lights glowing. Food spread between them. City skyline stretching behind. Oren leans back on one arm, other arm around Pinki's shoulder. She rests her head against him. The vinyl spins on the turntable beside them. Evening deepening into night.

@@ -36,22 +36,31 @@
           </div>
           <div class="config-item">
             <span class="label">{{ $t('professionalEditor.batch.generationMode') }}</span>
-            <el-select v-model="generationMode" size="small" style="width: 150px">
+            <el-select v-model="generationMode" size="small" style="width: 180px">
               <el-option :label="$t('professionalEditor.batch.firstFrameMode')" value="first" />
               <el-option :label="$t('professionalEditor.batch.keyframeMode')" value="key" />
               <el-option :label="$t('professionalEditor.batch.r2vMode')" value="action" />
+              <el-option label="All (Upscale Only)" value="all">
+                <el-tooltip
+                  placement="right"
+                  :show-after="300"
+                  content="Shows the best video per shot across ALL modes. Priority: HD > Upscaling > Completed (newest first within same tier). Generate buttons are disabled — this mode is for Upscale & Review only."
+                >
+                  <span style="display: block; width: 100%">All (Upscale Only)</span>
+                </el-tooltip>
+              </el-option>
             </el-select>
           </div>
         </div>
 
         <div class="action-row" style="margin-top: 15px">
-          <el-button type="primary" :loading="isBatching" @click="startFullBatch">
+          <el-button type="primary" :loading="isBatching" :disabled="generationMode === 'all'" @click="startFullBatch">
             <el-icon><MagicStick /></el-icon> {{ $t('professionalEditor.batch.runAll') }}
           </el-button>
           <el-button-group>
-            <el-button :disabled="isBatching" @click="startStep('prompt')">{{ $t('professionalEditor.batch.onlyPrompt') }}</el-button>
-            <el-button :disabled="isBatching" @click="startStep('image')">{{ $t('professionalEditor.batch.onlyImage') }}</el-button>
-            <el-button :disabled="isBatching" @click="startStep('video')">{{ $t('professionalEditor.batch.onlyVideo') }}</el-button>
+            <el-button :disabled="isBatching || generationMode === 'all'" @click="startStep('prompt')">{{ $t('professionalEditor.batch.onlyPrompt') }}</el-button>
+            <el-button :disabled="isBatching || generationMode === 'all'" @click="startStep('image')">{{ $t('professionalEditor.batch.onlyImage') }}</el-button>
+            <el-button :disabled="isBatching || generationMode === 'all'" @click="startStep('video')">{{ $t('professionalEditor.batch.onlyVideo') }}</el-button>
           </el-button-group>
           <el-button type="success" plain :disabled="isBatching" @click="startUpscaleAll">
             <el-icon><MagicStick /></el-icon> Upscale All Videos
@@ -185,7 +194,7 @@ const isBatching = ref(false)
 const isDownloadingZip = ref(false)
 const isReviewing = ref(false)
 const shouldStop = ref(false)
-const generationMode = ref<'first'|'key'|'action'>('action')
+const generationMode = ref<'first'|'key'|'action'|'all'>('action')
 
 // Video review state
 const reviewScores = reactive<Record<string, any>>({})
@@ -257,44 +266,97 @@ const clearBatchData = async () => {
 }
 
 // Map UI generation mode to video generation_mode for DB filtering
-const getVideoGenerationMode = (mode: string): string => {
+const getVideoGenerationMode = (mode: string): string | undefined => {
+  if (mode === 'all') return undefined // no filter — find best video across all modes
   if (mode === 'first') return 'i2v_s'
-  return 'shot_i2v'
+  return 'direct_r2v'
 }
 
 const initTaskStates = async () => {
   // Fetch fresh data from DB before determining status
   await refreshStoryboardsFromDB()
   
+  const isAllMode = generationMode.value === 'all'
+  
   // Also check image/video records per storyboard from DB for accurate status
   for (const sb of localStoryboards.value) {
-    // Check if prompt exists for the SELECTED frame_type in frame_prompts table
     let hasPrompt = false
-    try {
-      const fpRes = await getStoryboardFramePrompts(Number(sb.id))
-      const matchingPrompt = fpRes.frame_prompts?.find(
-        (fp: any) => fp.frame_type === generationMode.value && fp.prompt?.trim().length > 0
-      )
-      hasPrompt = !!matchingPrompt
-    } catch { /* ignore */ }
-    
-    // Check image status from DB filtered by frame_type (no storyboard field fallback)
     let hasImage = false
-    try {
-      const imgRes = await imageAPI.listImages({ storyboard_id: Number(sb.id), frame_type: generationMode.value as any })
-      const completedImg = imgRes.items?.find((i: any) => i.status === 'completed' && (i.image_url || i.local_path))
-      if (completedImg) hasImage = true
-    } catch { /* ignore */ }
+    let completedImgForMode: any = null
+    
+    if (isAllMode) {
+      // "All" mode: check if ANY frame_type has prompt/image (for display only)
+      try {
+        const fpRes = await getStoryboardFramePrompts(Number(sb.id))
+        hasPrompt = fpRes.frame_prompts?.some((fp: any) => fp.prompt?.trim().length > 0) || false
+      } catch { /* ignore */ }
+      try {
+        const imgRes = await imageAPI.listImages({ storyboard_id: Number(sb.id) })
+        completedImgForMode = imgRes.items?.find((i: any) => i.status === 'completed' && (i.image_url || i.local_path))
+        if (completedImgForMode) hasImage = true
+      } catch { /* ignore */ }
+    } else {
+      // Specific mode: check for the SELECTED frame_type only
+      try {
+        const fpRes = await getStoryboardFramePrompts(Number(sb.id))
+        const matchingPrompt = fpRes.frame_prompts?.find(
+          (fp: any) => fp.frame_type === generationMode.value && fp.prompt?.trim().length > 0
+        )
+        hasPrompt = !!matchingPrompt
+      } catch { /* ignore */ }
+      try {
+        const imgRes = await imageAPI.listImages({ storyboard_id: Number(sb.id), frame_type: generationMode.value as any })
+        completedImgForMode = imgRes.items?.find((i: any) => i.status === 'completed' && (i.image_url || i.local_path))
+        if (completedImgForMode) hasImage = true
+      } catch { /* ignore */ }
+    }
     
     let videoState = 'pending'
     let activeVideoId = null
     try {
-      const vidRes = await videoAPI.listVideos({ storyboard_id: String(sb.id), generation_mode: getVideoGenerationMode(generationMode.value) })
-      // Find latest relevant video
-      const completedVidHd = vidRes.items?.find((v: any) => v.status === 'upscaled' || (v.status === 'completed' && v.is_upscaled))
-      const upscalingVid = vidRes.items?.find((v: any) => v.status === 'upscaling')
-      const completedVid = vidRes.items?.find((v: any) => v.status === 'completed' && !v.is_upscaled)
-      const failedWithBase = vidRes.items?.find((v: any) => v.status === 'upscale_failed' || ((v.status === 'failed' || v.status === 'error') && (v.video_url || v.local_path)))
+      const vidModeFilter = getVideoGenerationMode(generationMode.value)
+      const vidParams: any = { storyboard_id: String(sb.id) }
+      if (vidModeFilter) vidParams.generation_mode = vidModeFilter
+      const vidRes = await videoAPI.listVideos(vidParams)
+      
+      let validItems = vidRes.items || []
+      
+      if (isAllMode) {
+        // "All" mode: accept any video for this storyboard, no image-based filtering
+        // (purpose is upscale-only, so we just need to find the best video)
+      } else {
+        // Specific mode: filter by image ownership
+        if (!completedImgForMode) {
+          validItems = []
+        } else if (validItems.length > 0) {
+          const expectedImageUrl = completedImgForMode.local_path || completedImgForMode.image_url
+          const filtered = validItems.filter((v: any) => {
+            if (v.image_gen_id && v.image_gen_id === completedImgForMode.id) return true
+            if (expectedImageUrl && v.image_url === expectedImageUrl) return true
+            if (expectedImageUrl && v.first_frame_url === expectedImageUrl) return true
+            if (expectedImageUrl && v.reference_image_urls) {
+              try {
+                const urls = typeof v.reference_image_urls === 'string'
+                  ? JSON.parse(v.reference_image_urls)
+                  : v.reference_image_urls
+                if (Array.isArray(urls) && urls.includes(expectedImageUrl)) return true
+              } catch {
+                if (typeof v.reference_image_urls === 'string' && v.reference_image_urls.includes(expectedImageUrl)) return true
+              }
+            }
+            return false
+          })
+          if (filtered.length > 0) {
+            validItems = filtered
+          }
+        }
+      }
+
+      // Find latest relevant video (priority: HD > upscaling > completed > failed-with-base)
+      const completedVidHd = validItems.find((v: any) => v.status === 'upscaled' || (v.status === 'completed' && v.is_upscaled))
+      const upscalingVid = validItems.find((v: any) => v.status === 'upscaling')
+      const completedVid = validItems.find((v: any) => v.status === 'completed' && !v.is_upscaled)
+      const failedWithBase = validItems.find((v: any) => v.status === 'upscale_failed' || ((v.status === 'failed' || v.status === 'error') && (v.video_url || v.local_path)))
 
       if (completedVidHd) {
         videoState = 'hd'
@@ -549,6 +611,7 @@ const processVideo = async (sb: Storyboard, image: any) => {
     const videoParams: any = {
       drama_id: props.dramaId.toString(),
       storyboard_id: Number(sb.id),
+      image_gen_id: image.id,
       prompt: sb.video_prompt_distilled || sb.action || "Cinematic video",
       duration: 5,
       provider: provider,

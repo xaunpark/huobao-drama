@@ -8,7 +8,6 @@ import (
 
 	models "github.com/drama-generator/backend/domain/models"
 	"github.com/drama-generator/backend/application/prompts"
-	"github.com/drama-generator/backend/pkg/ai"
 	"github.com/drama-generator/backend/pkg/logger"
 	"gorm.io/gorm"
 )
@@ -296,7 +295,7 @@ func (s *StyleDistillService) distillImageStyles(stylePrompt string, shots []sho
 		cleanGuide := stripNegativeSteering(stylePrompt)
 		prompt := fmt.Sprintf(template, cleanGuide, string(shotsJSON))
 
-		response, err := s.aiService.GenerateText(prompt, "", ai.WithMaxTokens(4000))
+		response, err := s.aiService.GenerateText(prompt, "")
 		if err != nil {
 			return nil, fmt.Errorf("LLM call failed for image style distill: %w", err)
 		}
@@ -351,7 +350,7 @@ func (s *StyleDistillService) distillVideoStyles(videoConstraint string, shots [
 
 		prompt := fmt.Sprintf(template, videoConstraint, string(shotsJSON))
 
-		response, err := s.aiService.GenerateText(prompt, "", ai.WithMaxTokens(4000))
+		response, err := s.aiService.GenerateText(prompt, "")
 		if err != nil {
 			return nil, fmt.Errorf("LLM call failed for video style distill: %w", err)
 		}
@@ -400,7 +399,7 @@ func (s *StyleDistillService) distillVideoCombined(videoConstraint string, shots
 		prompt := fmt.Sprintf(template, cleanGuide, string(shotsJSON))
 
 		// Higher token limit: producing both constraint + narrative per shot
-		response, err := s.aiService.GenerateText(prompt, "", ai.WithMaxTokens(8000))
+		response, err := s.aiService.GenerateText(prompt, "")
 		if err != nil {
 			return nil, fmt.Errorf("LLM call failed for video combined distill: %w", err)
 		}
@@ -450,6 +449,11 @@ func (s *StyleDistillService) saveDistilledStyles(storyboards []models.Storyboar
 			updates["image_style"] = style
 		}
 		if prompt, ok := videoPromptMap[sb.StoryboardNumber]; ok && prompt != "" {
+			mouthConstraint := getMouthConstraint(sb)
+			s.log.Infow("Injecting mouth constraint into distilled prompt", "shot_id", sb.ID, "mouth_constraint", mouthConstraint, "dialogue", sb.Dialogue)
+			if mouthConstraint != "" {
+				prompt = prompt + " " + mouthConstraint
+			}
 			updates["video_prompt_distilled"] = prompt
 		}
 
@@ -467,6 +471,44 @@ func (s *StyleDistillService) saveDistilledStyles(storyboards []models.Storyboar
 // parseJSONArray attempts to unmarshal a JSON string into the target slice.
 func parseJSONArray(data string, target interface{}) error {
 	return json.Unmarshal([]byte(data), target)
+}
+
+func getMouthConstraint(sb models.Storyboard) string {
+	dialogue := ""
+	if sb.Dialogue != nil {
+		dialogue = *sb.Dialogue
+	}
+	narrator := ""
+	if sb.NarratorScript != nil {
+		narrator = *sb.NarratorScript
+	}
+	audioMode := ""
+	if sb.AudioMode != nil {
+		audioMode = *sb.AudioMode
+	}
+
+	isVoiceoverMode := audioMode == "narrator_only" || (audioMode == "" && narrator != "" && dialogue == "")
+
+	if narrator != "" && isVoiceoverMode {
+		return fmt.Sprintf("Narration (voice-over): %s. The character's mouth is strictly closed, silent expression, purely visual acting, no speaking, voiceover scene. --no talking, speaking, moving lips, open mouth, chatting", narrator)
+	} else if dialogue != "" {
+		dialogueLower := strings.ToLower(strings.TrimSpace(dialogue))
+		isVoiceover := strings.HasPrefix(dialogueLower, "(vo)") ||
+			strings.HasPrefix(dialogueLower, "(monologue)") ||
+			strings.Contains(dialogueLower, "voiceover") ||
+			strings.HasPrefix(dialogueLower, "【旁白") ||
+			strings.HasPrefix(dialogueLower, "[旁白") ||
+			strings.HasPrefix(dialogueLower, "(narrator") ||
+			strings.Contains(dialogueLower, "（旁白）")
+
+		if isVoiceover {
+			return fmt.Sprintf("Dialogue (voice-over): %s. The character's mouth is strictly closed, silent expression, purely visual acting, no speaking, voiceover scene. --no talking, speaking, moving lips, open mouth, chatting", dialogue)
+		} else {
+			return fmt.Sprintf("Dialogue: %s. The character is actively speaking, lip-syncing naturally to the dialog, mouth moving", dialogue)
+		}
+	} else {
+		return "The character's mouth is completely closed, silent scene. --no talking, speaking, moving lips"
+	}
 }
 
 // extractJSONArray attempts to find a JSON array in a potentially messy LLM response.

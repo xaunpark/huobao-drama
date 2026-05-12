@@ -194,7 +194,7 @@
             </div>
           </div>
           <div style="display: flex; gap: 8px;">
-            <el-button size="small" type="primary" plain @click="loadStoryboardsView(currentViewMode)" :loading="loadingData">
+            <el-button size="small" type="primary" plain @click="loadStoryboardsView(currentViewMode)">
               <el-icon><RefreshRight /></el-icon> Refresh
             </el-button>
           </div>
@@ -2810,7 +2810,7 @@ const styleDistillStats = computed(() => {
   let video = 0;
   storyboards.value.forEach(sb => {
     if (sb.image_style) image++;
-    if (sb.video_style) video++;
+    if (sb.video_prompt_distilled) video++;
   });
   return { image, video, total: storyboards.value.length };
 });
@@ -2821,10 +2821,10 @@ const isDistillingStyles = computed(() => {
   // If the drama has no style defined, there's no distillation process to run
   if (!drama.value?.style && !drama.value?.custom_style) return false;
 
-  // We consider distillation running if shots lack both image_style and video_style
+  // We consider distillation running if shots lack both image_style and video_prompt_distilled
   // but exist in the Database (meaning the process hasn't finished its async work).
-  // Distillation always populates either image_style or video_style if successful.
-  return storyboards.value.some(sb => !sb.image_style && !sb.video_style);
+  // Distillation always populates either image_style or video_prompt_distilled if successful.
+  return storyboards.value.some(sb => !sb.image_style && !sb.video_prompt_distilled);
 });
 
 const currentStoryboard = computed(() => {

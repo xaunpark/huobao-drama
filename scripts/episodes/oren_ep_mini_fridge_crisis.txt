@@ -1,0 +1,191 @@
+// SHOT 01 | 4s | WS
+[BGM] Lazy lo-fi beat, Sunday morning vibe
+[SFX] City birds chirping; distant garbage truck beeping; apartment AC hum
+[CAM] Handheld approach, eye-level, slight sway
+[NOTE] Wide shot of a brick apartment building exterior in morning light. Fire escape with a dead plant on one railing. A skateboard leans against the stoop. Street mostly empty — parked cars, bodega with metal gate half-open across the road.
+
+// SHOT 02 | 3s | MS
+[SFX] Bare feet on floor; fridge door opening; fridge humming weakly
+[CAM] Static, eye-level
+[NOTE] Medium shot inside studio apartment. Oren shuffles from bed area toward the kitchen in boxers and a wrinkled tee, headphones around neck. One hand rubs eye, other reaches for the fridge handle. Messy counter with takeout containers. Records on the wall behind. MIDI keyboard on desk in background.
+
+// SHOT 03 | 3s | CU
+[SFX] Fridge door creaking open; a wet sizzle; faint electrical pop
+[CAM] Static, slight push-in
+[NOTE] Close-up of Oren's face as he opens the fridge door. Expression shifts from sleepy half-lidded to eyes snapping wide open. A wisp of thin white smoke curls up from below frame into his face.
+
+// SHOT 04 | 2s | INSERT
+[SFX] Electrical buzzing; liquid dripping onto floor
+[CAM] Low angle, static
+[NOTE] Insert shot from inside the fridge looking out at Oren. Frost melted into puddles on shelves. A pizza box sits in the center — cardboard soggy, cheese visibly sweating. The fridge light flickers twice, then dies.
+
+// SHOT 05 | 2s | CU
+[Oren] Bro, what?
+[SFX] Fridge motor grinding to a halt; silence
+[CAM] Static, eye-level
+[NOTE] Close-up of Oren, center frame. Jaw drops slightly. He holds the fridge door open with one hand, other hand hangs limp at his side. Antenna flatten back.
+
+// SHOT 06 | 3s | MS
+[SFX] Phone dialing tone; hold music — generic jazz
+[CAM] Handheld, slight drift left
+[NOTE] Medium shot. Oren leans against kitchen counter, phone pressed to ear, free hand drumming fingers on countertop impatiently. Coffee maker behind him. A magnet on the fridge reads "PAY RENT" in block letters.
+
+// SHOT 07 | 3s | CU | dialogue_dominant
+[SFX] Phone speaker crackle; Oren exhale
+[Oren] Two hundred bucks? For a fridge?
+[CAM] Static, eye-level
+[NOTE] Close-up of Oren holding phone slightly away from ear, staring at it in disbelief. Mouth slightly open. He pinches the bridge of his nose with free hand.
+
+// SHOT 08 | 2s | INSERT
+[SFX] Phone screen tap; banking app loading chime
+[CAM] Overhead, static
+[NOTE] Insert shot of Oren's hand holding smartphone. Banking app on screen shows balance: "$14.50". Recent transactions: "Uber Eats — $18.99", "Spotify — $10.99", "Uber Eats — $22.47". Thumb hovers over the screen.
+
+// SHOT 09 | 3s | CU
+[SFX] Long exhale through nose; hand dragging down face
+[Oren] Aw man...
+[CAM] Static, slight low angle
+[NOTE] Close-up of Oren. He drags one hand slowly down his face — full palm drag from forehead to chin. Eyes close in defeat. Shoulders drop. Leans head back against the cabinet. Antenna droop completely flat.
+
+// SHOT 10 | 3s | MS
+[SFX] Soggy cardboard peeling; Oren sniffing pizza; grunt of disgust
+[CAM] Static, eye-level
+[NOTE] Medium shot. Oren pulls the pizza box out of the dead fridge, opens it on the counter. Lifts a slice — cheese slides off in a wet glob. He holds the limp slice at arm's length, looks at it, then puts it back down with resignation. Wipes hand on shirt.
+
+// SHOT 11 | 3s | MS
+[SFX] Couch springs; phone tapping; app notification sounds
+[BGM] Beat shifts — slightly more driven, searching energy
+[CAM] Handheld, over-shoulder
+[NOTE] Medium shot. Oren slumped on couch, one ankle on opposite knee, scrolling through a gig app on phone. Laptop open on coffee table showing Craigslist. Headphones now on head, one ear off. He swipes past listings — "Dog Walker $12/hr", "Moving Help $15/hr".
+
+// SHOT 12 | 2s | INSERT
+[SFX] Phone tap; notification ding
+[CAM] Static close-up
+[NOTE] Insert of phone screen. A listing highlighted: "SIGN SPINNER NEEDED — Mattress Mega Sale! $80 cash, 4-hour shift. Start TODAY." A red "APPLY NOW" button at bottom. Oren's thumb taps it.
+
+// SHOT 13 | 2s | CU
+[Oren] Aight, bet.
+[SFX] Phone confirmation buzz
+[CAM] Static, eye-level
+[NOTE] Close-up of Oren. Small decisive nod. Jaw set. He tosses phone onto the couch cushion beside him and pushes himself up with both hands on knees.
+
+// SHOT 14 | 3s | WS
+[SFX] Apartment door closing; footsteps descending stairs; street traffic picking up
+[BGM] Beat picks up — upbeat lo-fi with a funky bassline
+[CAM] Handheld follow from behind
+[NOTE] Wide shot from behind. Oren walks down the apartment building stoop onto the sidewalk. Jacket on, headphones on, hands in pockets, slight swagger in stride. Morning sun casts long shadow ahead of him. He passes a fire hydrant and a newspaper box.
+
+// SHOT 15 | 4s | WS
+[SFX] Busy intersection — car horns, crosswalk beeping, distant music from a passing car
+[CAM] Static wide, across the street
+[NOTE] Wide establishing shot of a busy suburban intersection. A mattress store on the corner with giant "MEGA SALE 70% OFF" banner. Inflatable tube man flailing on the sidewalk. Oren approaches from the right, small figure against the large storefront. Heat shimmer visible on asphalt.
+
+// SHOT 16 | 3s | MWS | dialogue_dominant
+[SFX] Clipboard tapping; pen clicking
+[Manager] You the sign guy? Here — don't drop it.
+[CAM] Static, slightly low angle
+[NOTE] Medium wide two-shot in front of the mattress store. A heavyset man in a polo shirt and khakis hands Oren a large arrow-shaped sign reading "MATTRESS MEGA SALE →". Manager holds clipboard in other hand, looks Oren up and down casually. Oren takes the sign with both hands — it's almost as wide as he is tall.
+
+// SHOT 17 | 3s | MS
+[SFX] Cars whooshing past; sign wobbling in wind; Oren's sneakers on concrete
+[CAM] Handheld, tracking side-to-side
+[NOTE] Medium shot. Oren stands at the corner of the intersection holding the sign overhead. Stiff posture, sign wobbling. He shifts weight from foot to foot awkwardly. A car passes without looking. He adjusts grip. Sweat bead on forehead.
+
+// SHOT 18 | 3s | MS
+[SFX] Oren beat-boxing softly — boots-and-cats rhythm; sign starting to spin
+[CAM] Handheld, circling slightly
+[NOTE] Medium shot. Oren starts to find a rhythm. He beat-boxes quietly, begins swaying the sign side to side in sync. His body loosens up — feet start shuffling in a casual groove. He flips the sign to his other hand mid-beat.
+
+// SHOT 19 | 4s | MWS
+[SFX] Beat-boxing intensifies; sign whooshing through air; a car honks approvingly
+[CAM] Low angle, handheld, tracking
+[NOTE] Medium wide shot from low angle. Oren is now fully in the zone — spinning the sign on one finger, tossing it behind his back, catching it with swagger. Beat-boxing a full rhythm. A driver honks and gives thumbs-up through car window. Oren does a head-nod acknowledgment without breaking rhythm.
+
+// SHOT 20 | 3s | CU
+[SFX] Sign whooshing faster; Oren humming a melody over the beat
+[CAM] Handheld, eye-level, tracking his hands
+[NOTE] Close-up of Oren's face, fully locked in. Eyes half-closed in flow state, small grin, head bobbing to his own beat. Sweat on forehead but he doesn't care. Antenna bouncing with the rhythm.
+
+// SHOT 21 | 3s | MWS
+[SFX] Sign spinning — whoosh whoosh — then CLANG; metal trash can lid rattling; sign clattering on pavement
+[CAM] Static wide, capturing the arc of the sign
+[NOTE] Medium wide shot. Oren does an ambitious behind-the-back toss. The sign slips from his fingers, sails through the air in a wide arc, and smashes into a metal trash can on the sidewalk. The trash can tips. The sign bounces and lands flat on the ground. Oren freezes mid-pose, arms still extended.
+
+// SHOT 22 | 2s | CU
+[SFX] Silence beat; a single car horn in the distance
+[CAM] Static, eye-level
+[NOTE] Close-up of Oren. Freeze-frame expression — eyes wide, mouth in a small "o", hands still in the air from the toss. Slowly lowers arms to his sides.
+
+// SHOT 23 | 3s | MWS | dialogue_dominant
+[SFX] Footsteps approaching; clipboard smacking against thigh
+[Manager] ...Really, dude?
+[CAM] Over-shoulder from behind Manager, looking at Oren
+[NOTE] Medium wide shot. Manager stands with arms crossed at the store entrance, looking at Oren with one eyebrow raised. Oren is jogging toward the fallen sign, picks it up, brushes dirt off it. Trash can still tipped over behind him. Oren glances back with an apologetic half-smile.
+
+// SHOT 24 | 2s | MS
+[SFX] Sign scraping on concrete as Oren picks it up; him clearing throat
+[Oren] My bad. Won't happen again.
+[CAM] Eye-level, static
+[NOTE] Medium shot. Oren holds the sign upright, dusts it off with one hand. Straightens up, gives a small head-nod toward the Manager. Composed, not panicking. Professional-casual recovery.
+
+// SHOT 25 | 4s | WS
+[SFX] Time-lapse ambient — traffic sounds speeding up then normalizing; sun moving across pavement
+[BGM] Lo-fi beat continues, steady grind energy
+[CAM] Static wide, slight time-lapse feel
+[NOTE] Wide shot of the intersection. Oren back at his corner, spinning the sign with controlled, steady moves. No more flashy tricks — disciplined, rhythmic spins. Shadow on the ground has shifted — time has passed. He drinks from a water bottle between spins.
+
+// SHOT 26 | 3s | MS
+[SFX] Oren humming quietly; traffic lighter now; afternoon birds
+[CAM] Handheld, gentle drift
+[NOTE] Medium shot. Oren leans the sign against his shoulder, takes a breather. Wipes forehead with the back of his hand. Checks phone quickly — glances at the time. Slides phone back into pocket. Rolls neck, stretches one arm. Gets back into position.
+
+// SHOT 27 | 3s | MWS | dialogue_dominant
+[SFX] Manager's footsteps; car door closing nearby
+[Manager] Hey — come here a sec.
+[CAM] Static, eye-level
+[NOTE] Medium wide shot. Late afternoon. Manager walks out of the store toward Oren, who props the sign against the store wall. Manager pulls a small envelope from his back pocket. Two men standing at the same level, casual posture. Parking lot behind them is emptier now.
+
+// SHOT 28 | 3s | CU | dialogue_dominant
+[SFX] Envelope opening; bills rustling
+[Manager] Eighty for the shift. And here's an extra twenty — you pulled some real moves out there.
+[CAM] Static, eye-level
+[NOTE] Close-up two-shot. Manager hands the envelope to Oren. Oren opens it, thumbs through the cash — four twenties and a twenty. Manager smirks, arms crossed.
+
+// SHOT 29 | 2s | CU | dialogue_dominant
+[SFX] Cash tucking into wallet; fist-bump contact
+[Oren] That's fire. Appreciate it, man.
+[CAM] Static, slight low angle
+[NOTE] Close-up of Oren tucking the cash into his wallet. Small genuine smile, not over-the-top. He extends fist. Manager meets it with a casual fist-bump.
+
+// SHOT 30 | 3s | WS
+[SFX] Automatic doors sliding open; store fluorescent hum; shopping cart wheels
+[BGM] Beat shifts — brighter, lighter, shopping montage energy
+[CAM] Handheld follow from behind
+[NOTE] Wide shot. Oren walks through the automatic sliding doors of a big-box appliance store. Bright fluorescent interior. Rows of fridges, microwaves, washing machines. He walks in with hands in pockets, scanning the aisles. A "CLEARANCE" sign hangs from the ceiling in the back.
+
+// SHOT 31 | 3s | MS
+[SFX] Oren's hand tapping on a fridge door; price tag flipping
+[CAM] Handheld, over-shoulder
+[NOTE] Medium shot from behind Oren. He stands in front of a row of mini-fridges on a clearance shelf. Flips a price tag on a compact silver mini-fridge: "$89.99" crossed out, "$64.99 CLEARANCE" in red. He tilts his head, runs his hand along the top of it. Nods slowly.
+
+// SHOT 32 | 2s | INSERT
+[SFX] Register beep; cash counting; receipt printing
+[CAM] Close-up, static
+[NOTE] Insert shot of the checkout counter. Oren's hand places four twenties and a five on the counter. Cashier's hand slides a receipt back. The boxed mini-fridge sits on the counter beside them.
+
+// SHOT 33 | 3s | WS
+[SFX] Box scraping on sidewalk; Oren grunting; evening traffic
+[CAM] Handheld follow, eye-level
+[NOTE] Wide shot of Oren walking down the sidewalk toward his apartment building, carrying the mini-fridge box on one shoulder. It's slightly oversized for him but he manages with swagger — one hand steadying the box, other arm swinging. Evening sky, streetlights starting to flicker on.
+
+// SHOT 34 | 4s | MS
+[SFX] Box setting down; cardboard tearing; fridge plugging in — clean electric hum; fridge door opening and closing
+[CAM] Static, eye-level, slight push-in
+[NOTE] Medium shot inside apartment. Oren kneels on the kitchen floor, slides the mini-fridge out of the box, plugs it in. It hums to life — clean and new. He opens the door, peers inside the empty bright interior. Pulls the leftover pizza box from the counter, slides it in perfectly. Closes the door with a satisfied push.
+
+// SHOT 35 | 5s | MS | dialogue_dominant
+[SFX] Beer can cracking open; couch springs settling; finger-tapping rhythm on armrest; city evening ambient through open window
+[Oren] ...that's handled.
+[BGM] Original lazy lo-fi beat returns, full circle, mellow fade
+[CAM] Static, eye-level, very slow zoom-out
+[NOTE] Medium shot. Oren sinks into the couch, feet up on coffee table. One hand holds a cold beer can pulled from the new mini-fridge. Other hand taps a rhythm on the armrest. Headphones on, eyes half-closed, small satisfied smile. City skyline through the apartment window behind him. The mini-fridge hums softly in the kitchen. He takes a sip and nods to himself.

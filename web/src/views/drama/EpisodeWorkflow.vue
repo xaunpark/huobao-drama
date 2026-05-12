@@ -1539,18 +1539,42 @@ import { workerDelay, workerSetInterval, workerClearInterval } from "@/utils/wor
 
 const { maxConcurrentThreads } = useAISettings();
 
-const runConcurrently = async <T>(items: T[], limit: number, worker: (item: T) => Promise<void>) => {
-  const executing: Promise<void>[] = []
-  for (const item of items) {
-    const p = worker(item).finally(() => {
-      executing.splice(executing.indexOf(p), 1)
-    })
-    executing.push(p)
-    if (executing.length >= limit) {
-      await Promise.race(executing)
-    }
+// Shared semaphore for all batch generation operations (characters, scenes, props)
+// ensures total concurrency never exceeds maxConcurrentThreads across all groups.
+let sharedSemaphoreCount = 0;
+const sharedSemaphoreQueue: Array<() => void> = [];
+
+const acquireSemaphore = (limit: number): Promise<void> => {
+  if (sharedSemaphoreCount < limit) {
+    sharedSemaphoreCount++;
+    return Promise.resolve();
   }
-  await Promise.all(executing)
+  return new Promise<void>((resolve) => {
+    sharedSemaphoreQueue.push(() => {
+      sharedSemaphoreCount++;
+      resolve();
+    });
+  });
+};
+
+const releaseSemaphore = () => {
+  sharedSemaphoreCount--;
+  if (sharedSemaphoreQueue.length > 0) {
+    const next = sharedSemaphoreQueue.shift()!;
+    next();
+  }
+};
+
+const runConcurrently = async <T>(items: T[], limit: number, worker: (item: T) => Promise<void>) => {
+  const tasks = items.map(async (item) => {
+    await acquireSemaphore(limit);
+    try {
+      await worker(item);
+    } finally {
+      releaseSemaphore();
+    }
+  });
+  await Promise.all(tasks);
 };
 
 const route = useRoute();
@@ -2301,18 +2325,30 @@ const batchGenerateCharacterImages = async () => {
 
   batchGeneratingCharacters.value = true;
   try {
-    // 获取用户选择的图片生成模型
-    const model = selectedImageModel.value || undefined;
+    let successCount = 0;
+    let failCount = 0;
 
-    // 使用批量生成API
-    await characterLibraryAPI.batchGenerateCharacterImages(
-      selectedCharacterIds.value.map((id) => id.toString()),
-      model,
-      maxConcurrentThreads.value
-    );
+    await runConcurrently(selectedCharacterIds.value, maxConcurrentThreads.value, async (charId) => {
+      try {
+        await generateCharacterImage(charId);
+        successCount++;
+      } catch (err) {
+        failCount++;
+      }
+    });
 
-    ElMessage.success($t("workflow.batchTaskSubmitted"));
-    await loadDramaData();
+    if (failCount === 0) {
+      ElMessage.success(
+        $t("workflow.batchCompleteSuccess", { count: successCount }),
+      );
+    } else {
+      ElMessage.warning(
+        $t("workflow.batchCompletePartial", {
+          success: successCount,
+          fail: failCount,
+        }),
+      );
+    }
   } catch (error: any) {
     ElMessage.error(error.message || $t("workflow.batchGenerateFailed"));
   } finally {

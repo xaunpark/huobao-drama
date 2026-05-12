@@ -61,6 +61,12 @@ func SafeParseAIJSON(aiResponse string, v interface{}) error {
 		}
 	}
 
+	// 如果正则没匹配到（可能响应被截断，缺少闭合括号），
+	// 但响应确实以 { 或 [ 开头，则使用整个cleaned文本并尝试修复
+	if jsonMatch == "" && (strings.HasPrefix(cleaned, "{") || strings.HasPrefix(cleaned, "[")) {
+		jsonMatch = cleaned
+	}
+
 	if jsonMatch == "" {
 		return fmt.Errorf("响应中未找到有效的JSON对象或数组，原始响应: %s", truncateString(aiResponse, 200))
 	}
